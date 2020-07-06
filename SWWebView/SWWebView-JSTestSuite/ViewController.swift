@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         self.addStubs()
         let config = WKWebViewConfiguration()
 
-        Log.info = { NSLog($0) }
+        Log.info = { print($0) }
 
         let storageURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("testapp-db", isDirectory: true)
@@ -34,29 +34,30 @@ class ViewController: UIViewController {
 
         let swView = SWWebView(frame: self.view.frame, configuration: config)
         // This will move to a delegate method eventually
-        swView.serviceWorkerPermittedDomains.append("localhost:4567")
+        swView.serviceWorkerPermittedDomains.append("localhost:8000")
+        swView.serviceWorkerPermittedDomains.append("localhost")
         swView.containerDelegate = self.coordinator!
         self.view.addSubview(swView)
 
-        var url = URLComponents(string: "sw://localhost:4567/tests.html")!
+        let url = URLComponents(string: "http://localhost:8000/")!
         URLCache.shared.removeAllCachedResponses()
-        NSLog("Loading \(url.url!.absoluteString)")
-        swView.load(URLRequest(url: url.url!))
+        print("Loading \(url.url!.absoluteString)")
+        _ = swView.load(URLRequest(url: url.url!))
     }
 
     func addStubs() {
         SWWebViewBridge.routes["/ping"] = { _, _ in
 
-            Promise(value: [
+            Promise.value([
                 "pong": true
             ])
         }
 
         SWWebViewBridge.routes["/ping-with-body"] = { _, json in
 
-            var responseText = json?["value"] as? String ?? "no body found"
+            let responseText = json?["value"] as? String ?? "no body found"
 
-            return Promise(value: [
+            return Promise.value([
                 "pong": responseText
             ])
         }

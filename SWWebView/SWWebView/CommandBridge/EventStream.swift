@@ -1,5 +1,6 @@
 import Foundation
 import WebKit
+import PromiseKit
 import ServiceWorker
 import ServiceWorkerContainer
 
@@ -66,10 +67,11 @@ public class EventStream: NSObject {
         // Because the container doesn't contain a direct reference to its registrations,
         // we manually grab them, and send them down as well.
         self.container.getRegistrations()
-            .then { regs in
+            .then { regs -> Promise<Void> in
                 // Registrations send down their corresponding worker objects, so we don't
                 // need to push those too.
                 regs.forEach { self.sendUpdate(identifier: "serviceworkeregistration", object: $0) }
+                return .value
             }
             .catch { error in
                 Log.error?("Failed to send existing registrations to event stream: \(error)")

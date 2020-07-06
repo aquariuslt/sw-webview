@@ -121,8 +121,9 @@ import PromiseKit
         let mappedClosePromises = allWebSQL.map { $0.close() }
 
         when(fulfilled: mappedClosePromises)
-            .then {
+            .then { () -> Promise<Void> in
                 Log.info?("Closed WebSQL connections")
+                return .value
             }
             .passthrough(responsePromise)
     }
@@ -311,9 +312,9 @@ import PromiseKit
         self.checkOnThread()
         do {
             try call.funcToRun(self.jsContext)
-            call.fulfill(())
+            call.resolver.fulfill(())
         } catch {
-            call.reject(error)
+            call.resolver.reject(error)
         }
     }
 
@@ -327,9 +328,9 @@ import PromiseKit
 
         do {
             try self.throwExceptionIfExists()
-            call.fulfill(nil)
+            call.resolver.fulfill(nil)
         } catch {
-            call.reject(error)
+            call.resolver.reject(error)
         }
     }
 

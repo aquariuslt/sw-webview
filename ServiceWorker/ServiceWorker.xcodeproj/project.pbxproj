@@ -6,20 +6,6 @@
 	objectVersion = 48;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		8A177BE11F7EEA4B0097CA3D /* CommonCrypto */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 8A177BE41F7EEA4B0097CA3D /* Build configuration list for PBXAggregateTarget "CommonCrypto" */;
-			buildPhases = (
-				8A177BE51F7EEA4F0097CA3D /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = CommonCrypto;
-			productName = CommonCrypto;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		8A177BDB1F7EC2730097CA3D /* PassthroughStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A177BDA1F7EC2730097CA3D /* PassthroughStream.swift */; };
 		8A177BDD1F7EC8D00097CA3D /* PassthroughStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A177BDC1F7EC8D00097CA3D /* PassthroughStream.swift */; };
@@ -144,13 +130,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8A177BE61F7EEA680097CA3D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8AC7545F1F3122FE00C6B70A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8A177BE11F7EEA4B0097CA3D;
-			remoteInfo = CommonCrypto;
-		};
 		8AC754731F3122FE00C6B70A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8AC7545F1F3122FE00C6B70A /* Project object */;
@@ -744,7 +723,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				8A177BE71F7EEA680097CA3D /* PBXTargetDependency */,
 			);
 			name = ServiceWorker;
 			productName = ServiceWorker;
@@ -780,10 +758,6 @@
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Guardian Mobile Innovation Lab";
 				TargetAttributes = {
-					8A177BE11F7EEA4B0097CA3D = {
-						CreatedOnToolsVersion = 9.0;
-						ProvisioningStyle = Automatic;
-					};
 					8AC754671F3122FE00C6B70A = {
 						CreatedOnToolsVersion = 9.0;
 						LastSwiftMigration = 0900;
@@ -807,7 +781,6 @@
 			targets = (
 				8AC754671F3122FE00C6B70A /* ServiceWorker */,
 				8AC754701F3122FE00C6B70A /* ServiceWorkerTests */,
-				8A177BE11F7EEA4B0097CA3D /* CommonCrypto */,
 			);
 		};
 /* End PBXProject section */
@@ -831,19 +804,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8A177BE51F7EEA4F0097CA3D /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${BUILT_PRODUCTS_DIR}/CommonCryptoModuleMap\"\ncat <<EOF > \"${BUILT_PRODUCTS_DIR}/CommonCryptoModuleMap/module.modulemap\"\nmodule CommonCrypto [system] {\n    header \"${SDKROOT}/usr/include/CommonCrypto/CommonCrypto.h\"\n    export *\n}\nEOF";
-		};
 		8A2360041F34F50000969268 /* Copy Carthage Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1039,11 +999,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		8A177BE71F7EEA680097CA3D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8A177BE11F7EEA4B0097CA3D /* CommonCrypto */;
-			targetProxy = 8A177BE61F7EEA680097CA3D /* PBXContainerItemProxy */;
-		};
 		8AC754741F3122FE00C6B70A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8AC754671F3122FE00C6B70A /* ServiceWorker */;
@@ -1052,24 +1007,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		8A177BE21F7EEA4B0097CA3D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		8A177BE31F7EEA4B0097CA3D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		8AC7547A1F3122FE00C6B70A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1120,7 +1057,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1175,7 +1112,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -1261,15 +1198,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8A177BE41F7EEA4B0097CA3D /* Build configuration list for PBXAggregateTarget "CommonCrypto" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8A177BE21F7EEA4B0097CA3D /* Debug */,
-				8A177BE31F7EEA4B0097CA3D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		8AC754621F3122FE00C6B70A /* Build configuration list for PBXProject "ServiceWorker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

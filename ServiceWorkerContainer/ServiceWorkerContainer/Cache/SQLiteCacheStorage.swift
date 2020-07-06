@@ -82,8 +82,11 @@ import PromiseKit
 
     public func match(_ stringOrRequest: JSValue, _ options: [String: Any]?) -> JSValue? {
         return self.matchAll(stringOrRequest, options, stopAfterFirst: true)
-            .then { responses in
-                responses.first
+            .then { responses -> Promise<FetchResponseProtocol> in
+                guard let first = responses.first else {
+                    throw ErrorMessage("Could not parse the first response")
+                }
+                return .value(first)
             }
             .toJSPromiseInCurrentContext()
     }
@@ -137,7 +140,7 @@ import PromiseKit
                 }
             }
 
-            return Promise(value: responses)
+            return Promise.value(responses)
         } catch {
             return Promise(error: error)
         }
@@ -185,7 +188,7 @@ import PromiseKit
 
     public func has(_ name: String) -> JSValue? {
         return firstly {
-            Promise(value: try self.nativeHas(name))
+            Promise.value(try self.nativeHas(name))
         }.toJSPromiseInCurrentContext()
     }
 
@@ -197,7 +200,7 @@ import PromiseKit
                 try db.update(sql: "INSERT OR IGNORE INTO caches(cache_name) VALUES (?)", values: [name])
             }
 
-            return Promise(value: SQLiteCache(in: self, name: name))
+            return Promise.value(SQLiteCache(in: self, name: name))
 
         }.toJSPromiseInCurrentContext()
     }
@@ -214,7 +217,7 @@ import PromiseKit
                 }
             }
 
-            return Promise(value: alreadyExists)
+            return Promise.value(alreadyExists)
 
         }.toJSPromiseInCurrentContext()
     }
@@ -233,7 +236,7 @@ import PromiseKit
                         names.append(name)
                     }
 
-                    return Promise(value: names)
+                    return Promise.value(names)
                 }
             }
         }.toJSPromiseInCurrentContext()

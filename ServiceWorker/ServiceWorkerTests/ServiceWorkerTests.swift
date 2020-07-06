@@ -31,7 +31,7 @@ class ServiceWorkerTests: XCTestCase {
             })
 
             DispatchQueue.global().async {
-                Promise(value: ())
+                Promise.value(())
                     .then {
                         Log.info?("doing this now")
                     }
@@ -51,7 +51,7 @@ class ServiceWorkerTests: XCTestCase {
             let semaphore = DispatchSemaphore(value: 0)
             DispatchQueue.global().asyncAfter(deadline: .now() + 2, execute: {
 
-                Promise(value: ())
+                Promise.value:(())
                     .then { () -> Void in
                         Log.info?("signalling")
                         semaphore.signal()

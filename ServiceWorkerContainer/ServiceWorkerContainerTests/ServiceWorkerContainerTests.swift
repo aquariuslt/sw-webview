@@ -35,10 +35,11 @@ class ServiceWorkerContainerTests: XCTestCase {
             let reg2 = try factory.create(scope: URL(string: "https://www.example.com/scope2")!)
             let container = try ServiceWorkerContainer(forURL: URL(string: "https://www.example.com/scope3")!, withFactory: factory)
             return container.getRegistrations()
-                .then { registrations -> Void in
+                .then { registrations -> Promise<Void> in
                     XCTAssertEqual(registrations.count, 2)
                     XCTAssertEqual(registrations[0], reg1)
                     XCTAssertEqual(registrations[1], reg2)
+                    return .value
                 }
         }
         .assertResolves()
@@ -51,8 +52,9 @@ class ServiceWorkerContainerTests: XCTestCase {
             _ = try factory.create(scope: URL(string: "https://www.example.com/scope1/scope2/file2.html")!)
             let container = try ServiceWorkerContainer(forURL: URL(string: "https://www.example.com/scope1/scope2/file.html")!, withFactory: factory)
             return container.getRegistration()
-                .then { registration -> Void in
+                .then { registration -> Promise<Void> in
                     XCTAssertEqual(registration, reg1)
+                    return .value
                 }
         }
         .assertResolves()

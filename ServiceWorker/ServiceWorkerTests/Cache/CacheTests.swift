@@ -47,7 +47,7 @@ class CacheTests: XCTestCase {
         func keys(_: JSValue, _: [String: Any]?) -> JSValue? {
 
             let testKeys = ["\(self.name)-file1.js", "\(self.name)-file2.css"]
-            return Promise(value: testKeys)
+            return Promise.value(testKeys)
                 .toJSPromiseInCurrentContext()
         }
     }
@@ -70,7 +70,7 @@ class CacheTests: XCTestCase {
         }
 
         func open(_ cacheName: String) -> JSValue? {
-            return Promise(value: TestCache(name: cacheName))
+            return Promise.value(TestCache(name: cacheName))
                 .toJSPromiseInCurrentContext()
         }
 
@@ -80,7 +80,7 @@ class CacheTests: XCTestCase {
 
         func keys() -> JSValue? {
 
-            return Promise(value: self.names)
+            return Promise.value(self.names)
                 .toJSPromiseInCurrentContext()
         }
     }

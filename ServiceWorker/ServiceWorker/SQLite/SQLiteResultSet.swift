@@ -75,7 +75,7 @@ public class SQLiteResultSet {
             return nil
         }
 
-        return String(cString: result)
+        return result.map(String.init)
     }
 
     public func int(_ name: String) throws -> Int? {

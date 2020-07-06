@@ -6,7 +6,7 @@
 //  Copyright © 2017 Guardian Mobile Innovation Lab. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import Foundation;
 
 //! Project version number for ServiceWorker.
 FOUNDATION_EXPORT double ServiceWorkerVersionNumber;

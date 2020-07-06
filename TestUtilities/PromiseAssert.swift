@@ -15,8 +15,9 @@ extension Promise {
 
         let expect = XCTestExpectation(description: "Promise resolves")
         let waiter = XCTWaiter()
-        then { (_) in
+        then { (_) -> Promise<Void> in
             expect.fulfill()
+            return .value
         }.catch { error in
             XCTFail("\(error)")
             expect.fulfill()
@@ -29,8 +30,9 @@ extension Promise {
 
         let expect = XCTestExpectation(description: "Promise resolves")
 
-        then { _ in
+        then { _ -> Promise<Void> in
             XCTFail("Promise should reject")
+            return .value
         }.catch { _ in
             expect.fulfill()
         }

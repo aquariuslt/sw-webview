@@ -396,7 +396,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftformat >/dev/null; then\n\nswiftformat $PROJECT_DIR --commas false --self insert --header strip\nelse\necho \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi";
+			shellScript = "if which swiftformat >/dev/null; then\n\nswiftformat $PROJECT_DIR --commas false --self insert --header strip\nelse\necho \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
 		};
 		8A5B36201F604B8A009F72AC /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -410,7 +410,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		8A5D983B1F3E1030002E521F /* Copy Carthage Dependencies */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -442,7 +442,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}/js-src\nnpm run build";
+			shellScript = "#cd ${SRCROOT}/js-src\n#npm run build\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

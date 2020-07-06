@@ -119,14 +119,14 @@ private var allowedCORSHeaders = [
 
     func data() -> Promise<Data> {
         if self.responseType == .Opaque {
-            return Promise(value: Data(count: 0))
+            return Promise.value(Data(count: 0))
         }
         return self._internal.data()
     }
 
     func json() -> Promise<Any?> {
         if self.responseType == .Opaque {
-            return Promise(value: nil)
+            return Promise.value(nil)
         }
         return self._internal.json()
     }
@@ -142,14 +142,14 @@ private var allowedCORSHeaders = [
     func text() -> Promise<String> {
 
         if self.responseType == .Opaque {
-            return Promise(value: "")
+            return Promise.value("")
         }
 
         return self._internal.text()
     }
 
     func arrayBuffer() -> JSValue? {
-        NSLog("are we even hitting this?")
+        print("are we even hitting this?")
 
         guard let ctx = JSContext.current() else {
             Log.error?("Tried to call arrayBuffer() outside of a JSContext")
@@ -160,15 +160,15 @@ private var allowedCORSHeaders = [
 
             return firstly { () -> Promise<JSValue> in
 
-                Promise(value: JSArrayBuffer.make(from: Data(count: 0), in: JSContext.current()))
+                Promise.value(JSArrayBuffer.make(from: Data(count: 0), in: JSContext.current()))
 
             }.toJSPromiseInCurrentContext()
         }
 
         return self.data()
-            .then { data -> JSValue? in
+            .then { data -> Promise<JSValue?> in
                 let buffer = JSArrayBuffer.make(from: data, in: ctx)
-                return buffer
+                return .value(buffer)
             }.toJSPromiseInCurrentContext()
     }
 

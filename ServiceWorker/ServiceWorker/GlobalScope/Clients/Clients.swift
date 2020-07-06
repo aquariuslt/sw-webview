@@ -22,24 +22,24 @@ import PromiseKit
 
     func get(_ id: String) -> JSValue? {
 
-        return Promise<Client?> { fulfill, reject in
+        return Promise<Client?> { resolver in
             if self.worker.clientsDelegate?.clients?(self.worker, getById: id, { err, clientProtocol in
                 if let error = err {
-                    reject(error)
+                    resolver.reject(error)
                 } else if let clientExists = clientProtocol {
-                    fulfill(Client.getOrCreate(from: clientExists))
+                    resolver.fulfill(Client.getOrCreate(from: clientExists))
                 } else {
-                    fulfill(nil)
+                    resolver.fulfill(nil)
                 }
             }) == nil {
-                reject(ErrorMessage("ServiceWorkerDelegate does not implement get()"))
+                resolver.reject(ErrorMessage("ServiceWorkerDelegate does not implement get()"))
             }
         }.toJSPromiseInCurrentContext()
     }
 
     func matchAll(_ options: [String: Any]?) -> JSValue? {
 
-        return Promise<[Client]> { fulfill, reject in
+        return Promise<[Client]> { resolver in
 
             // Two options provided here: https://developer.mozilla.org/en-US/docs/Web/API/Clients/matchAll
 
@@ -50,15 +50,15 @@ import PromiseKit
 
             if self.worker.clientsDelegate?.clients?(self.worker, matchAll: options, { err, clientProtocols in
                 if let error = err {
-                    reject(error)
+                    resolver.reject(error)
                 } else if let clientProtocolsExist = clientProtocols {
                     let mapped = clientProtocolsExist.map({ Client.getOrCreate(from: $0) })
-                    fulfill(mapped)
+                    resolver.fulfill(mapped)
                 } else {
-                    reject(ErrorMessage("Callback did not error but did not send a response either"))
+                    resolver.reject(ErrorMessage("Callback did not error but did not send a response either"))
                 }
             }) == nil {
-                reject(ErrorMessage("ServiceWorkerDelegate does not implement matchAll()"))
+                resolver.reject(ErrorMessage("ServiceWorkerDelegate does not implement matchAll()"))
             }
         }
         .toJSPromiseInCurrentContext()
@@ -66,34 +66,34 @@ import PromiseKit
 
     func openWindow(_ url: String) -> JSValue? {
 
-        return Promise<ClientProtocol> { fulfill, reject in
+        return Promise<ClientProtocol> { resolver in
             guard let parsedURL = URL(string: url, relativeTo: self.worker.url) else {
-                return reject(ErrorMessage("Could not parse URL given"))
+                return resolver.reject(ErrorMessage("Could not parse URL given"))
             }
 
             if self.worker.clientsDelegate?.clients?(self.worker, openWindow: parsedURL, { err, resp in
                 if let error = err {
-                    reject(error)
+                    resolver.reject(error)
                 } else if let response = resp {
-                    fulfill(response)
+                    resolver.fulfill(response)
                 }
             }) == nil {
-                reject(ErrorMessage("ServiceWorkerDelegate does not implement openWindow()"))
+                resolver.reject(ErrorMessage("ServiceWorkerDelegate does not implement openWindow()"))
             }
         }.toJSPromiseInCurrentContext()
     }
 
     func claim() -> JSValue? {
 
-        return Promise<Void> { fulfill, reject in
+        return Promise<Void> { resolver in
             if self.worker.clientsDelegate?.clientsClaim?(self.worker, { err in
                 if let error = err {
-                    reject(error)
+                    resolver.reject(error)
                 } else {
-                    fulfill(())
+                    resolver.fulfill(())
                 }
             }) == nil {
-                reject(ErrorMessage("ServiceWorkerDelegate does not implement claim()"))
+                resolver.reject(ErrorMessage("ServiceWorkerDelegate does not implement claim()"))
             }
         }.toJSPromiseInCurrentContext()
     }

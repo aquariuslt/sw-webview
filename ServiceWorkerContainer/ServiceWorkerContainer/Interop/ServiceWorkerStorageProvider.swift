@@ -45,8 +45,9 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
         }
 
         self.downloadAndCacheScript(id: worker.id, url: script)
-            .then { body in
+            .then { body -> Promise<Void> in
                 callback(nil, body)
+                return Promise.value
             }
             .catch { error in
                 callback(error, nil)
@@ -77,7 +78,7 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
                         }
 
                         return StreamPipe.pipeSHA256(from: fileStream, to: stream, bufferSize: 1024)
-                            .then { hash -> String in
+                            .then { hash -> Promise<String> in
 
                                 // Now we update the hash for the script
                                 try db.update(sql: "UPDATE worker_imported_scripts SET content_hash = ? WHERE worker_id = ? AND url = ?", values: [hash, id, url])
@@ -93,7 +94,7 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
                                         throw ErrorMessage("Could not get content of script from DB")
                                     }
 
-                                    return content
+                                    return .value(content)
                                 }
                             }
                     }

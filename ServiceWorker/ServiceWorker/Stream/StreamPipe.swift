@@ -65,7 +65,7 @@ public class StreamPipe: NSObject, StreamDelegate {
         StreamPipe.currentlyRunning.insert(self)
         self.start()
         return self.complete
-            .always {
+            .ensure {
                 StreamPipe.currentlyRunning.remove(self)
             }
     }
@@ -78,8 +78,8 @@ public class StreamPipe: NSObject, StreamDelegate {
 
         let pipe = StreamPipe(from: from, bufferSize: bufferSize)
 
-        return Promise(value: ())
-            .then {
+        return Promise()
+            .then { _ -> Promise<Void> in
                 try pipe.add(stream: to)
 
                 return pipe.pipe()
@@ -99,13 +99,13 @@ public class StreamPipe: NSObject, StreamDelegate {
             CC_SHA256_Update(&hashToUse, bytes, CC_LONG(count))
         }
 
-        return firstly {
+        return firstly { () -> Promise<Data> in
             try pipe.add(stream: to)
             return pipe.pipe()
-                .then { () -> Data in
+                .then { () -> Promise<Data> in
                     var hashData: [UInt8] = Array(repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
                     CC_SHA256_Final(&hashData, &hashToUse)
-                    return Data(bytes: hashData)
+                    return .value(Data(bytes: hashData))
                 }
         }
     }
@@ -185,7 +185,7 @@ public class StreamPipe: NSObject, StreamDelegate {
             // expected that a StreamPipe might not be resolved - for instance when we use
             // a FetchResponse without also downloading the body.
 
-            self.completePromise.fulfill(())
+            self.completePromise.resolver.fulfill(())
         }
     }
 
@@ -206,7 +206,7 @@ public class StreamPipe: NSObject, StreamDelegate {
         self.to.forEach { $0.remove(from: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode) }
 
         if self.completePromise.promise.isPending {
-            self.completePromise.fulfill(())
+            self.completePromise.resolver.fulfill(())
         }
     }
 
@@ -268,10 +268,10 @@ public class StreamPipe: NSObject, StreamDelegate {
         if eventCode == .errorOccurred {
             logFunction?("error")
             guard let error = source.streamError else {
-                self.completePromise.reject(ErrorMessage("Stream failed but does not have an error"))
+                self.completePromise.resolver.reject(ErrorMessage("Stream failed but does not have an error"))
                 return
             }
-            self.completePromise.reject(error)
+            self.completePromise.resolver.reject(error)
             self.finish()
         }
 

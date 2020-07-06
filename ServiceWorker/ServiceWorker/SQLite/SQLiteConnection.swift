@@ -75,7 +75,7 @@ public class SQLiteConnection {
     public static func inConnection<T>(_ dbURL: URL, _ cb: @escaping ((SQLiteConnection) throws -> Promise<T>)) -> Promise<T> {
 
         return firstly {
-            Promise(value: try SQLiteConnection(dbURL))
+            Promise.value(try SQLiteConnection(dbURL))
         }.then { conn in
             try cb(conn)
                 .always {

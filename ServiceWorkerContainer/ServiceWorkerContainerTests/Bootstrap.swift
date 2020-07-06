@@ -8,10 +8,10 @@ class TestBootstrap: NSObject {
     override init() {
         super.init()
 
-        Log.error = { NSLog($0) }
-        Log.warn = { NSLog($0) }
-        Log.info = { NSLog($0) }
-        Log.debug = { NSLog($0) }
+        Log.error = { print($0) }
+        Log.warn = { print($0) }
+        Log.info = { print($0) }
+        Log.debug = { print($0) }
 
         do {
             CoreDatabase.dbDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("testDB", isDirectory: true)

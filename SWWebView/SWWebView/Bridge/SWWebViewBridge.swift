@@ -27,7 +27,7 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
 
     public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
 
-        firstly { () -> Promise<Any?> in
+        firstly { () -> Promise<Void> in
             guard let body = message.body as? [String: Any] else {
                 throw ErrorMessage("Could not parse body")
             }
@@ -43,18 +43,27 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
 
             let matchingRoute = SWWebViewBridge.routes.first(where: { $0.key == path })
 
-            return (try matchingRoute?.value(eventStream, requestBody) ?? Promise(error: ErrorMessage("Route not found")))
-                .then { response in
+            var value: Promise<Any?>? = try matchingRoute?.value(eventStream, requestBody)
+
+            if value == nil {
+                value = .init(error: ErrorMessage("Route not found"))
+            }
+
+            return value!
+                .then { response -> Promise<Void> in
                     eventStream.sendCustomUpdate(identifier: "promisereturn", object: [
                         "promiseIndex": promiseIndex,
                         "response": response
                     ])
-                }.catch { error in
-                    eventStream.sendCustomUpdate(identifier: "promisereturn", object: [
-                        "promiseIndex": promiseIndex,
-                        "error": "\(error)"
-                    ])
+                    return .value
                 }
+//                .catch { error in
+//                    eventStream.sendCustomUpdate(identifier: "promisereturn", object: [
+//                        "promiseIndex": promiseIndex,
+//                        "error": "\(error)"
+//                    ])
+//                    return ()
+//                }
 
         }.catch { error in
             Log.error?("Failed to parse API request: \(error)")
@@ -94,7 +103,7 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
 
                 // Since the event stream stays alive indefinitely, we just early return
                 // a void promise
-                return Promise(value: ())
+                return Promise.value
             }
 
             //            if modifiedTask.request.httpMethod == SWWebViewBridge.serviceWorkerRequestMethod {
@@ -106,15 +115,15 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
             return firstly { () -> Promise<FetchResponseProtocol?> in
 
                 guard let referrer = modifiedTask.referrer else {
-                    return Promise(value: nil)
+                    return Promise.value(nil)
                 }
 
                 guard let container = swWebView.containerDelegate?.container(swWebView, getContainerFor: referrer) else {
-                    return Promise(value: nil)
+                    return Promise.value(nil)
                 }
 
                 guard let controller = container.controller else {
-                    return Promise(value: nil)
+                    return Promise.value(nil)
                 }
 
                 let fetchEvent = FetchEvent(request: request)
@@ -125,7 +134,7 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
             }
             .then { maybeResponse -> Promise<FetchResponseProtocol> in
                 if let responseExists = maybeResponse {
-                    return Promise(value: responseExists)
+                    return Promise.value(responseExists)
                 } else {
                     return FetchSession.default.fetch(request)
                 }
