@@ -71,11 +71,11 @@ public class SQLiteResultSet {
 
     public func string(_ name: String) throws -> String? {
 
-        guard let result = try self.getColumnResult(name, processor: sqlite3_column_text) else {
+        guard let result = try self.getColumnResult(name, processor: sqlite3_column_text), let cString = result else {
             return nil
         }
 
-        return String(cString: result!)
+        return String(cString: cString)
     }
 
     public func int(_ name: String) throws -> Int? {

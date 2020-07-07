@@ -122,7 +122,6 @@ import JavaScriptCore
         // into the main promise chain without worrying about manually deleting the temp file.
 
         return firstly { () -> Promise<T> in
-            
             try self.markBodyUsed()
 
             guard let streamPipe = self.streamPipe else {
@@ -196,7 +195,7 @@ import JavaScriptCore
         if let contentTypeHeader = headers.get("Content-Type") {
             do {
                 let charsetRegex = try NSRegularExpression(pattern: ";\\s?charset=(.*)+", options: [])
-                let charsetMatches = charsetRegex.matches(in: contentTypeHeader, options: [], range: NSRange(location: 0, length: contentTypeHeader.characters.count))
+                let charsetMatches = charsetRegex.matches(in: contentTypeHeader, options: [], range: NSRange(location: 0, length: contentTypeHeader.count))
 
                 if let relevantMatch = charsetMatches.first {
 

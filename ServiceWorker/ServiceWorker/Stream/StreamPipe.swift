@@ -82,8 +82,8 @@ public class StreamPipe: NSObject, StreamDelegate {
             .compactMap {
                 try pipe.add(stream: to)
             }
-            .done{
-                pipe.pipe()
+            .done {
+                _ = pipe.pipe()
             }
     }
 
@@ -179,7 +179,7 @@ public class StreamPipe: NSObject, StreamDelegate {
     }
 
     deinit {
-        self.buffer.deallocate(capacity: self.bufferSize)
+        self.buffer.deallocate()
         if self.completePromise.promise.isPending {
 
             // This isn't strictly necessary, but PromiseKit logs a warning about

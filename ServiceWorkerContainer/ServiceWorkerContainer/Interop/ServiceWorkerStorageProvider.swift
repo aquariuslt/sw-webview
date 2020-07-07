@@ -55,7 +55,7 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
 
     fileprivate func downloadAndCacheScript(id: String, url: URL) -> Promise<String> {
 
-        return FetchSession.default.fetch(url:url)
+        return FetchSession.default.fetch(url: url)
 
             .then { res in
 

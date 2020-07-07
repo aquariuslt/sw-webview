@@ -70,7 +70,7 @@ public class EventStream: NSObject {
                 // Registrations send down their corresponding worker objects, so we don't
                 // need to push those too.
                 regs.forEach {reg in
-                    let serviceWorkerReg:ServiceWorkerRegistration = reg
+                    let serviceWorkerReg: ServiceWorkerRegistration = reg
                     self.sendUpdate(identifier: "serviceworkeregistration", object: serviceWorkerReg) }
             }
             .catch { error in

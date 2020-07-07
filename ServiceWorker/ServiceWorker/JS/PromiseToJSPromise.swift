@@ -6,7 +6,7 @@ public extension Promise {
 
     /// A convenience function added to all promises, to turn them into
     /// JS promises quickly and easily.
-    public func toJSPromiseInCurrentContext() -> JSValue? {
+    func toJSPromiseInCurrentContext() -> JSValue? {
 
         guard let ctx = JSContext.current() else {
             fatalError("Cannot call toJSPromiseInCurrentContext() outside of a JSContext")

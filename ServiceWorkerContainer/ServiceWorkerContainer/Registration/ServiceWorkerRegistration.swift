@@ -104,7 +104,7 @@ import JavaScriptCore
 
                     let newWorker = try self.factory.createNewInstallingWorker(for: request.url, in: self)
 
-                    self.processHTTPResponse(res, newWorker: newWorker, byteCompareWorker: worker)
+                    _ = self.processHTTPResponse(res, newWorker: newWorker, byteCompareWorker: worker)
                 }
         }
     }
@@ -123,7 +123,7 @@ import JavaScriptCore
 
             let worker = try self.factory.createNewInstallingWorker(for: workerURL, in: self)
 
-            return FetchSession.default.fetch(url:workerURL)
+            return FetchSession.default.fetch(url: workerURL)
                 .map { res -> RegisterReturn in
 
                     if res.ok == false {
@@ -161,9 +161,7 @@ import JavaScriptCore
                         // self.skipWaiting() OR if we have no active worker currently.
 
                         if newWorker.skipWaitingStatus == true || self.active == nil {
-                            self.activate(worker: newWorker)
-                        } else {
-                            Promise.value(())
+                            _ = self.activate(worker: newWorker)
                         }
                     }
             }

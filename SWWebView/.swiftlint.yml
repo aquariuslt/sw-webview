@@ -1,8 +1,17 @@
 disabled_rules:
- - identifier_name
- - line_length
+  - identifier_name
+  - line_length
 opt_in_rules:
- - force_unwrapping
+  - force_unwrapping
 included:
- - SWWebView
+  - SWWebView
+cyclomatic_complexity:
+  - 15
+  - 30
+function_body_length:
+  - 50
+  - 100
+file_length:
+  - 500
+  - 800
 #force_unwrapping: error

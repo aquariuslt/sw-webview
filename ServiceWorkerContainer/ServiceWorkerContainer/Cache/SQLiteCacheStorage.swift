@@ -363,7 +363,7 @@ import PromiseKit
 
             let varyHeaders = self.getVaryHeaders(varyHeader: cacheResponse.headers.get("Vary"), requestHeaders: request.headers)
 
-            var params: [String: Any?] = [
+            let params: [String: Any?] = [
                 "cache_name": cacheName,
                 "method": request.method,
                 "request_url_no_query": urlNoQuery,

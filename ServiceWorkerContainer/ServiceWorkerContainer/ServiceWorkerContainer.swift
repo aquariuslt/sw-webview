@@ -24,10 +24,10 @@ import ServiceWorker
     }
 
     func resetReadyRegistration() throws {
-        /// ServiceWorkerContainer.ready is a promise that resolves when a registration
-        /// under the scope of the container has an active worker. It's quite possible that
-        /// there will already be an active worker when the container is created, so we check
-        /// for that.
+        // ServiceWorkerContainer.ready is a promise that resolves when a registration
+        // under the scope of the container has an active worker. It's quite possible that
+        // there will already be an active worker when the container is created, so we check
+        // for that.
         self.readyRegistration = try self.registrationFactory.getReadyRegistration(for: self.url)
         self.controller = self.readyRegistration?.active
     }

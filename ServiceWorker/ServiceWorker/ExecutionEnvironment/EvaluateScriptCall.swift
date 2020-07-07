@@ -5,7 +5,7 @@ import JavaScriptCore
 extension ServiceWorkerExecutionEnvironment {
 
     class PromiseWrappedCall: NSObject {
-        internal let seal : Resolver<Any?>
+        internal let seal: Resolver<Any?>
         internal let promise: Promise<Any?>
 
         override init() {
@@ -44,8 +44,9 @@ extension ServiceWorkerExecutionEnvironment {
         }
     }
 
+    typealias FuncType = (JSContext) throws -> Void
+
     @objc internal class WithJSContextCall: PromiseWrappedCall {
-        typealias FuncType = (JSContext) throws -> Void
         let funcToRun: FuncType
         init(_ funcToRun: @escaping FuncType) {
             self.funcToRun = funcToRun

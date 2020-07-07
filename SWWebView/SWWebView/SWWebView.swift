@@ -7,7 +7,7 @@ public class SWWebView: WKWebView {
     static let ServiceWorkerScheme = "sw"
 
     public var serviceWorkerPermittedDomains: [String] = []
-    fileprivate weak var swNavigationDelegate: SWWebViewNavigationDelegate?
+    fileprivate var swNavigationDelegate: SWWebViewNavigationDelegate?
     fileprivate var bridge: SWWebViewBridge!
     public weak var containerDelegate: SWWebViewContainerDelegate?
 

@@ -53,7 +53,7 @@ class ServiceWorkerContainerCommands {
 
         return eventStream.container.register(workerURL: workerURL, options: options)
             .map { result in
-                let registration:ServiceWorkerRegistration = result
+                let registration: ServiceWorkerRegistration = result
                 return registration.toJSONSuitableObject()
             }
     }

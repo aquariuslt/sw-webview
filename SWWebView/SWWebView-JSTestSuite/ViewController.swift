@@ -38,10 +38,10 @@ class ViewController: UIViewController {
         swView.containerDelegate = self.coordinator!
         self.view.addSubview(swView)
 
-        var url = URLComponents(string: "sw://localhost:4567/tests.html")!
+        let url = URLComponents(string: "sw://localhost:4567/tests.html")!
         URLCache.shared.removeAllCachedResponses()
         NSLog("Loading \(url.url!.absoluteString)")
-        swView.load(URLRequest(url: url.url!))
+        _ = swView.load(URLRequest(url: url.url!))
     }
 
     func addStubs() {
@@ -54,7 +54,7 @@ class ViewController: UIViewController {
 
         SWWebViewBridge.routes["/ping-with-body"] = { _, json in
 
-            var responseText = json?["value"] as? String ?? "no body found"
+            let responseText = json?["value"] as? String ?? "no body found"
 
             return Promise.value([
                 "pong": responseText
