@@ -55,7 +55,7 @@ class ConsoleMirrorTests: XCTestCase {
                     console.error('error-test');
                 """)
             }
-            .then { _ -> Void in
+            .map { _ -> Void in
 
                 XCTAssert(functionsRun.contains("info"), "Info")
                 XCTAssert(functionsRun.contains("debug"), "Debug")

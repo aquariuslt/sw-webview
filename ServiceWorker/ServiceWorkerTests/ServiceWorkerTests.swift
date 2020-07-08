@@ -31,10 +31,7 @@ class ServiceWorkerTests: XCTestCase {
             })
 
             DispatchQueue.global().async {
-                Promise(value: ())
-                    .then {
-                        Log.info?("doing this now")
-                    }
+                Log.info?("doing this now")
             }
 
             Log.info?("waiting")

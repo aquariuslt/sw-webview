@@ -23,7 +23,7 @@ class JSPromiseTests: XCTestCase {
         }.then { () -> Promise<Void> in
             promise!.fulfill(10)
             return sw.evaluateScript("testValue")
-                .then { (returnVal: Int) -> Void in
+                .map { (returnVal: Int) -> Void in
                     XCTAssertEqual(returnVal, 10)
                 }
 

@@ -42,14 +42,14 @@ class ConstructableFetchResponseTests: XCTestCase {
                 }
             })
         """)
-            .map { (response: FetchResponseProxy?) in
+            .then { (response: FetchResponseProxy?) -> Promise<String> in
                 XCTAssertEqual(response!.status, 201)
                 XCTAssertEqual(response!.statusText, "CUSTOM TEXT")
                 XCTAssertEqual(response!.headers.get("X-Custom-Header"), "blah")
                 XCTAssertEqual(response!.headers.get("Content-Type"), "text/custom-content")
                 return response!.text()
             }
-            .compactMap { text -> Void in
+            .map { text -> Void in
                 XCTAssertEqual(text, "hello")
             }
             .assertResolves()
@@ -66,7 +66,7 @@ class ConstructableFetchResponseTests: XCTestCase {
             .then { (response: FetchResponseProtocol?) -> Promise<Data> in
                 return response!.data()
             }
-            .then { data -> Void in
+            .map { data -> Void in
                 let array = [UInt8](data)
                 XCTAssertEqual(array[0], 1)
                 XCTAssertEqual(array[1], 2)

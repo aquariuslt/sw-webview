@@ -83,7 +83,7 @@ class GlobalScopeTests: XCTestCase {
         ]
 
         sw.evaluateScript("[\(keys.joined(separator: ","))]")
-            .then { (val: [Any]?) -> Void in
+            .compactMap { (val: [Any]?) -> Void in
                 if let valArray = val {
                     valArray.enumerated().forEach { arg in
                         let asJsVal = arg.element as? JSValue
@@ -102,7 +102,7 @@ class GlobalScopeTests: XCTestCase {
         let sw = TestWorker(id: name, state: .activated, url: URL(string: "http://www.example.com/sw.js")!, content: "")
 
         sw.evaluateScript("[self.location, location]")
-            .then { (arr: [WorkerLocation]?) -> Void in
+            .compactMap { (arr: [WorkerLocation]?) -> Void in
                 XCTAssertNotNil(arr?[0])
                 XCTAssertNotNil(arr?[1])
                 XCTAssertEqual(arr?[0], arr?[1])

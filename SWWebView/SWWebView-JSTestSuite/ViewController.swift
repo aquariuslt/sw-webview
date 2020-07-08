@@ -41,16 +41,18 @@ class ViewController: UIViewController {
         swView.containerDelegate = self.coordinator!
         self.view.addSubview(swView)
 
+        title = "SWWebView"
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refresh))
+
         let url = URLComponents(string: "sw://localhost:4567/scope/")!
         URLCache.shared.removeAllCachedResponses()
         print("Loading \(url.url!.absoluteString)")
         _ = swView.load(URLRequest(url: url.url!))
-        
-        refreshButton.setTitle("Refresh", for: .normal)
-        refreshButton.addTarget(self, action: #selector(refresh), for: .touchUpInside)
+
         view.addSubview(refreshButton)
     }
-    
+
     @objc private func refresh() {
         swView.reload()
     }

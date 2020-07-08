@@ -29,7 +29,7 @@ class FetchPerformance: XCTestCase {
         // This is an example of a performance test case.
         self.measure {
 
-            let data = try! Data(contentsOf: TestWeb.serverURL.appendingPathComponent("data"))
+            _ = try! Data(contentsOf: TestWeb.serverURL.appendingPathComponent("data"))
         }
     }
 

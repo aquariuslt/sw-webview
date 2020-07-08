@@ -47,7 +47,7 @@ class CacheTests: XCTestCase {
         func keys(_: JSValue, _: [String: Any]?) -> JSValue? {
 
             let testKeys = ["\(self.name)-file1.js", "\(self.name)-file2.css"]
-            return Promise(value: testKeys)
+            return Promise.value(testKeys)
                 .toJSPromiseInCurrentContext()
         }
     }
@@ -80,7 +80,7 @@ class CacheTests: XCTestCase {
 
         func keys() -> JSValue? {
 
-            return Promise(value: self.names)
+            return Promise.value(self.names)
                 .toJSPromiseInCurrentContext()
         }
     }
@@ -132,7 +132,7 @@ class CacheTests: XCTestCase {
             .then { (jsVal: JSContextPromise) in
                 return jsVal.resolve()
             }
-            .then { (items: [String]) -> Void in
+            .map { (items: [String]) -> Void in
                 XCTAssertEqual(items[0], "TestCache-file1.js")
                 XCTAssertEqual(items[1], "TestCache-file2.css")
             }
@@ -144,7 +144,7 @@ class CacheTests: XCTestCase {
         sw.cacheStorage = TestStorage(names: ["TestCache"])
 
         sw.evaluateScript("[Cache,CacheStorage]")
-            .then { (arr: [Any]?) -> Void in
+            .map { (arr: [Any]?) -> Void in
                 XCTAssert(arr?[0] as! Cache.Type === TestCache.self as Cache.Type)
                 XCTAssert(arr?[1] as! CacheStorage.Type === TestStorage.self as CacheStorage.Type)
             }

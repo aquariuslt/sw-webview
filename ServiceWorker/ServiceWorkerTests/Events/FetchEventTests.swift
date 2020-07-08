@@ -22,7 +22,7 @@ class FetchEventTests: XCTestCase {
             .then { res in
                 return res!.text()
             }
-            .then { responseText in
+            .map { responseText in
                 XCTAssertEqual(responseText, "hello")
             }
             .assertResolves()
@@ -49,7 +49,7 @@ class FetchEventTests: XCTestCase {
             .then { res in
                 return res!.text()
             }
-            .then { responseText in
+            .map { responseText in
                 XCTAssertEqual(responseText, "hello")
             }
             .assertResolves()

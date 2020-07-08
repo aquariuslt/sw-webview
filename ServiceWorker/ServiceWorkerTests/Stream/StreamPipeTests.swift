@@ -12,7 +12,7 @@ class StreamPipeTests: XCTestCase {
         let outputStream = OutputStream.toMemory()
 
         StreamPipe.pipe(from: inputStream, to: outputStream, bufferSize: 1)
-            .then { _ -> Void in
+            .map { _ -> Void in
 
                 let transferredData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
 
@@ -30,7 +30,7 @@ class StreamPipeTests: XCTestCase {
         let inputStream = InputStream(data: testData)
         let outputStream = OutputStream.toMemory()
 
-        let (promise, fulfill, reject) = Promise<Void>.pending()
+        let (promise, resolver) = Promise<Void>.pending()
 
         let queue = DispatchQueue.global()
 
@@ -43,10 +43,10 @@ class StreamPipeTests: XCTestCase {
                     let str = String(data: transferredData, encoding: String.Encoding.utf8)
 
                     XCTAssertEqual(str, "THIS IS TEST DATA")
-                    fulfill(())
+                    resolver.fulfill(())
                 }
                 .catch { error in
-                    reject(error)
+                    resolver.reject(error)
                 }
         }
 
@@ -66,7 +66,7 @@ class StreamPipeTests: XCTestCase {
         XCTAssertNoThrow(try streamPipe.add(stream: outputStream2))
 
         streamPipe.pipe()
-            .then { () -> Void in
+            .map { () -> Void in
                 [outputStream, outputStream2].forEach { stream in
                     let transferredData = stream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
 

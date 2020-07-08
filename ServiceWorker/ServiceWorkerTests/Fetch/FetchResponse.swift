@@ -30,7 +30,7 @@ class FetchResponseTests: XCTestCase {
             .then { res in
                 res.text()
             }
-            .then { str -> Void in
+            .map { str -> Void in
                 XCTAssertEqual(str, "THIS IS TEST CONTENT")
             }
             .assertResolves()
@@ -62,7 +62,7 @@ class FetchResponseTests: XCTestCase {
                 XCTAssertNil(response.headers.get("Content-Length"))
 
                 return response.text()
-                    .then { text -> Void in
+                    .map { text -> Void in
                         XCTAssertEqual(text, "THIS IS TEST CONTENT")
                     }
             }.assertResolves()
@@ -150,9 +150,10 @@ class FetchResponseTests: XCTestCase {
         }
 
         FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.dat"))
-            .then { res in
+            .map { res in
                 res.data()
-            }.then { data -> Void in
+            }
+            .map { data -> Void in
 
                 data.withUnsafeBytes { (bytes: UnsafePointer<UInt8>) in
                     XCTAssertEqual(bytes[0], 1)
@@ -188,7 +189,8 @@ class FetchResponseTests: XCTestCase {
         """)
             .then { (val: JSContextPromise) in
                 return val.resolve()
-            }.then { (arr: [Int]) -> Void in
+            }
+            .map { (arr: [Int]) -> Void in
 
                 XCTAssertEqual(arr[0], 1)
                 XCTAssertEqual(arr[1], 2)

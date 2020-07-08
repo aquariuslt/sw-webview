@@ -53,7 +53,7 @@ class WebSQLConnectionTests: XCTestCase {
         sw.delegate = WebSQLTestDelegate.instance
 
         return sw.getExecutionEnvironment()
-            .then { exec in
+            .then { exec -> Promise<Void> in
 
                 let openDatabaseFunction: @convention(block) (String, String, String, Int, JSValue?) -> WebSQLDatabase? = { [unowned exec] name, _, _, _, _ in
                     try! exec.openWebSQLDatabase(name: name)

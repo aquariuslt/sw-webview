@@ -34,7 +34,7 @@ class TimeoutTests: XCTestCase {
             .then {
                 return sw.evaluateScript("ticks")
             }
-            .then { (response: Int) -> Void in
+            .map { (response: Int) -> Void in
                 XCTAssertEqual(response, 1)
             }
             .assertResolves()
@@ -88,7 +88,7 @@ class TimeoutTests: XCTestCase {
             .then { () -> Promise<Int> in
                 return sw.evaluateScript("ticks")
             }
-            .then { (response: Int) -> Void in
+            .map { (response: Int) -> Void in
                 XCTAssertEqual(response, 2)
             }
             .assertResolves()
