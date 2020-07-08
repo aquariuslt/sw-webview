@@ -15,7 +15,7 @@ extension Promise {
 
         let expect = XCTestExpectation(description: "Promise resolves")
         let waiter = XCTWaiter()
-        then { (_) in
+        compactMap { (_) in
             expect.fulfill()
         }.catch { error in
             XCTFail("\(error)")
@@ -29,7 +29,7 @@ extension Promise {
 
         let expect = XCTestExpectation(description: "Promise resolves")
 
-        then { _ in
+        compactMap { _ in
             XCTFail("Promise should reject")
         }.catch { _ in
             expect.fulfill()

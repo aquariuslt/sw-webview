@@ -89,10 +89,10 @@ class ImportScriptsTests: XCTestCase {
         //        }
         //
         //        let delegate = TestImportDelegate { _, queue, cb in
-        //            NSLog("Running fetch")
+        //            print("Running fetch")
         //            FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.js"))
         //                .then(on: queue, execute: { res -> Promise<String> in
-        //                    NSLog("Got fetch")
+        //                    print("Got fetch")
         //                    return res.text()
         //                })
         //                .then(on: queue, execute: { text in

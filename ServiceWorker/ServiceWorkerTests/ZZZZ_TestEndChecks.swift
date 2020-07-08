@@ -17,7 +17,7 @@ class ZZZZ_TestEndChecks: XCTestCase {
                 let allContexts = ServiceWorkerExecutionEnvironment.contexts.keyEnumerator().allObjects as! [JSContext]
 
                 allContexts.forEach { context in
-                    NSLog("Still active context: \(context.name)")
+                    print("Still active context: \(context.name)")
                 }
                 if allContexts.count > 0 {
                     throw ErrorMessage("Contexts still exist")
@@ -34,15 +34,15 @@ class ZZZZ_TestEndChecks: XCTestCase {
                 Promise<Void> { fulfill, _ in
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                        NSLog("Performing check")
+                        print("Performing check")
 
                         queues.objectEnumerator()!.forEach { _ in
-                            NSLog("valll")
+                            print("valll")
                         }
 
                         queues.keyEnumerator().forEach { key in
                             let val = queues.object(forKey: key as! JSContext)
-                            NSLog("WHAAT")
+                            print("WHAAT")
                         }
 
                         XCTAssertEqual(ServiceWorkerExecutionEnvironment.contexts.keyEnumerator().allObjects.count, 0)

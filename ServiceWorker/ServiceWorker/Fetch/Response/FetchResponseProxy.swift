@@ -149,7 +149,7 @@ private var allowedCORSHeaders = [
     }
 
     func arrayBuffer() -> JSValue? {
-        NSLog("are we even hitting this?")
+        print("are we even hitting this?")
 
         guard let ctx = JSContext.current() else {
             Log.error?("Tried to call arrayBuffer() outside of a JSContext")

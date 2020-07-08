@@ -10,13 +10,16 @@ class ViewController: UIViewController {
 
     var coordinator: SWWebViewCoordinator?
 
+    private let refreshButton = UIButton(type: .custom)
+    private var swView: SWWebView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         self.addStubs()
         let config = WKWebViewConfiguration()
 
-        Log.info = { NSLog($0) }
+        Log.info = { print($0) }
 
         let storageURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("testapp-db", isDirectory: true)
@@ -32,16 +35,24 @@ class ViewController: UIViewController {
 
         self.coordinator = SWWebViewCoordinator(storageURL: storageURL)
 
-        let swView = SWWebView(frame: self.view.frame, configuration: config)
+        swView = SWWebView(frame: self.view.frame, configuration: config)
         // This will move to a delegate method eventually
         swView.serviceWorkerPermittedDomains.append("localhost:4567")
         swView.containerDelegate = self.coordinator!
         self.view.addSubview(swView)
 
-        let url = URLComponents(string: "sw://localhost:4567/scope/index.html")!
+        let url = URLComponents(string: "sw://localhost:4567/scope/")!
         URLCache.shared.removeAllCachedResponses()
-        NSLog("Loading \(url.url!.absoluteString)")
+        print("Loading \(url.url!.absoluteString)")
         _ = swView.load(URLRequest(url: url.url!))
+        
+        refreshButton.setTitle("Refresh", for: .normal)
+        refreshButton.addTarget(self, action: #selector(refresh), for: .touchUpInside)
+        view.addSubview(refreshButton)
+    }
+    
+    @objc private func refresh() {
+        swView.reload()
     }
 
     func addStubs() {

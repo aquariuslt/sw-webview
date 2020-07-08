@@ -420,7 +420,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}/js-src\nnpm run build\n";
+			shellScript = "cd ${SRCROOT}/js-src\n#npm run build\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
