@@ -117,9 +117,9 @@ E.prototype = {
 E.prototype.addEventListener = E.prototype.on;
 E.prototype.removeEventListener = E.prototype.off;
 
-var tinyEmitter = E;
+var index = E;
 
-var StreamingXHR = /** @class */ (function (_super) {
+var StreamingXHR = (function (_super) {
     __extends(StreamingXHR, _super);
     function StreamingXHR(url) {
         var _this = _super.call(this) || this;
@@ -250,13 +250,13 @@ var StreamingXHR = /** @class */ (function (_super) {
         // this.xhr.abort();
     };
     return StreamingXHR;
-}(tinyEmitter));
+}(index));
 
 var eventsURL = new URL(swwebviewSettings.EVENT_STREAM_PATH, window.location.href);
 eventsURL.searchParams.append("path", window.location.pathname + window.location.search);
 var eventStream = new StreamingXHR(eventsURL.href);
 
-var APIError = /** @class */ (function (_super) {
+var APIError = (function (_super) {
     __extends(APIError, _super);
     function APIError(message, response) {
         var _this = _super.call(this, message) || this;
@@ -345,7 +345,7 @@ function serializeTransferables(message, transferables) {
     }
 }
 
-var MessagePortProxy = /** @class */ (function () {
+var MessagePortProxy = (function () {
     function MessagePortProxy(port, id) {
         this.port = port;
         this.id = id;
@@ -392,7 +392,7 @@ eventStream.addEventListener("messageport", function (e) {
 });
 
 var existingWorkers = [];
-var ServiceWorkerImplementation = /** @class */ (function (_super) {
+var ServiceWorkerImplementation = (function (_super) {
     __extends(ServiceWorkerImplementation, _super);
     function ServiceWorkerImplementation(opts, registration) {
         var _this = _super.call(this) || this;
@@ -444,7 +444,7 @@ var ServiceWorkerImplementation = /** @class */ (function (_super) {
         }
     };
     return ServiceWorkerImplementation;
-}(tinyEmitter));
+}(index));
 eventStream.addEventListener("serviceworker", function (e) {
     var existingWorker = ServiceWorkerImplementation.get(e.data);
     console.info("Worker update:", e.data);
@@ -458,7 +458,7 @@ eventStream.addEventListener("workerinstallerror", function (e) {
 });
 
 var existingRegistrations = [];
-var ServiceWorkerRegistrationImplementation = /** @class */ (function (_super) {
+var ServiceWorkerRegistrationImplementation = (function (_super) {
     __extends(ServiceWorkerRegistrationImplementation, _super);
     function ServiceWorkerRegistrationImplementation(opts) {
         var _this = _super.call(this) || this;
@@ -515,7 +515,7 @@ var ServiceWorkerRegistrationImplementation = /** @class */ (function (_super) {
         throw new Error("not yet");
     };
     return ServiceWorkerRegistrationImplementation;
-}(tinyEmitter));
+}(index));
 eventStream.addEventListener("serviceworkerregistration", function (e) {
     console.log("reg update", e.data);
     var reg = existingRegistrations.find(function (r) { return r.id == e.data.id; });
@@ -527,7 +527,7 @@ eventStream.addEventListener("serviceworkerregistration", function (e) {
     }
 });
 
-var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
+var ServiceWorkerContainerImplementation = (function (_super) {
     __extends(ServiceWorkerContainerImplementation, _super);
     function ServiceWorkerContainerImplementation() {
         var _this = _super.call(this) || this;
@@ -630,7 +630,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
     // used for detection
     ServiceWorkerContainerImplementation.__isSWWebViewImplementation = true;
     return ServiceWorkerContainerImplementation;
-}(tinyEmitter));
+}(index));
 eventStream.addEventListener("serviceworkercontainer", function (e) {
     console.log("Container update", e.data);
     navigator.serviceWorker.updateFromAPIResponse(e.data);
