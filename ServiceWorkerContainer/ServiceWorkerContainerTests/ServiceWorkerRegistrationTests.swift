@@ -98,7 +98,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                     XCTAssertNotNil(reg.active)
                     return reg.active!.evaluateScript("installed")
                 }
-                .then { jsVal -> Void in
+                .map { jsVal -> Void in
                     XCTAssertEqual(jsVal!.toBool(), true)
                 }
         }
@@ -127,7 +127,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                         .then { result in
                             result.registerComplete
                         }
-                        .then { () -> Void in
+                        .map {
                             XCTAssertEqual(currentActive, reg.active)
                             XCTAssertNotNil(reg.waiting)
                             XCTAssertEqual(reg.active!.url.absoluteString, TestWeb.serverURL.appendingPathComponent("test.js").absoluteString)
@@ -164,7 +164,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                         .then { result in
                             result.registerComplete
                         }
-                        .then { () -> Void in
+                        .map {
                             XCTAssertEqual(currentActive?.state, ServiceWorkerInstallState.redundant)
                             XCTAssertEqual(reg.active?.state, ServiceWorkerInstallState.activated)
                             XCTAssertEqual(reg.active?.url.absoluteString, TestWeb.serverURL.appendingPathComponent("test2.js").absoluteString)
@@ -190,16 +190,16 @@ class ServiceWorkerRegistrationTests: XCTestCase {
 
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { result -> Promise<ServiceWorker?> in
-                    result.registerComplete
-                        .then {
-                            return nil
+                    return result.registerComplete
+                        .then { _ -> Promise<ServiceWorker?> in
+                            return .value(nil)
                         }
-                        .recover { error -> ServiceWorker? in
+                        .recover { error -> Guarantee<ServiceWorker?> in
                             XCTAssertEqual("\(error)", "no")
-                            return result.worker
+                            return .value(result.worker)
                         }
                 }
-                .then { worker -> Void in
+                .map { worker in
 
                     XCTAssertEqual(worker?.state, ServiceWorkerInstallState.redundant)
                     XCTAssertEqual(reg.redundant, worker)
@@ -230,19 +230,23 @@ class ServiceWorkerRegistrationTests: XCTestCase {
             let reg = try factory.create(scope: TestWeb.serverURL)
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { $0.registerComplete }
-                .then {
+                .then { _ -> Promise<Void> in
                     let currentActive = reg.active
                     XCTAssertNotNil(currentActive)
                     return reg.register(TestWeb.serverURL.appendingPathComponent("test2.js"))
-                        .then { $0.registerComplete }
-                        .then { () -> Void in
+                        .then { register -> Promise<Void> in
+                            register.registerComplete
+                        }
+                        .then { reg -> Promise<Void> in
                             XCTFail("Should not succeed!")
+                            return .value
                         }
                         .recover { _ -> Void in
                             XCTAssertEqual(currentActive, reg.active)
                             XCTAssertNotNil(reg.redundant)
                             XCTAssertEqual(reg.active?.url.absoluteString, TestWeb.serverURL.appendingPathComponent("test.js").absoluteString)
                             XCTAssertEqual(reg.redundant?.url.absoluteString, TestWeb.serverURL.appendingPathComponent("test2.js").absoluteString)
+                            return ()
                         }
                 }
         }
@@ -258,7 +262,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
             let reg = try factory.create(scope: TestWeb.serverURL)
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { $0.registerComplete }
-                .then { () -> Void in
+                .map { () -> Void in
                     XCTFail("Should not succeed")
                 }
                 .recover { _ in
@@ -287,15 +291,15 @@ class ServiceWorkerRegistrationTests: XCTestCase {
 
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { $0.registerComplete }
-                .then {
+                .then { () -> Promise<Void> in
                     XCTAssertNotNil(reg.active)
                     return reg.update()
                 }
-                .then { () -> Void in
+                .map {
                     XCTAssertNil(reg.waiting)
                     return try CoreDatabase.inConnection { db in
                         try db.select(sql: "SELECT count(*) AS workercount FROM workers") { resultSet in
-                            _ = resultSet.next()
+                            _ = try? resultSet.next()
                             XCTAssertEqual(try resultSet.int("workercount"), 1)
                         }
                     }
@@ -318,12 +322,12 @@ class ServiceWorkerRegistrationTests: XCTestCase {
 
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { $0.registerComplete }
-                .then {
+                .then { () -> Promise<Void> in
                     XCTAssertNotNil(reg.active)
                     content = "'WORKERCONTENT2'"
                     return reg.update()
                 }
-                .then { () -> Void in
+                .map {
                     XCTAssertNotNil(reg.waiting)
                 }
         }
@@ -336,7 +340,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
             let reg = try factory.get(byScope: TestWeb.serverURL)!
             let worker = reg.active!
             return reg.unregister()
-                .then { () -> Void in
+                .map {
                     XCTAssertEqual(reg.unregistered, true)
                     XCTAssertEqual(worker.state, ServiceWorkerInstallState.redundant)
                     XCTAssertNil(try self.factory.get(byId: reg.id))
