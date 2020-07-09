@@ -11,7 +11,6 @@ import PromiseKit
 /// exposes respondWith() instead of waitUntil(), because we want to be able to return a FetchResponse after
 /// resolving promises.
 @objc public class FetchEvent: NSObject, FetchEventExports {
-
     /// All FetchEvents must have a FetchRequest attached for the worker to respond to.
     let request: FetchRequest
 
@@ -19,9 +18,7 @@ import PromiseKit
     public let type = "fetch"
 
     func respondWith(_ val: JSValue) {
-
         if self.respondValue != nil {
-
             // Unlike waitUntil(), you can only call respondWith() once. So we throw an error if the client
             // code tries twice.
 
@@ -35,7 +32,6 @@ import PromiseKit
             // quickly call Promise.resolve() to ensure whatever we've been provided is a promise.
             .evaluateScript("(val) => Promise.resolve(val)")
             .call(withArguments: [val]) else {
-
             // There shouldn't (AFAIK?) be any reason for Promise.resolve() to fail, but you never know.
 
             let err = JSValue(newErrorFromMessage: "Could not call Promise.resolve() on provided value", in: val.context)
@@ -52,9 +48,7 @@ import PromiseKit
     }
 
     public func resolve(in _: ServiceWorker) throws -> Promise<FetchResponseProtocol?> {
-
         guard let promise = self.respondValue else {
-
             // if e.respondWith() was never called that's perfectly valid - we resolve the
             // promise with no FetchResponse having been provided.
 
@@ -62,7 +56,6 @@ import PromiseKit
         }
 
         guard let exec = ServiceWorkerExecutionEnvironment.contexts.object(forKey: promise.context) else {
-
             // It's possible that someone might try using this in a JSContext that is not a ServiceWorker.
             // So we need to double-check that we do actually have a ServiceWorkerExecutionEnvironment, and
             // thus a specific thread, to resolve this promise to.

@@ -1,6 +1,6 @@
 import Foundation
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
 
 /// Still trying to figure out the best trade-off between memory and performance for keeping
 /// DB connections hanging around. But this pool ensures that we only ever have one connection
@@ -8,7 +8,6 @@ import PromiseKit
 /// can customise behaviour here depending on whether we're in the Notification Extension or
 /// the full app, maybe.
 class DBConnectionPool {
-
     fileprivate static var currentOpenConnections = NSHashTable<SQLiteConnection>.weakObjects()
 
     // Rather than do a migration check for every opened connection (expensive!) we keep track of which
@@ -17,7 +16,6 @@ class DBConnectionPool {
     fileprivate static var checkedMigrations = Set<String>()
 
     static func inConnection<T>(at url: URL, type: DatabaseType, _ callback: (SQLiteConnection) throws -> Promise<T>) -> Promise<T> {
-
         return firstly { () -> Promise<T> in
             let connection = try DBConnectionPool.getConnection(for: url, type: type)
             return try callback(connection)
@@ -25,14 +23,12 @@ class DBConnectionPool {
     }
 
     static func inConnection<T>(at url: URL, type: DatabaseType, _ callback: (SQLiteConnection) throws -> T) throws -> T {
-
         let connection = try DBConnectionPool.getConnection(for: url, type: type)
         return try callback(connection)
     }
 
     fileprivate static func getConnection(for url: URL, type: DatabaseType) throws -> SQLiteConnection {
-
-        let existing = currentOpenConnections.allObjects.first(where: { $0.url.absoluteString == url.absoluteString })
+        let existing = self.currentOpenConnections.allObjects.first(where: { $0.url.absoluteString == url.absoluteString })
 
         if let doesExist = existing {
             return doesExist

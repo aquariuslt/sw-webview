@@ -1,17 +1,15 @@
 import Foundation
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
 
 /// We keep track of the workers currently in use, so that we don't ever duplicate them.
 public class WorkerFactory {
-
     fileprivate let workerStorage = NSHashTable<ServiceWorker>.weakObjects()
     public var clientsDelegateProvider: ServiceWorkerClientsDelegate?
     public var serviceWorkerDelegateProvider: ServiceWorkerDelegate?
     public var cacheStorageProvider: CacheStorageProviderDelegate?
 
-    public init() {
-    }
+    public init() {}
 
     func getCoreDBPath() throws -> URL {
         guard let coreStorage = self.serviceWorkerDelegateProvider?.getCoreDatabaseURL() else {
@@ -22,13 +20,11 @@ public class WorkerFactory {
     }
 
     public func get(id: String, withRegistration registration: ServiceWorkerRegistration) throws -> ServiceWorker {
-
         let dbURL = try self.getCoreDBPath()
 
-        let workerWanted = workerStorage.allObjects.filter { $0.id == id }
+        let workerWanted = self.workerStorage.allObjects.filter { $0.id == id }
 
         if let existingWorker = workerWanted.first {
-
             if existingWorker.registration?.id != registration.id {
                 throw ErrorMessage("Existing worker has a different registration")
             }
@@ -37,7 +33,7 @@ public class WorkerFactory {
         }
 
         let dbWorker = try DBConnectionPool.inConnection(at: dbURL, type: .core) { db -> ServiceWorker in
-            return try db.select(sql: "SELECT registration_id, url, install_state FROM workers WHERE worker_id = ?", values: [id]) { (resultSet) -> ServiceWorker in
+            try db.select(sql: "SELECT registration_id, url, install_state FROM workers WHERE worker_id = ?", values: [id]) { (resultSet) -> ServiceWorker in
 
                 if try resultSet.next() == false {
                     throw ErrorMessage("Worker does not exist")
@@ -79,13 +75,12 @@ public class WorkerFactory {
             }
         }
 
-        workerStorage.add(dbWorker)
+        self.workerStorage.add(dbWorker)
 
         return dbWorker
     }
 
     func create(for url: URL, in registration: ServiceWorkerRegistration) throws -> ServiceWorker {
-
         let dbURL = try self.getCoreDBPath()
 
         let newWorkerID = UUID().uuidString
@@ -117,7 +112,6 @@ public class WorkerFactory {
     }
 
     func update(worker: ServiceWorker, setScriptResponse res: FetchResponseProtocol) -> Promise<Void> {
-
         return firstly {
             try DBConnectionPool.inConnection(at: self.getCoreDBPath(), type: .core) { db -> Promise<Void> in
 
@@ -149,7 +143,7 @@ public class WorkerFactory {
             // you to establish a blob with length. So instead, we are streaming the download to disk, then
             // manually streaming into the DB when we have the length available.
 
-            res.internalResponse.fileDownload({ url, fileSize in
+            res.internalResponse.fileDownload { url, fileSize in
 
                 // ISSUE: do we update the URL here, if the response was redirected? If we do, it'll mean
                 // future update() calls won't check the original URL, which feels wrong. But having this
@@ -192,8 +186,7 @@ public class WorkerFactory {
                             try db.update(sql: "UPDATE workers SET content_hash = ? WHERE worker_id = ?", values: [hash, worker.id])
                         }
                 }
-
-            })
+            }
         }
     }
 
@@ -233,7 +226,6 @@ public class WorkerFactory {
     }
 
     func getUpdateRequest(forExistingWorker worker: ServiceWorker) throws -> FetchRequest {
-
         return try DBConnectionPool.inConnection(at: self.getCoreDBPath(), type: .core) { db in
 
             let request = FetchRequest(url: worker.url)

@@ -1,12 +1,10 @@
-import XCTest
-@testable import ServiceWorker
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class ConstructableFetchResponseTests: XCTestCase {
-
     func testManualTextResponseCreationInWorker() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
 
         sw.evaluateScript("""
@@ -17,9 +15,9 @@ class ConstructableFetchResponseTests: XCTestCase {
             })
         """)
             .then { (jsVal: JSContextPromise) -> Promise<[Any?]> in
-                return jsVal.resolve()
+                jsVal.resolve()
             }
-            .compactMap { (array) in
+            .compactMap { array in
                 XCTAssertEqual(array[0] as? String, "hello")
                 XCTAssertEqual(array[1] as? Int, 200)
                 XCTAssertEqual(array[2] as? String, "")
@@ -29,7 +27,6 @@ class ConstructableFetchResponseTests: XCTestCase {
     }
 
     func testResponseConstructionOptions() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
 
         sw.evaluateScript("""
@@ -56,7 +53,6 @@ class ConstructableFetchResponseTests: XCTestCase {
     }
 
     func testResponseWithArrayBuffer() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
 
         sw.evaluateScript("""
@@ -64,7 +60,7 @@ class ConstructableFetchResponseTests: XCTestCase {
             new Response(buffer)
         """)
             .then { (response: FetchResponseProtocol?) -> Promise<Data> in
-                return response!.data()
+                response!.data()
             }
             .map { data -> Void in
                 let array = [UInt8](data)

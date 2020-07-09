@@ -2,7 +2,6 @@ import Foundation
 import SQLite3
 
 class SQLiteBlobStreamPointer {
-
     class State {
         let pointer: OpaquePointer
         let blobLength: Int32
@@ -38,7 +37,7 @@ class SQLiteBlobStreamPointer {
 
         var pointer: OpaquePointer?
 
-        let openResult = sqlite3_blob_open(self.db.db, "main", table, column, row, isWriteStream ? 1 : 0, &pointer)
+        let openResult = sqlite3_blob_open(self.db.db, "main", self.table, self.column, self.row, self.isWriteStream ? 1 : 0, &pointer)
 
         if openResult != SQLITE_OK {
             guard let errMsg = sqlite3_errmsg(self.db.db) else {

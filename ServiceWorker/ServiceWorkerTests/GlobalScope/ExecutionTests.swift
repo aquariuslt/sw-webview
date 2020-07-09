@@ -1,8 +1,7 @@
-import XCTest
 @testable import ServiceWorker
+import XCTest
 
 class ExecutionTests: XCTestCase {
-
     //    func testAsyncDispatch() {
     //        // Trying to work out why variables sometimes don't exist
     //

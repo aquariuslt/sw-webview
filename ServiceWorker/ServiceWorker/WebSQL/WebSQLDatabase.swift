@@ -11,7 +11,6 @@ import PromiseKit
 /// by the IndexedDB shim, that's been my measure of success - if the shim works, we're done. So
 /// I have no idea what's missing here, really.
 @objc class WebSQLDatabase: NSObject, WebSQLDatabaseExports {
-
     let connection: SQLiteConnection
     weak var environment: ServiceWorkerExecutionEnvironment?
     var transactionQueue: [WebSQLTransaction] = []
@@ -73,7 +72,6 @@ import PromiseKit
     }
 
     func close() -> Promise<Void> {
-
         // If we still have transactions pending we want them to execute before
         // we close up connections.
 
@@ -94,7 +92,6 @@ import PromiseKit
     }
 
     static func openDatabase(for worker: ServiceWorker, in environment: ServiceWorkerExecutionEnvironment, name: String) throws -> WebSQLDatabase {
-
         // We defer to the delegate to get the path where we should be storing our WebSQL data files.
 
         guard let storagePath = try worker.delegate?.serviceWorkerGetDomainStoragePath(worker) else {

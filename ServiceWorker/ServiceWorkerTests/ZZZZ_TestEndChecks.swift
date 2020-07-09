@@ -1,14 +1,12 @@
-import XCTest
+import JavaScriptCore
 import PromiseKit
 @testable import ServiceWorker
-import JavaScriptCore
+import XCTest
 
 class ZZZZ_TestEndChecks: XCTestCase {
-
     /// A wrap-up test we always want to run last, that double-checks all of our JSContexts
     /// have been garbage collected. If they haven't, it means we have a memory leak somewhere.
     func testShouldDeinitSuccessfully() {
-
         let queues = ServiceWorkerExecutionEnvironment.contexts
 
         Promise.value
@@ -32,7 +30,7 @@ class ZZZZ_TestEndChecks: XCTestCase {
             }.then { _ -> Promise<Void> in
 
                 Promise<Void> { resolver in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         print("Performing check")
 
                         queues.objectEnumerator()!.forEach { _ in
@@ -46,7 +44,7 @@ class ZZZZ_TestEndChecks: XCTestCase {
 
                         XCTAssertEqual(ServiceWorkerExecutionEnvironment.contexts.keyEnumerator().allObjects.count, 0)
                         resolver.fulfill(())
-                    })
+                    }
                 }
             }
             .assertResolves()

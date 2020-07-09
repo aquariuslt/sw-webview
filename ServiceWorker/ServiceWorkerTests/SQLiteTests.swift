@@ -1,18 +1,16 @@
-import XCTest
 import FMDB
 import PromiseKit
 @testable import ServiceWorker
 import SQLite3
+import XCTest
 
 class SQLiteTests: XCTestCase {
-
     let dbPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test.db")
 
     override func setUp() {
         super.setUp()
 
         do {
-
             if FileManager.default.fileExists(atPath: self.dbPath.path) {
                 try FileManager.default.removeItem(at: self.dbPath)
             }
@@ -26,7 +24,6 @@ class SQLiteTests: XCTestCase {
         super.tearDown()
 
         do {
-
             if FileManager.default.fileExists(atPath: self.dbPath.path) {
                 try FileManager.default.removeItem(at: self.dbPath)
             }
@@ -45,9 +42,8 @@ class SQLiteTests: XCTestCase {
     }
 
     func testOpenDatabaseConnection() {
-
         var conn: SQLiteConnection?
-        XCTAssertNoThrow(conn = try SQLiteConnection(dbPath))
+        XCTAssertNoThrow(conn = try SQLiteConnection(self.dbPath))
         XCTAssert(conn!.open == true)
 
         XCTAssertNoThrow(try conn!.select(sql: "SELECT 1 as num") { resultSet in
@@ -60,7 +56,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testOpenDatabaseConnectionPromise() {
-
         SQLiteConnection.inConnection(self.dbPath) { db -> Promise<Int> in
 
             Promise { resolver in
@@ -84,7 +79,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testExecQuery() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -108,7 +102,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testInsertQuery() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -134,7 +127,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testSelect() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -168,7 +160,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testSelectOfOptionalTypes() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -189,7 +180,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testInsert() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -207,7 +197,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testBlobReadStream() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -254,7 +243,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testBlobReadStreamPipe() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -283,7 +271,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testBlobReadStreamPipeOffThread() {
-
         let conn = try! SQLiteConnection(self.dbPath)
         try! conn.exec(sql: """
             CREATE TABLE "testtable" (
@@ -309,7 +296,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testBlobWriteStream() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
@@ -405,9 +391,7 @@ class SQLiteTests: XCTestCase {
     }
 
     func testRowChangesNumber() {
-
         XCTAssertNoThrow(try {
-
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
                 CREATE TABLE "testtable" (
@@ -427,9 +411,7 @@ class SQLiteTests: XCTestCase {
     }
 
     func testInsertedRowID() {
-
         XCTAssertNoThrow(try {
-
             let conn = try SQLiteConnection(self.dbPath)
             try conn.exec(sql: """
                 CREATE TABLE "testtable" (
@@ -450,7 +432,6 @@ class SQLiteTests: XCTestCase {
     }
 
     func testDataTypeDetection() {
-
         XCTAssertNoThrow(try {
             let conn = try SQLiteConnection(self.dbPath)
 

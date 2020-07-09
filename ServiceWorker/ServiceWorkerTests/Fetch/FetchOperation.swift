@@ -1,11 +1,10 @@
-import XCTest
-@testable import ServiceWorker
 import GCDWebServers
 import Gzip
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class FetchOperationTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         URLCache.shared.removeAllCachedResponses()
@@ -18,7 +17,6 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testSimpleFetch() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(jsonObject: [
                 "blah": "value"
@@ -37,7 +35,6 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testSimpleFetchBody() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(jsonObject: [
                 "blah": "value"
@@ -51,7 +48,7 @@ class FetchOperationTests: XCTestCase {
 
         FetchSession.default.fetch(request)
             .then { response -> Promise<Any?> in
-                return response.json()
+                response.json()
             }
             .map { obj -> Void in
                 let json = obj as! [String: String]
@@ -61,19 +58,18 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testMultipleFetches() {
-
         // trying to work out what's going on with some streaming bug
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { _, complete in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 complete(GCDWebServerDataResponse(text: "this is some text"))
-            })
+            }
         }
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test2.txt", request: GCDWebServerRequest.self) { _, complete in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 complete(GCDWebServerDataResponse(text: "this is some text two"))
-            })
+            }
         }
 
         when(fulfilled: [
@@ -98,13 +94,11 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testFailedFetch() {
-
         FetchSession.default.fetch(url: URL(string: "http://localhost:23423")!)
             .assertRejects()
     }
 
     fileprivate func setupRedirectURLs() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 201
@@ -121,7 +115,6 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testRedirectFetch() {
-
         self.setupRedirectURLs()
 
         FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/redirect-me"))
@@ -166,7 +159,6 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testFetchRequestBody() {
-
         let expectResponse = expectation(description: "Request body is received")
 
         TestWeb.server!.addHandler(forMethod: "POST", path: "/post", request: GCDWebServerDataRequest.self) { (request) -> GCDWebServerResponse? in
@@ -197,7 +189,6 @@ class FetchOperationTests: XCTestCase {
     }
 
     func testJSFetch() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
         }
@@ -207,7 +198,7 @@ class FetchOperationTests: XCTestCase {
         sw.evaluateScript("""
             fetch('\(TestWeb.serverURL.appendingPathComponent("/test.txt").absoluteString)')
             .then(function(res) {
-            
+
             function valOrNo(val) {
                 if (typeof val == "undefined") {
                     return -1;
@@ -215,7 +206,7 @@ class FetchOperationTests: XCTestCase {
                     return 1;
                 }
             }
-            
+
             return {
                 status: valOrNo(res.status),
                 ok: valOrNo(res.ok),
@@ -230,7 +221,7 @@ class FetchOperationTests: XCTestCase {
             })
         """)
             .then { (val: JSContextPromise) in
-                return val.resolve()
+                val.resolve()
             }
             .map { (obj: [String: Int]) -> Void in
 

@@ -1,10 +1,9 @@
 import Foundation
-import ServiceWorker
 import JavaScriptCore
 import PromiseKit
+import ServiceWorker
 
 @objc public class SQLiteCache: NSObject, Cache {
-
     let storage: SQLiteCacheStorage
     let name: String
 
@@ -14,7 +13,6 @@ import PromiseKit
     }
 
     public func match(_ toMatch: JSValue, _ options: [String: Any]?) -> JSValue? {
-
         var modified = options ?? [:]
         modified["cacheName"] = self.name
 
@@ -49,7 +47,6 @@ import PromiseKit
     }
 
     public func addAll(_ requests: JSValue) -> JSValue? {
-
         return firstly { () -> Promise<Void> in
             guard let array = requests.toArray() else {
                 throw ErrorMessage("Arguments must be an array")
@@ -75,7 +72,7 @@ import PromiseKit
             }
 
             let actualPuts = mapped.map { request in
-                return FetchSession.default.fetch(request, fromOrigin: worker.url)
+                FetchSession.default.fetch(request, fromOrigin: worker.url)
                     .then { response -> Promise<Void> in
 
                         guard let asCacheable = response as? CacheableFetchResponse else {
@@ -97,7 +94,6 @@ import PromiseKit
     }
 
     public func delete(_ request: JSValue, _ options: [String: Any]?) -> JSValue? {
-
         return firstly { () -> Promise<Bool> in
             var opts = options ?? [:]
             opts["cacheName"] = self.name
@@ -115,7 +111,6 @@ import PromiseKit
     }
 
     public func keys(_ request: JSValue, _ options: [String: Any]?) -> JSValue? {
-
         return firstly { () -> Promise<[FetchRequest]> in
             var opts = options ?? [:]
             opts["cacheName"] = self.name
@@ -130,7 +125,7 @@ import PromiseKit
             }
 
             let requests = try DBConnectionPool.inConnection(at: try self.storage.getDBURL(), type: .cache) { db in
-                return try db.select(sql: """
+                try db.select(sql: """
                     SELECT DISTINCT
                     method, request_url_no_query, request_query, request_headers
                     FROM cache_entries
@@ -140,7 +135,6 @@ import PromiseKit
                     var requests: [FetchRequest] = []
 
                     while try rs.next() {
-
                         guard let method = try rs.string("method"),
                             var url = try rs.url("request_url_no_query"),
                             let headersJSON = try rs.string("request_headers") else {

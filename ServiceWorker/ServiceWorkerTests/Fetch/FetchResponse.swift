@@ -1,12 +1,11 @@
-import XCTest
-@testable import ServiceWorker
 import GCDWebServers
 import Gzip
 import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class FetchResponseTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         URLCache.shared.removeAllCachedResponses()
@@ -19,7 +18,6 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testFetchResponseText() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
@@ -37,7 +35,6 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testGzipResponse() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test-gzip.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
 
             var res: GCDWebServerDataResponse?
@@ -67,7 +64,6 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testFetchResponseJSON() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.json", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(jsonObject: [
                 "test": "value"
@@ -90,7 +86,6 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testResponseInWorker() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
@@ -104,7 +99,7 @@ class FetchResponseTests: XCTestCase {
             .then(function(res) { return res.text() })
         """)
             .then { (val: JSContextPromise) in
-                return val.resolve()
+                val.resolve()
             }
             .map { (val: String) in
                 XCTAssertEqual(val, "THIS IS TEST CONTENT")
@@ -113,7 +108,6 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testFetchResponseClone() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
@@ -165,7 +159,6 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testArrayBufferResponse() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.dat", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
 
             let d = Data(bytes: [1, 2, 3, 4, 255])
@@ -186,7 +179,7 @@ class FetchResponseTests: XCTestCase {
             })
         """)
             .then { (val: JSContextPromise) in
-                return val.resolve()
+                val.resolve()
             }
             .map { (arr: [Int]) -> Void in
 
@@ -218,7 +211,7 @@ class FetchResponseTests: XCTestCase {
                         }
                     }
                     .map { () -> String in
-                        return try String(contentsOfFile: localFile.path)
+                        try String(contentsOfFile: localFile.path)
                     }
                 }
             }

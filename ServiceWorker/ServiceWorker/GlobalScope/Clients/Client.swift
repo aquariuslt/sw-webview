@@ -11,7 +11,6 @@ import JavaScriptCore
 /// An implementation of the Client API: https://developer.mozilla.org/en-US/docs/Web/API/Client
 /// mostly a wrapper around an external class that implements ClientProtocol.
 @objc class Client: NSObject, ClientExports {
-
     // We keep track of the client objects we've made before now, so that we
     // pass the same instances back into JSContexts where relevant. That means
     // they'll pass equality checks etc.
@@ -20,9 +19,7 @@ import JavaScriptCore
     fileprivate static var existingClients = NSHashTable<Client>.weakObjects()
 
     static func getOrCreate<T: ClientProtocol>(from wrapper: T) -> Client {
-
         return self.existingClients.allObjects.first(where: { $0.clientInstance.id == wrapper.id }) ?? {
-
             let newClient = { () -> Client in
 
                 // We could pass back either a Client or the more specific WindowClient - we need
@@ -46,7 +43,6 @@ import JavaScriptCore
     }
 
     func postMessage(_ toSend: JSValue, _: [JSValue]) {
-
         self.clientInstance.postMessage(message: toSend.toObject(), transferable: nil)
     }
 

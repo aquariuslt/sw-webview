@@ -4,7 +4,6 @@ import SQLite3
 /// Used in SQLiteConnection.select()'s callback, allows you to actually
 /// read rows and columns from the database.
 public class SQLiteResultSet {
-
     fileprivate var statement: OpaquePointer?
     let columnNames: [String]
     var open: Bool {
@@ -48,7 +47,6 @@ public class SQLiteResultSet {
     }
 
     fileprivate func idxForColumnName(_ name: String) throws -> Int32 {
-
         guard let idx = columnNames.index(of: name) else {
             throw ErrorMessage("Column '\(name)' does not exist in result set")
         }
@@ -57,7 +55,6 @@ public class SQLiteResultSet {
     }
 
     fileprivate func getColumnResult<T>(_ name: String, processor: (OpaquePointer, Int32) -> T) throws -> T? {
-
         let idx = try idxForColumnName(name)
 
         let statement = try getStatementPointer()
@@ -70,7 +67,6 @@ public class SQLiteResultSet {
     }
 
     public func string(_ name: String) throws -> String? {
-
         guard let result = try self.getColumnResult(name, processor: sqlite3_column_text), let cString = result else {
             return nil
         }
@@ -79,7 +75,6 @@ public class SQLiteResultSet {
     }
 
     public func int(_ name: String) throws -> Int? {
-
         guard let result = try self.getColumnResult(name, processor: sqlite3_column_int) else {
             return nil
         }
@@ -88,7 +83,6 @@ public class SQLiteResultSet {
     }
 
     public func int64(_ name: String) throws -> Int64? {
-
         guard let result = try self.getColumnResult(name, processor: sqlite3_column_int64) else {
             return nil
         }
@@ -97,12 +91,10 @@ public class SQLiteResultSet {
     }
 
     public func double(_ name: String) throws -> Double? {
-
         return try self.getColumnResult(name, processor: sqlite3_column_double)
     }
 
     public func data(_ name: String) throws -> Data? {
-
         let idx = try idxForColumnName(name)
 
         let statement = try getStatementPointer()
@@ -129,7 +121,6 @@ public class SQLiteResultSet {
     }
 
     public func getColumnType(_ name: String) throws -> SQLiteDataType {
-
         let idx = try idxForColumnName(name)
         let colType = sqlite3_column_type(try getStatementPointer(), idx)
 

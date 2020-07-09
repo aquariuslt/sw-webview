@@ -1,9 +1,8 @@
-import XCTest
-@testable import ServiceWorkerContainer
 import PromiseKit
+@testable import ServiceWorkerContainer
+import XCTest
 
 class ServiceWorkerContainerTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         CoreDatabase.clearForTests()
@@ -29,7 +28,6 @@ class ServiceWorkerContainerTests: XCTestCase {
     }
 
     func testGetRegistrations() {
-
         firstly { () -> Promise<Void> in
             let reg1 = try factory.create(scope: URL(string: "https://www.example.com/scope1")!)
             let reg2 = try factory.create(scope: URL(string: "https://www.example.com/scope2")!)

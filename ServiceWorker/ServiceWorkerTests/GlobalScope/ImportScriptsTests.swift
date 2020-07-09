@@ -1,11 +1,10 @@
-import XCTest
-@testable import ServiceWorker
-import JavaScriptCore
 import GCDWebServers
+import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class ImportScriptsTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         TestWeb.createServer()
@@ -17,7 +16,6 @@ class ImportScriptsTests: XCTestCase {
     }
 
     class TestImportDelegate: NSObject, ServiceWorkerDelegate {
-
         func serviceWorkerGetDomainStoragePath(_: ServiceWorker) throws -> URL {
             throw ErrorMessage("Not implemented")
         }
@@ -46,7 +44,6 @@ class ImportScriptsTests: XCTestCase {
     }
 
     func testImportingAScript() {
-
         //        let sw = ServiceWorker.createTestWorker(id: name)
         //
         //        let delegate = TestImportDelegate { url, _, cb in
@@ -83,7 +80,6 @@ class ImportScriptsTests: XCTestCase {
     //    }
 
     func testImportingWithAsyncOperation() {
-
         //        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
         //            GCDWebServerDataResponse(data: "self.testValue = 'hello2';".data(using: String.Encoding.utf8)!, contentType: "text/javascript")
         //        }

@@ -9,10 +9,8 @@ public struct CacheMatchOptions {
 }
 
 public extension CacheMatchOptions {
-
     /// Just a quick shortcut method to let us construct matching options from a JS object
     static func fromDictionary(opts: [String: Any]) -> CacheMatchOptions {
-
         let ignoreSearch = opts["ignoreSearch"] as? Bool ?? false
         let ignoreMethod = opts["ignoreMethod"] as? Bool ?? false
         let ignoreVary = opts["ignoreVary"] as? Bool ?? false

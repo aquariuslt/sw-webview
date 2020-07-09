@@ -1,9 +1,8 @@
-import XCTest
-@testable import ServiceWorker
 import JavaScriptCore
+@testable import ServiceWorker
+import XCTest
 
 class MessagePortTests: XCTestCase {
-
     func testSendingAMessage() {
         let portOne = SWMessagePort()
         let portTwo = SWMessagePort()

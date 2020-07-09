@@ -5,7 +5,6 @@ import Foundation
 /// PassthroughStream to help with that - if the source stream starts, it buffers the data
 /// into memory, then passes on if and when read actions take place.
 public class PassthroughStream {
-
     public static func create() -> (input: InputStream, output: OutputStream) {
         let data = PassthroughDataHolder()
         let input = PassthroughInputStream(data: data)
@@ -16,7 +15,6 @@ public class PassthroughStream {
     }
 
     fileprivate class PassthroughDataHolder {
-
         var data = Data(count: 0)
         weak var inputDelegate: InputStreamImplementation?
 
@@ -33,7 +31,6 @@ public class PassthroughStream {
         }
 
         func read(buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) -> Int {
-
             let lengthToRead = min(maxLength, self.data.count)
 
             self.data.copyBytes(to: buffer, count: lengthToRead)
@@ -54,7 +51,6 @@ public class PassthroughStream {
     }
 
     fileprivate class PassthroughInputStream: InputStreamImplementation {
-
         let data: PassthroughDataHolder
 
         init(data: PassthroughDataHolder) {
@@ -90,7 +86,6 @@ public class PassthroughStream {
     }
 
     fileprivate class PassthroughOutputStream: OutputStreamImplementation {
-
         let data: PassthroughDataHolder
 
         init(data: PassthroughDataHolder) {

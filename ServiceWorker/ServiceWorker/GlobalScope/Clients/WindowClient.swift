@@ -12,7 +12,6 @@ import PromiseKit
 /// A more specific version of Client, WindowClient: https://developer.mozilla.org/en-US/docs/Web/API/WindowClient
 /// also provides information on visibility and focus state (that don't apply to workers etc)
 @objc class WindowClient: Client, WindowClientExports {
-
     let wrapAroundWindow: WindowClientProtocol
 
     init(wrapping: WindowClientProtocol) {
@@ -21,7 +20,6 @@ import PromiseKit
     }
 
     func focus() -> JSValue? {
-
         return Promise<Client> { seal in
 
             wrapAroundWindow.focus { err, windowClient in
@@ -36,7 +34,6 @@ import PromiseKit
     }
 
     func navigate(_ url: String) -> JSValue? {
-
         return Promise<WindowClientProtocol> { seal in
             guard let parsedURL = URL(string: url, relativeTo: nil) else {
                 return seal.reject(ErrorMessage("Could not parse URL returned by native implementation"))

@@ -1,11 +1,9 @@
-import XCTest
-@testable import ServiceWorker
 import JavaScriptCore
+@testable import ServiceWorker
+import XCTest
 
 class EventTargetTests: XCTestCase {
-
     func testShouldFireEvents() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
         return sw.evaluateScript("""
@@ -17,14 +15,13 @@ class EventTargetTests: XCTestCase {
             didFire;
         """)
 
-            .map { (didFire:Bool?) -> Void in
+            .map { (didFire: Bool?) -> Void in
                 XCTAssertEqual(didFire, true)
             }
             .assertResolves()
     }
 
     func testShouldRemoveEventListeners() {
-
         let testEvents = EventTarget()
 
         let sw = ServiceWorker.createTestWorker(id: name)
@@ -35,7 +32,7 @@ class EventTargetTests: XCTestCase {
             context.globalObject.setValue(testEvents, forProperty: "testEvents")
         }
         .then {
-            return sw.evaluateScript("""
+            sw.evaluateScript("""
                 var didFire = false;
                 function trigger() {
                     didFire = true;
@@ -46,7 +43,7 @@ class EventTargetTests: XCTestCase {
                 didFire;
             """)
         }
-        .compactMap { (didFire:Bool?) -> Void in
+        .compactMap { (didFire: Bool?) -> Void in
             XCTAssertEqual(didFire, false)
             expect.fulfill()
         }
@@ -58,7 +55,6 @@ class EventTargetTests: XCTestCase {
     }
 
     func testShouldFireSwiftEvents() {
-
         let testEvents = EventTarget()
         var fired = false
 

@@ -4,7 +4,6 @@ import Foundation
 /// would (I think) like us to create different classes/enums for each error. But
 /// this lets us throw errors with custom strings attached.
 public class ErrorMessage: Error, CustomStringConvertible {
-
     public let message: String
 
     public init(_ message: String) {

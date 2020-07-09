@@ -17,7 +17,6 @@ private var allowedCORSHeaders = [
 /// this proxy takes these into account, exposes only the right data to JS, but also provides access to the internal
 /// response natively, when we need to do things JS can't (like cache opaque responses)
 @objc(Response) class FetchResponseProxy: NSObject, FetchResponseProtocol, FetchResponseJSExports, CacheableFetchResponse {
-
     var url: URL? {
         return self._internal.url
     }
@@ -44,7 +43,6 @@ private var allowedCORSHeaders = [
         // the Response constructor can have a few additional options specified upon creation.
 
         if let specifiedOptions = options {
-
             if let specifiedStatus = specifiedOptions["status"] as? Int {
                 status = specifiedStatus
             }
@@ -54,14 +52,13 @@ private var allowedCORSHeaders = [
             }
 
             if let specifiedHeaders = specifiedOptions["headers"] as? [String: String] {
-                specifiedHeaders.forEach({ key, val in
+                specifiedHeaders.forEach { key, val in
                     headers.set(key, val)
-                })
+                }
             }
         }
 
-        if headers.get("Content-Type") == nil && body.isString {
-
+        if headers.get("Content-Type") == nil, body.isString {
             // This is what Chrome does. Not totally sure what the spec states.
 
             headers.set("Content-Type", "text/plain;charset=UTF-8")
@@ -86,7 +83,6 @@ private var allowedCORSHeaders = [
     fileprivate static func convert(jsValue val: JSValue) -> InputStream {
         do {
             if val.isString {
-
                 guard let data = val.toString().data(using: String.Encoding.utf8) else {
                     throw ErrorMessage("Could not successfully parse string")
                 }
@@ -94,13 +90,11 @@ private var allowedCORSHeaders = [
                 return InputStream(data: data)
 
             } else if let arrayBufferStream = InputStream(arrayBuffer: val) {
-
                 return arrayBufferStream
             }
 
             throw ErrorMessage("Cannot convert input object")
         } catch {
-
             let err = JSValue(newErrorFromMessage: "\(error)", in: val.context)
             val.context.exception = err
 
@@ -140,7 +134,6 @@ private var allowedCORSHeaders = [
     }
 
     func text() -> Promise<String> {
-
         if self.responseType == .Opaque {
             return Promise.value("")
         }
@@ -157,7 +150,6 @@ private var allowedCORSHeaders = [
         }
 
         if self.responseType == .Opaque {
-
             return firstly { () -> Promise<JSValue> in
 
                 Promise.value(JSArrayBuffer.make(from: Data(count: 0), in: JSContext.current()))
@@ -173,7 +165,6 @@ private var allowedCORSHeaders = [
     }
 
     func clone() throws -> FetchResponseProtocol {
-
         if self.bodyUsed {
             throw ErrorMessage("Cannot clone response: body already used")
         }
@@ -184,7 +175,6 @@ private var allowedCORSHeaders = [
     }
 
     func cloneResponseExports() -> FetchResponseJSExports? {
-
         // Really dumb but I can't figure out a better way to export both
         // clone() for Swift and clone() for JS because the Swift version
         // throws an error.
@@ -194,7 +184,6 @@ private var allowedCORSHeaders = [
         do {
             clone = try self.clone()
         } catch {
-
             var errmsg = String(describing: error)
             if let err = error as? ErrorMessage {
                 errmsg = err.message
@@ -207,13 +196,11 @@ private var allowedCORSHeaders = [
     }
 
     var headers: FetchHeaders {
-
         if self.responseType == .Opaque {
             return FetchHeaders()
         }
 
         if self.responseType == .CORS {
-
             var allowedHeaders = allowedCORSHeaders
 
             if let extraHeaders = self._internal.headers.get("Access-Control-Expose-Headers") {
@@ -227,7 +214,6 @@ private var allowedCORSHeaders = [
             return self._internal.headers.filteredBy(allowedKeys: allowedHeaders)
 
         } else if self.responseType == .Basic {
-
             return self._internal.headers.filteredBy(disallowedKeys: ["set-cookie", "set-cookie2"])
 
         } else {
@@ -236,7 +222,6 @@ private var allowedCORSHeaders = [
     }
 
     var statusText: String {
-
         if self.responseType == .Opaque {
             return ""
         }
@@ -245,7 +230,6 @@ private var allowedCORSHeaders = [
     }
 
     var ok: Bool {
-
         if self.responseType == .Opaque {
             // This is what Chrome does. Not entirely sure what the spec says.
             return false
@@ -255,7 +239,6 @@ private var allowedCORSHeaders = [
     }
 
     var redirected: Bool {
-
         if self.responseType == .Opaque {
             // This is what Chrome does. Not entirely sure what the spec says.
             return false
@@ -269,7 +252,6 @@ private var allowedCORSHeaders = [
     }
 
     var status: Int {
-
         if self.responseType == .Opaque {
             return 0
         }

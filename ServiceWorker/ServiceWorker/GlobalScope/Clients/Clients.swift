@@ -13,7 +13,6 @@ import PromiseKit
 /// Service Workers to get/take control of/open clients under their scope. This is really just
 /// a bridge to whatever ServiceWorkerClientDelegate is set.
 @objc class Clients: NSObject, ClientsExports {
-
     unowned let worker: ServiceWorker
 
     init(for worker: ServiceWorker) {
@@ -21,7 +20,6 @@ import PromiseKit
     }
 
     func get(_ id: String) -> JSValue? {
-
         return Promise<Client?> { seal in
             if self.worker.clientsDelegate?.clients?(self.worker, getById: id, { err, clientProtocol in
                 if let error = err {
@@ -38,7 +36,6 @@ import PromiseKit
     }
 
     func matchAll(_ options: [String: Any]?) -> JSValue? {
-
         return Promise<[Client]> { seal in
 
             // Two options provided here: https://developer.mozilla.org/en-US/docs/Web/API/Clients/matchAll
@@ -52,7 +49,7 @@ import PromiseKit
                 if let error = err {
                     seal.reject(error)
                 } else if let clientProtocolsExist = clientProtocols {
-                    let mapped = clientProtocolsExist.map({ Client.getOrCreate(from: $0) })
+                    let mapped = clientProtocolsExist.map { Client.getOrCreate(from: $0) }
                     seal.fulfill(mapped)
                 } else {
                     seal.reject(ErrorMessage("Callback did not error but did not send a response either"))
@@ -65,7 +62,6 @@ import PromiseKit
     }
 
     func openWindow(_ url: String) -> JSValue? {
-
         return Promise<ClientProtocol> { seal in
             guard let parsedURL = URL(string: url, relativeTo: self.worker.url) else {
                 return seal.reject(ErrorMessage("Could not parse URL given"))
@@ -84,7 +80,6 @@ import PromiseKit
     }
 
     func claim() -> JSValue? {
-
         return Promise<Void> { seal in
             if self.worker.clientsDelegate?.clientsClaim?(self.worker, { err in
                 if let error = err {

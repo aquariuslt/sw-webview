@@ -1,10 +1,9 @@
 import Foundation
+import ServiceWorker
 import ServiceWorkerContainer
 import XCTest
-import ServiceWorker
 
 class TestBootstrap: NSObject {
-
     override init() {
         super.init()
 

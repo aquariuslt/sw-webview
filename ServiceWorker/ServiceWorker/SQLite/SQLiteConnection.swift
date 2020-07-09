@@ -1,6 +1,6 @@
 import Foundation
-import SQLite3
 import PromiseKit
+import SQLite3
 
 // These aren't imported correctly from SQLite3, so we have to define them:
 // https://stackoverflow.com/a/26884081/470339
@@ -13,7 +13,6 @@ private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.sel
 /// conditions, like the Notification Service Extension, so we might need to heavily customise
 /// some stuff later on. Therefore, our own quick and dirty SQLite implementation.
 public class SQLiteConnection {
-
     var db: OpaquePointer?
     public let url: URL
 
@@ -27,7 +26,7 @@ public class SQLiteConnection {
 
     public init(_ dbURL: URL) throws {
         self.url = dbURL
-        let open = sqlite3_open_v2(dbURL.path.cString(using: String.Encoding.utf8), &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil)
+        let open = sqlite3_open_v2(dbURL.path.cString(using: String.Encoding.utf8), &self.db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil)
 
         if open != SQLITE_OK || self.db == nil {
             throw ErrorMessage("Could not create SQLite database instance: \(open)")
@@ -43,7 +42,6 @@ public class SQLiteConnection {
     }
 
     deinit {
-
         // We'll automatically close any SQLite connection when it is dereferenced.
 
         do {
@@ -57,8 +55,7 @@ public class SQLiteConnection {
 
     /// A way to run a callback with a self-closing database connection. Opens, runs callback, closes, then
     /// passes whatever the callback returned back.
-    public static func inConnection<T>(_ dbURL: URL, _ cb: ((SQLiteConnection) throws -> T)) throws -> T {
-
+    public static func inConnection<T>(_ dbURL: URL, _ cb: (SQLiteConnection) throws -> T) throws -> T {
         let conn = try SQLiteConnection(dbURL)
         do {
             let result = try cb(conn)
@@ -73,7 +70,6 @@ public class SQLiteConnection {
     /// Much like the other inConnection() call, except this one supports promises, and waits for them to
     /// resolve before closing the database connection.
     public static func inConnection<T>(_ dbURL: URL, _ cb: @escaping ((SQLiteConnection) throws -> Promise<T>)) -> Promise<T> {
-
         return firstly {
             Promise.value(try SQLiteConnection(dbURL))
         }.then { conn in
@@ -89,7 +85,6 @@ public class SQLiteConnection {
     }
 
     public func close() throws {
-
         guard let db = self.db else {
             throw ErrorMessage("SQLite connection is not open")
         }
@@ -109,7 +104,6 @@ public class SQLiteConnection {
 
     /// Quick wrapper to convert a SQLite error into a native one.
     func throwSQLiteError(_ err: UnsafeMutablePointer<Int8>?) throws {
-
         guard let errExists = err else {
             throw ErrorMessage("SQLITE return value was unexpected, but no error message was returned")
         }
@@ -130,7 +124,6 @@ public class SQLiteConnection {
     /// Executes a multi-line SQL statement. Doesn't support parameters
     /// or anything like that. Used in database migrations.
     public func exec(sql: String) throws {
-
         var zErrMsg: UnsafeMutablePointer<Int8>?
         let pointer = try getDBPointer()
         let rc = sqlite3_exec(pointer, sql, nil, nil, &zErrMsg)
@@ -155,7 +148,6 @@ public class SQLiteConnection {
     }
 
     public func inTransaction<T>(_ closure: () throws -> T) throws -> T {
-
         try self.beginTransaction()
 
         do {
@@ -177,7 +169,6 @@ public class SQLiteConnection {
     /// object to various different types in order to make them compatible with the query. If we've
     /// passed in something totally unsupported, it'll throw.
     fileprivate func bindValue(_ statement: OpaquePointer, idx: Int32, value: Any?) throws {
-
         if value == nil {
             sqlite3_bind_null(statement, idx)
         } else if let int32Value = value as? Int32 {
@@ -210,7 +201,6 @@ public class SQLiteConnection {
     /// Execute an update statement. Uses bindValue() to convert values into SQLite
     /// parameters.
     public func update(sql: String, values: [Any?]) throws {
-
         let db = try getDBPointer()
 
         var statement: OpaquePointer?
@@ -278,7 +268,6 @@ public class SQLiteConnection {
     /// requires you to close it when you're done with it, but using this callback means we don't
     /// have to remember to do it ourselves.
     public func select<T>(sql: String, values: [Any?] = [], _ cb: (SQLiteResultSet) throws -> T) throws -> T {
-
         let db = try getDBPointer()
 
         var statement: OpaquePointer?

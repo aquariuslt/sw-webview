@@ -6,7 +6,6 @@ import PromiseKit
 /// (NSObject.perform() is always a void) so instead we need to pass through fulfill and
 /// reject as function parameters. So we use this as a container for those functions.
 @objc class PromisePassthrough: NSObject {
-
     let fulfill: (Any?) -> Void
     let reject: (Error) -> Void
 
@@ -17,10 +16,8 @@ import PromiseKit
 }
 
 extension Promise {
-
     /// And an extension method on Promise to create a passthrough promise
     static func makePassthrough() -> (promise: Promise<T>, passthrough: PromisePassthrough) {
-
         let (promise, seal) = Promise<T>.pending()
 
         let fulfillCast = { (result: Any?) in

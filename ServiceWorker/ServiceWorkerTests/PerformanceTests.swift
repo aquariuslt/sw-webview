@@ -1,8 +1,7 @@
-import XCTest
 @testable import ServiceWorker
+import XCTest
 
 class PerformanceTests: XCTestCase {
-
     //    func testPerformanceExample() {
     //        // This is an example of a performance test case.
     //        self.measure {

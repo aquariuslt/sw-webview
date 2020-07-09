@@ -1,10 +1,8 @@
-import XCTest
 @testable import ServiceWorker
+import XCTest
 
 class FetchHeadersTests: XCTestCase {
-
     func testShouldParseJSON() {
-
         let headersJSON = """
             [
                 {"key":"Content-Type", "value": "application/json"},
@@ -26,7 +24,6 @@ class FetchHeadersTests: XCTestCase {
     }
 
     func testShouldAppendGetAndDelete() {
-
         let fh = FetchHeaders()
         fh.append("Test", "Value")
 

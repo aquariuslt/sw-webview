@@ -6,7 +6,6 @@ import JavaScriptCore
 }
 
 @objc class WebSQLTransaction: NSObject, WebSQLTransactionExports {
-
     unowned let db: WebSQLDatabase
 
     var processingCallback: JSValue?
@@ -31,7 +30,6 @@ import JavaScriptCore
     }
 
     func run(_ cb: @escaping () -> Void) {
-
         guard let processing = self.processingCallback, let complete = self.completeCallback, let errorCB = self.errorCallback else {
             Log.error?("Callbacks do not exist")
             return
@@ -42,7 +40,6 @@ import JavaScriptCore
 
         RunLoop.current.perform {
             do {
-
                 if self.db.connection.open == false {
                     Log.error?("Cannot execute WebSQL operation - connection has been closed")
                     return
@@ -84,7 +81,6 @@ import JavaScriptCore
 
     func executeSql(_ sqlStatement: String, _ arguments: JSValue, _ callback: JSValue, _ errorCallback: JSValue) {
         do {
-
             guard let argumentArray = arguments.toArray() else {
                 throw ErrorMessage("Could not turn arguments provided into array")
             }
@@ -97,9 +93,9 @@ import JavaScriptCore
             let webResultSet: WebSQLResultSet
 
             if isSelectStatement == true {
-                webResultSet = try self.db.connection.select(sql: sqlStatement, values: argumentArray, { res in
+                webResultSet = try self.db.connection.select(sql: sqlStatement, values: argumentArray) { res in
                     try WebSQLResultSet(resultSet: res, connection: self.db.connection)
-                })
+                }
             } else {
                 try self.db.connection.update(sql: sqlStatement, values: argumentArray)
                 webResultSet = try WebSQLResultSet(fromUpdateIn: self.db.connection)

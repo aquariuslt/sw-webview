@@ -1,10 +1,9 @@
 import Foundation
+import JavaScriptCore
 import PromiseKit
 import ServiceWorker
-import JavaScriptCore
 
 @objc public class ServiceWorkerRegistration: NSObject, ServiceWorkerRegistrationProtocol {
-
     public func showNotification(_ val: JSValue) -> JSValue {
         return JSValue(undefinedIn: val.context)
     }
@@ -33,7 +32,6 @@ import JavaScriptCore
     fileprivate var workers: [RegistrationWorkerSlot: ServiceWorker] = [:]
 
     internal func set(workerSlot: RegistrationWorkerSlot, to worker: ServiceWorker?, makeOldRedundant: Bool = true) throws {
-
         if self._unregistered {
             throw ErrorMessage("Cannot set worker into slot of an unregistered ServiceWorkerRegistration")
         }
@@ -58,7 +56,6 @@ import JavaScriptCore
     fileprivate let factory: WorkerRegistrationFactory
 
     internal init(scope: URL, id: String, workerIDs: [RegistrationWorkerSlot: String], fromFactory factory: WorkerRegistrationFactory) throws {
-
         self.scope = scope
         self.id = id
 
@@ -71,7 +68,6 @@ import JavaScriptCore
     }
 
     func update() -> Promise<Void> {
-
         return firstly { () -> Promise<Void> in
 
             var updateWorker: ServiceWorker?
@@ -115,7 +111,6 @@ import JavaScriptCore
     }
 
     func register(_ workerURL: URL) -> Promise<RegisterReturn> {
-
         // The install process is asynchronous and the register call doesn't wait for it.
         // So we create our stub in the database then return the promise immediately.
 
@@ -142,7 +137,6 @@ import JavaScriptCore
     }
 
     func processHTTPResponse(_ res: FetchResponseProtocol, newWorker: ServiceWorker, byteCompareWorker: ServiceWorker? = nil) -> Promise<Void> {
-
         return self.factory.workerFactory.update(worker: newWorker, setScriptResponse: res)
             .then { () -> Promise<Void> in
 
@@ -156,7 +150,6 @@ import JavaScriptCore
 
                 return self.install(worker: newWorker)
                     .done {
-
                         // Workers move from installed directly to activating if they have called
                         // self.skipWaiting() OR if we have no active worker currently.
 
@@ -168,7 +161,6 @@ import JavaScriptCore
     }
 
     fileprivate func install(worker: ServiceWorker) -> Promise<Void> {
-
         return firstly { () -> Promise<Void> in
             if self.installing != worker {
                 throw ErrorMessage("Can only install a worker if it's in the installing slot")
@@ -193,7 +185,6 @@ import JavaScriptCore
     }
 
     fileprivate func activate(worker: ServiceWorker) -> Promise<Void> {
-
         // The spec is a little confusing here, but it seems like if
         // 'active' is empty our worker goes directly into that slot
         // even while it is activating. If not, it stays in waiting
@@ -201,7 +192,7 @@ import JavaScriptCore
 
         let moveToActiveImmediately = self.active == nil
 
-        return firstly { ()->Promise<Void> in
+        return firstly { () -> Promise<Void> in
 
             if self.waiting != worker {
                 throw ErrorMessage("Can only activate a worker if it's in the waiting slot")
@@ -281,7 +272,6 @@ import JavaScriptCore
     }
 
     public func unregister() -> Promise<Void> {
-
         return firstly { () -> Promise<Void> in
 
             try self.workers.forEach { slot in

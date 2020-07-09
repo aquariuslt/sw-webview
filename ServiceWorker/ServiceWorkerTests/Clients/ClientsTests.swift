@@ -1,12 +1,10 @@
-import XCTest
-@testable import ServiceWorker
 import JavaScriptCore
+@testable import ServiceWorker
+import XCTest
 
 class ClientsTests: XCTestCase {
-
     class TestClient: ClientProtocol {
-        func postMessage(message _: Any?, transferable _: [Any]?) {
-        }
+        func postMessage(message _: Any?, transferable _: [Any]?) {}
 
         let id: String
 
@@ -24,11 +22,9 @@ class ClientsTests: XCTestCase {
     }
 
     class TestWindowClient: TestClient, WindowClientProtocol {
-        func focus(_: (Error?, WindowClientProtocol?) -> Void) {
-        }
+        func focus(_: (Error?, WindowClientProtocol?) -> Void) {}
 
-        func navigate(to _: URL, _: (Error?, WindowClientProtocol?) -> Void) {
-        }
+        func navigate(to _: URL, _: (Error?, WindowClientProtocol?) -> Void) {}
 
         var focused: Bool
 
@@ -42,7 +38,6 @@ class ClientsTests: XCTestCase {
     }
 
     class TestClients: ServiceWorkerClientsDelegate {
-
         var clients: [ClientProtocol] = []
         var claimFunc: (() -> Void)?
 
@@ -51,14 +46,14 @@ class ClientsTests: XCTestCase {
         }
 
         func clients(_: ServiceWorker, matchAll options: ClientMatchAllOptions, _ cb: (Error?, [ClientProtocol]?) -> Void) {
-            cb(nil, self.clients.filter({ client in
+            cb(nil, self.clients.filter { client in
 
                 let asTestCase = client as! TestClient
 
                 return (options.type == "all" || options.type == client.type.stringValue) &&
                     (options.includeUncontrolled == true || asTestCase.isControlled == true)
 
-            }))
+            })
         }
 
         func clients(_: ServiceWorker, openWindow url: URL, _ cb: (Error?, ClientProtocol?) -> Void) {
@@ -76,7 +71,6 @@ class ClientsTests: XCTestCase {
     }
 
     func testShouldGetClientByID() {
-
         let testAPI = TestClients()
         testAPI.clients.append(TestClient(id: "TESTCLIENT", type: .Window, url: URL(string: "http://www.example.com")!))
 
@@ -94,7 +88,7 @@ class ClientsTests: XCTestCase {
             })
         """)
             .then { (val: JSContextPromise) in
-                return val.resolve()
+                val.resolve()
             }
             .map { (returnArray: [Any]) -> Void in
                 XCTAssertEqual(returnArray.count, 4)
@@ -107,7 +101,6 @@ class ClientsTests: XCTestCase {
     }
 
     func testShouldMatchAllWithOptions() {
-
         let testAPI = TestClients()
         testAPI.clients.append(TestClient(id: "TESTCLIENT", type: .Window, url: URL(string: "http://www.example.com")!))
         testAPI.clients.append(TestClient(id: "TESTCLIENT2", type: .Worker, url: URL(string: "http://www.example.com")!))
@@ -133,7 +126,7 @@ class ClientsTests: XCTestCase {
             })
         """)
             .then { (val: JSContextPromise) in
-                return val.resolve()
+                val.resolve()
             }
             .map { (val: [String: Any]) -> Void in
 
@@ -162,7 +155,6 @@ class ClientsTests: XCTestCase {
     }
 
     func testShouldRunClaim() {
-
         var claimed = false
 
         let testAPI = TestClients()
@@ -177,7 +169,7 @@ class ClientsTests: XCTestCase {
             self.clients.claim()
         """)
             .then { (val: JSContextPromise) in
-                return val.resolve()
+                val.resolve()
             }
             .map {
                 XCTAssertEqual(claimed, true)

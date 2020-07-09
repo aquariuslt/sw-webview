@@ -1,10 +1,9 @@
-import XCTest
-@testable import ServiceWorker
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class ConsoleMirrorTests: XCTestCase {
-
     override func tearDown() {
         Log.debug = { print($0) }
         Log.info = { print($0) }
@@ -13,7 +12,6 @@ class ConsoleMirrorTests: XCTestCase {
     }
 
     func testShouldMirrorAllLevels() {
-
         var functionsRun: Set<String> = []
 
         let testWorker = ServiceWorker.createTestWorker(id: name)
@@ -66,7 +64,6 @@ class ConsoleMirrorTests: XCTestCase {
     }
 
     func testShouldMirrorObjects() {
-
         let expect = expectation(description: "Should log")
 
         Log.debug = { msg in

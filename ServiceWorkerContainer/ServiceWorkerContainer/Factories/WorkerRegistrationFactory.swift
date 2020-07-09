@@ -2,7 +2,6 @@ import Foundation
 import ServiceWorker
 
 public class WorkerRegistrationFactory {
-
     let workerFactory: WorkerFactory
 
     fileprivate let activeRegistrations = NSHashTable<ServiceWorkerRegistration>.weakObjects()
@@ -12,7 +11,7 @@ public class WorkerRegistrationFactory {
     }
 
     public func get(byId id: String) throws -> ServiceWorkerRegistration? {
-        let active = activeRegistrations.allObjects.filter { $0.id == id }.first
+        let active = self.activeRegistrations.allObjects.filter { $0.id == id }.first
 
         if active != nil {
             return active
@@ -78,7 +77,6 @@ public class WorkerRegistrationFactory {
                 var ids: [String] = []
 
                 while try resultSet.next() {
-
                     guard let regID = try resultSet.string("registration_id") else {
                         throw ErrorMessage("Found a registration with no ID")
                     }
@@ -127,7 +125,6 @@ public class WorkerRegistrationFactory {
     }
 
     public func get(forPageURL url: URL) throws -> ServiceWorkerRegistration? {
-
         return try DBConnectionPool.inConnection(at: self.workerFactory.getCoreDBPath(), type: .core) { db in
 
             try db.select(sql: """
@@ -148,7 +145,6 @@ public class WorkerRegistrationFactory {
     }
 
     public func create(scope: URL) throws -> ServiceWorkerRegistration {
-
         return try DBConnectionPool.inConnection(at: self.workerFactory.getCoreDBPath(), type: .core) { connection in
             let newRegID = UUID().uuidString
             _ = try connection.insert(sql: "INSERT INTO registrations (registration_id, scope) VALUES (?, ?)", values: [newRegID, scope])
@@ -159,7 +155,6 @@ public class WorkerRegistrationFactory {
     }
 
     func createNewInstallingWorker(for url: URL, in registration: ServiceWorkerRegistration) throws -> ServiceWorker {
-
         let worker = try self.workerFactory.create(for: url, in: registration)
 
         try registration.set(workerSlot: .installing, to: worker)
@@ -170,7 +165,6 @@ public class WorkerRegistrationFactory {
     /// A special case. If an installing worker fails we don't want to make it redundant, we
     /// just delete it entirely.
     func clearInstallingWorker(in registration: ServiceWorkerRegistration) throws {
-
         guard let installing = registration.installing else {
             throw ErrorMessage("Cannot clear installing worker when there is none")
         }
@@ -210,7 +204,6 @@ public class WorkerRegistrationFactory {
     }
 
     func update(_ registration: ServiceWorkerRegistration, workerSlot: RegistrationWorkerSlot, to worker: ServiceWorker?) throws {
-
         try DBConnectionPool.inConnection(at: self.workerFactory.getCoreDBPath(), type: .core) { db in
 
             _ = try db.insert(sql: """

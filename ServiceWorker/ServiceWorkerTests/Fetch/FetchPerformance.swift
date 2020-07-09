@@ -1,12 +1,11 @@
-import XCTest
-@testable import ServiceWorker
 import GCDWebServers
 import Gzip
 import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class FetchPerformance: XCTestCase {
-
     override func setUp() {
         super.setUp()
         URLCache.shared.removeAllCachedResponses()
@@ -28,7 +27,6 @@ class FetchPerformance: XCTestCase {
     func testNative() {
         // This is an example of a performance test case.
         self.measure {
-
             _ = try! Data(contentsOf: TestWeb.serverURL.appendingPathComponent("data"))
         }
     }

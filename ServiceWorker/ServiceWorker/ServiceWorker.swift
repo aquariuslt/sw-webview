@@ -7,7 +7,6 @@ import PromiseKit
 /// only when we run evaluateScript() or dispatchEvent() that the ServiceWorkerExecutionEnvironment
 /// (and consequently, JSContext) are created.
 @objc public class ServiceWorker: NSObject {
-
     /// The URL the worker was downloaded from. Also serves as the base URL for any
     /// relative URLs loaded within the worker.
     public let url: URL
@@ -53,7 +52,7 @@ import PromiseKit
     #if DEBUG
         fileprivate func setJSContextDebuggingName() {
             if let exec = self._executionEnvironment {
-                exec.jsContextName = "\(url.absoluteString) (\(state.rawValue))"
+                exec.jsContextName = "\(self.url.absoluteString) (\(self.state.rawValue))"
             }
         }
     #endif
@@ -61,7 +60,7 @@ import PromiseKit
     public init(id: String, url: URL, state: ServiceWorkerInstallState) {
         self.id = id
         self.url = url
-        _installState = state
+        self._installState = state
         super.init()
     }
 
@@ -69,7 +68,6 @@ import PromiseKit
     /// has completed operations before we shut it down. Right now it only uses WebSQL
     /// stuff, but should probably also include setTimeout.
     public func ensureFinished() -> Promise<Void> {
-
         if let exec = self._executionEnvironment {
             let (promise, passthrough) = Promise<Void>.makePassthrough()
             exec.perform(#selector(ServiceWorkerExecutionEnvironment.ensureFinished(responsePromise:)), on: exec.thread, with: passthrough, waitUntilDone: false)
@@ -101,13 +99,11 @@ import PromiseKit
     fileprivate var loadingExecutionEnvironmentPromise: Promise<ServiceWorkerExecutionEnvironment>?
 
     internal func getExecutionEnvironment() -> Promise<ServiceWorkerExecutionEnvironment> {
-
         if let exec = _executionEnvironment {
             return Promise.value(exec)
         }
 
         if let loadingPromise = self.loadingExecutionEnvironmentPromise {
-
             // Our worker script loads asynchronously, so it's possible that
             // getExecutionEnvironment() could be run while an existing environment
             // is being created. Adding this promise means we can close that loop
@@ -120,7 +116,7 @@ import PromiseKit
         // like it (like, say, when ServiceWorkerRegistration is populating active, waiting etc)
         // without incurring a huge penalty for doing so.
 
-        Log.info?("Creating execution environment for worker: " + id)
+        Log.info?("Creating execution environment for worker: " + self.id)
 
         return firstly { () -> Promise<ServiceWorkerExecutionEnvironment> in
 
@@ -132,7 +128,6 @@ import PromiseKit
 
             Thread.detachNewThread { [unowned self] in
                 do {
-
                     let env = try ServiceWorkerExecutionEnvironment(self)
 
                     // Return the promise early, before we run...
@@ -176,7 +171,6 @@ import PromiseKit
                     return env
                 }
                 .ensure {
-
                     // Now that this promise is done, clear it out. It doesn't really matter because getExecutionEnvironment()
                     // will now just return self._executionEnvironment, but worth tidying up for when we implement spinning
                     // the environment back down again.
@@ -203,8 +197,7 @@ import PromiseKit
     /// The actual script execution work happens in ServiceWorkerExecutionEnvironment, but this wraps around that,
     /// making a generic function so we can cast the JS result to whatever native type we want.
     public func evaluateScript<T>(_ script: String) -> Promise<T> {
-
-        return getExecutionEnvironment()
+        return self.getExecutionEnvironment()
             .then { (exec: ServiceWorkerExecutionEnvironment) -> Promise<T> in
 
                 // We deliberately don't return any kind of JSValue from ServiceWorkerExecutionEnvironment, to avoid
@@ -228,7 +221,6 @@ import PromiseKit
     /// We should try to avoid using this wherever possible as it has the potential to leak JSValues, but
     /// sometimes it's necessary to perform some custom code directly onto our JSContext.
     public func withJSContext(_ cb: @escaping (JSContext) throws -> Void) -> Promise<Void> {
-
         let call = ServiceWorkerExecutionEnvironment.WithJSContextCall(cb)
 
         return self.getExecutionEnvironment()
@@ -240,7 +232,6 @@ import PromiseKit
     /// Much like evaluateScript, the bulk of the actual work is done in ServiceWorkerExecutionEnviroment - this
     /// is just a wrapper to ensure we end up on the worker thread.
     public func dispatchEvent(_ event: Event) -> Promise<Void> {
-
         let call = ServiceWorkerExecutionEnvironment.DispatchEventCall(event)
 
         // Need to actually profile whether this matters for performance, but if the exec environment already
@@ -248,13 +239,11 @@ import PromiseKit
         // anyway but there might be a small overhead?
 
         if let exec = self._executionEnvironment {
-
             exec.perform(#selector(ServiceWorkerExecutionEnvironment.dispatchEvent), on: exec.thread, with: call, waitUntilDone: false)
 
             return call.resolveVoid()
 
         } else {
-
             return self.getExecutionEnvironment()
                 .done { exec in
                     exec.perform(#selector(ServiceWorkerExecutionEnvironment.dispatchEvent), on: exec.thread, with: call, waitUntilDone: false)

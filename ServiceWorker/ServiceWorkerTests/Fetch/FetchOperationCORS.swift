@@ -1,11 +1,10 @@
-import XCTest
-@testable import ServiceWorker
 import GCDWebServers
 import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class FetchOperationCORSTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         URLCache.shared.removeAllCachedResponses()
@@ -18,7 +17,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testDisallowedCORSNoOption() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             GCDWebServerDataResponse(text: "blah")
         }
@@ -30,7 +28,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testDisallowedCORSOptionNoOrigin() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -41,7 +38,7 @@ class FetchOperationCORSTests: XCTestCase {
         }
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(text: "blah")
+            GCDWebServerDataResponse(text: "blah")
         }
 
         let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
@@ -60,7 +57,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testAllowedCORSOptionWithSpecificOrigin() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -73,7 +69,7 @@ class FetchOperationCORSTests: XCTestCase {
         }
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(text: "blah")
+            GCDWebServerDataResponse(text: "blah")
         }
 
         let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
@@ -93,7 +89,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testAllowedCORSOptionWithWildcardOrigin() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -106,7 +101,7 @@ class FetchOperationCORSTests: XCTestCase {
         }
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(text: "blah")
+            GCDWebServerDataResponse(text: "blah")
         }
 
         let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
@@ -126,7 +121,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testDisallowedCORSOptionMissingMethod() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -138,7 +132,7 @@ class FetchOperationCORSTests: XCTestCase {
         }
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(text: "blah")
+            GCDWebServerDataResponse(text: "blah")
         }
 
         let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
@@ -157,7 +151,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testAllowedCORSOptionWithMethod() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -169,7 +162,7 @@ class FetchOperationCORSTests: XCTestCase {
         }
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(text: "blah")
+            GCDWebServerDataResponse(text: "blah")
         }
 
         let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
@@ -187,7 +180,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testMissingHeaderWhenNotAllowed() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -224,7 +216,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testHasHeaderWhenAllowed() {
-
         let serverExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -264,7 +255,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testFiltersRequestHeadersWhenNoAllowHeaderIsProvided() {
-
         let optionsExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -307,7 +297,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testKeepsRequestHeadersWhenAllowHeaderIsProvided() {
-
         let optionsExpectation = expectation(description: "Fetch call should hit OPTIONS")
 
         TestWeb.server!.addHandler(forMethod: "OPTIONS", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
@@ -350,7 +339,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testAllowsOpaqueCORSResponse() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             GCDWebServerDataResponse(text: "blah")
         }
@@ -370,7 +358,6 @@ class FetchOperationCORSTests: XCTestCase {
     }
 
     func testReturnsBasicResponseWhenSameDomain() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "blah")!
             res.setValue("TEST", forAdditionalHeader: "X-Custom-Header")

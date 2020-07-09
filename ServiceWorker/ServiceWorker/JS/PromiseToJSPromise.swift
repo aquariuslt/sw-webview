@@ -1,13 +1,11 @@
 import Foundation
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
 
 public extension Promise {
-
     /// A convenience function added to all promises, to turn them into
     /// JS promises quickly and easily.
     func toJSPromiseInCurrentContext() -> JSValue? {
-
         guard let ctx = JSContext.current() else {
             fatalError("Cannot call toJSPromiseInCurrentContext() outside of a JSContext")
         }

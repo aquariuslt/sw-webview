@@ -3,9 +3,8 @@ import Foundation
 /// If you want to subclass InputStream you have to implement a load of boilerplate code to
 /// go along with it. This is that boilerplate code, so we can just inherit from this instead.
 open class InputStreamImplementation: InputStream {
-
     // Get an error about abstract classes if we do not implement this. No idea why.
-    open override var delegate: StreamDelegate? {
+    override open var delegate: StreamDelegate? {
         get {
             return self._delegate
         }
@@ -16,7 +15,7 @@ open class InputStreamImplementation: InputStream {
 
     fileprivate var _streamStatus: Stream.Status = .notOpen
 
-    open internal(set) override var streamStatus: Stream.Status {
+    override open internal(set) var streamStatus: Stream.Status {
         get {
             return self._streamStatus
         }
@@ -27,7 +26,7 @@ open class InputStreamImplementation: InputStream {
 
     fileprivate var _streamError: Error?
 
-    open internal(set) override var streamError: Error? {
+    override open internal(set) var streamError: Error? {
         get {
             return self._streamError
         }
@@ -50,25 +49,22 @@ open class InputStreamImplementation: InputStream {
 
     internal func emitEvent(event: Stream.Event) {
         if self.runLoops.count > 0 {
-
             // If we're already scheduled in a run loop, send immediately
 
-            self.runLoops.forEach({ loopPair in
+            self.runLoops.forEach { loopPair in
                 loopPair.key.perform(inModes: Array(loopPair.value), block: {
                     self.delegate?.stream?(self, handle: event)
                 })
-            })
+            }
 
         } else {
-
             // Otherwise store these events to be sent when we are scheduled
 
             self.pendingEvents.append(event)
         }
     }
 
-    open override func schedule(in aRunLoop: RunLoop, forMode mode: RunLoopMode) {
-
+    override open func schedule(in aRunLoop: RunLoop, forMode mode: RunLoopMode) {
         var modeArray = self.runLoops[aRunLoop] ?? Set<RunLoopMode>()
         modeArray.insert(mode)
         self.runLoops[aRunLoop] = modeArray
@@ -78,8 +74,7 @@ open class InputStreamImplementation: InputStream {
         self.pendingEvents.removeAll()
     }
 
-    open override func remove(from aRunLoop: RunLoop, forMode mode: RunLoopMode) {
-
+    override open func remove(from aRunLoop: RunLoop, forMode mode: RunLoopMode) {
         guard var existing = self.runLoops[aRunLoop] else {
             return
         }

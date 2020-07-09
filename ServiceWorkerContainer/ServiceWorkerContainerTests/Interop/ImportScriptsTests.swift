@@ -1,12 +1,11 @@
-import XCTest
 import GCDWebServers
-import ServiceWorker
 import JavaScriptCore
 import PromiseKit
+import ServiceWorker
 @testable import ServiceWorkerContainer
+import XCTest
 
 class ImportScriptsTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         TestWeb.createServer()
@@ -21,7 +20,6 @@ class ImportScriptsTests: XCTestCase {
     }
 
     func testImportingAScript() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/import.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             GCDWebServerDataResponse(data: "var test = 100; //testImporting ".data(using: String.Encoding.utf8)!, contentType: "text/javascript")
         }
@@ -38,11 +36,10 @@ class ImportScriptsTests: XCTestCase {
     }
 
     func testImportingASecondTimeUsesCache() {
-
         var toReturn = "test = 100; //testSecondTime"
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/import.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(data: toReturn.data(using: String.Encoding.utf8)!, contentType: "text/javascript")
+            GCDWebServerDataResponse(data: toReturn.data(using: String.Encoding.utf8)!, contentType: "text/javascript")
         }
 
         let worker = ServiceWorker(id: "TEST", url: TestWeb.serverURL.appendingPathComponent("test.js"), registration: DummyServiceWorkerRegistration(), state: .activated, content: "")
@@ -51,7 +48,7 @@ class ImportScriptsTests: XCTestCase {
 
         worker.evaluateScript("importScripts('import.js');")
             .then { _ -> Promise<JSValue?> in
-                return worker.evaluateScript("test = 150")
+                worker.evaluateScript("test = 150")
             }
             .then { _ -> Promise<JSValue?> in
                 toReturn = "test = 200"
@@ -64,11 +61,10 @@ class ImportScriptsTests: XCTestCase {
     }
 
     func testSecondWorkerDoesNotUseCache() {
-
         var toReturn = "test = 100; //testNotUseCache"
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/import.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
-            return GCDWebServerDataResponse(data: toReturn.data(using: String.Encoding.utf8)!, contentType: "text/javascript")
+            GCDWebServerDataResponse(data: toReturn.data(using: String.Encoding.utf8)!, contentType: "text/javascript")
         }
 
         let worker = ServiceWorker(id: "TEST", url: TestWeb.serverURL.appendingPathComponent("test.js"), registration: DummyServiceWorkerRegistration(), state: .activated, content: "var test = 50")
@@ -77,7 +73,7 @@ class ImportScriptsTests: XCTestCase {
         URLCache.shared.removeAllCachedResponses()
         worker.evaluateScript("importScripts('import.js');")
             .then { _ -> Promise<JSValue?> in
-                return worker.evaluateScript("test = 150")
+                worker.evaluateScript("test = 150")
             }
             .then { _ -> Promise<JSValue?> in
                 URLCache.shared.removeAllCachedResponses()

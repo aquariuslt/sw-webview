@@ -5,7 +5,6 @@ import JavaScriptCore
 /// a reference to the Data contained within them, otherwise the reference is
 /// lost and the data overwritten.
 class JSArrayBuffer: NSObject {
-
     /// We keep track of all the JSArrayBuffer instances that have been made
     /// and not yet deallocated. This means we never lose references to the data
     /// an array buffer is using.
@@ -16,7 +15,6 @@ class JSArrayBuffer: NSObject {
 
     /// This is called by the ArrayBuffer deallocator - set in make()
     static func unassign(bytes _: UnsafeMutableRawPointer?, reference: UnsafeMutableRawPointer?) {
-
         guard let existingReference = reference else {
             Log.error?("Received deallocate message from a JSArrayBuffer with no native reference")
             return
@@ -35,7 +33,6 @@ class JSArrayBuffer: NSObject {
     }
 
     static func make(from data: Data, in context: JSContext) -> JSValue {
-
         let instance = JSArrayBuffer(from: data)
 
         // create a strong reference to this data
@@ -49,7 +46,7 @@ class JSArrayBuffer: NSObject {
         // Now we make our actual array buffer JSValue using the data and deallocation callback
         let jsInstance = instance.data.withUnsafeMutableBytes { pointer -> JSObjectRef in
 
-            return JSObjectMakeArrayBufferWithBytesNoCopy(context.jsGlobalContextRef, pointer, data.count, { bytes, reference in
+            JSObjectMakeArrayBufferWithBytesNoCopy(context.jsGlobalContextRef, pointer, data.count, { bytes, reference in
                 JSArrayBuffer.unassign(bytes: bytes, reference: reference)
             }, instancePointer, nil)
         }

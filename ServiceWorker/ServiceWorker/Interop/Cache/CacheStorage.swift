@@ -12,7 +12,6 @@ import JavaScriptCore
 }
 
 @objc public protocol CacheStorage: CacheStorageJSExports, JSExport {
-
     /// This is used to define the Cache object in a worker's global scope - probaby
     /// not strictly necessary, but it matches what browsers do.
     static var CacheClass: Cache.Type { get }

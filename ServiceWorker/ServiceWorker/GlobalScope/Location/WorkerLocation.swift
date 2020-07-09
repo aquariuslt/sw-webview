@@ -16,5 +16,4 @@ import JavaScriptCore
 
 /// Basically the same as URL as far as I can, except for the fact that it is
 /// read-only. https://developer.mozilla.org/en-US/docs/Web/API/WorkerLocation
-@objc(WorkerLocation) public class WorkerLocation: LocationBase, WorkerLocationExports {
-}
+@objc(WorkerLocation) public class WorkerLocation: LocationBase, WorkerLocationExports {}

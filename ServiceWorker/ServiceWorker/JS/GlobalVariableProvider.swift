@@ -5,7 +5,6 @@ import JavaScriptCore
 // JSContext's global object. So instead we use this and defineProperty to map
 // properties without directly attaching them to the object.
 class GlobalVariableProvider {
-
     static let variableMaps = NSMapTable<JSContext, NSMutableDictionary>(keyOptions: NSPointerFunctions.Options.weakMemory, valueOptions: NSPointerFunctions.Options.strongMemory)
 
     fileprivate static func getDictionary(forContext context: JSContext) -> NSDictionary {
@@ -20,7 +19,6 @@ class GlobalVariableProvider {
 
     fileprivate static func createPropertyAccessor(for name: String) -> @convention(block) () -> Any? {
         return {
-
             guard let ctx = JSContext.current() else {
                 Log.error?("Tried to use a JS property accessor with no JSContext. Should never happen")
                 return nil
@@ -32,7 +30,6 @@ class GlobalVariableProvider {
     }
 
     static func destroy(forContext context: JSContext) {
-
         if let dict = variableMaps.object(forKey: context) {
             // Not really sure if this makes a difference, but we might as well
             // delete the property callbacks we created.
@@ -60,7 +57,6 @@ class GlobalVariableProvider {
     }
 
     static func add(variable: Any, to context: JSContext, withName name: String) {
-
         let dictionary = GlobalVariableProvider.getDictionary(forContext: context)
         dictionary.setValue(variable, forKey: name)
 
@@ -70,7 +66,6 @@ class GlobalVariableProvider {
     }
 
     static func add(missingPropertyWithError error: String, to context: JSContext, withName name: String) {
-
         context.globalObject.defineProperty(name, descriptor: [
             "get": {
                 if let ctx = JSContext.current() {

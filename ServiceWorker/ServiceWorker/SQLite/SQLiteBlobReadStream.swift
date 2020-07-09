@@ -3,7 +3,6 @@ import SQLite3
 
 /// A bridge between the a Foundation InputStream and the SQLite C API's blob functions.
 public class SQLiteBlobReadStream: InputStreamImplementation {
-
     let dbPointer: SQLiteBlobStreamPointer
 
     init(_ db: SQLiteConnection, table: String, column: String, row: Int64) {
@@ -15,8 +14,7 @@ public class SQLiteBlobReadStream: InputStreamImplementation {
         self.streamStatus = .notOpen
     }
 
-    public override func open() {
-
+    override public func open() {
         do {
             self.streamStatus = Stream.Status.opening
             try self.dbPointer.open()
@@ -28,7 +26,7 @@ public class SQLiteBlobReadStream: InputStreamImplementation {
         }
     }
 
-    public override var hasBytesAvailable: Bool {
+    override public var hasBytesAvailable: Bool {
         guard let state = self.dbPointer.openState else {
             // As specified in docs: https://developer.apple.com/documentation/foundation/inputstream/1409410-hasbytesavailable
             // both hasSpaceAvailable and hasBytesAvailable should return true when the actual state is unknown.
@@ -37,12 +35,12 @@ public class SQLiteBlobReadStream: InputStreamImplementation {
         return state.currentPosition < state.blobLength
     }
 
-    public override func close() {
+    override public func close() {
         self.dbPointer.close()
         self.streamStatus = .closed
     }
 
-    public override func read(_ buffer: UnsafeMutablePointer<UInt8>, maxLength len: Int) -> Int {
+    override public func read(_ buffer: UnsafeMutablePointer<UInt8>, maxLength len: Int) -> Int {
         do {
             self.streamStatus = .reading
             guard let state = self.dbPointer.openState else {
@@ -79,7 +77,6 @@ public class SQLiteBlobReadStream: InputStreamImplementation {
 
             return Int(lengthToRead)
         } catch {
-
             self.throwError(error)
             return -1
         }

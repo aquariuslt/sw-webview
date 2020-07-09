@@ -5,7 +5,6 @@ import JavaScriptCore
 /// variables will be both globally accessible, and available on the "self" variable. (e.g.
 /// self.addEventListener() and addEventListener() both work).
 @objc class ServiceWorkerGlobalScope: EventTarget {
-
     let console: ConsoleMirror
     unowned let worker: ServiceWorker
     unowned let context: JSContext
@@ -29,7 +28,6 @@ import JavaScriptCore
     }
 
     init(context: JSContext, _ worker: ServiceWorker) throws {
-
         self.console = try ConsoleMirror(in: context)
         self.worker = worker
         self.context = context
@@ -38,7 +36,6 @@ import JavaScriptCore
         if let workerLocation = WorkerLocation(withURL: worker.url) {
             self.location = workerLocation
         } else {
-
             // There's really no reason why this would ever happen, but URLComponents.init
             // returns an optional so we need to cover the possibility.
 
@@ -56,7 +53,6 @@ import JavaScriptCore
     }
 
     fileprivate func attachVariablesToContext() throws {
-
         // Annoyingly, we can't change the globalObject to be a reference to this. Instead, we have to take
         // all the attributes from the global scope and manually apply them to the existing global object.
 
@@ -90,7 +86,6 @@ import JavaScriptCore
         GlobalVariableProvider.add(variable: try WorkerLocation.createJSValue(for: self.context), to: self.context, withName: "WorkerLocation")
 
         if let storage = self.worker.cacheStorage {
-
             // Cache storage is provided through a delegate, which might not exist. So, if it does
             // then we add the object itself:
 
@@ -103,7 +98,6 @@ import JavaScriptCore
             GlobalVariableProvider.add(variable: type(of: storage).CacheClass, to: self.context, withName: "Cache")
 
         } else {
-
             // Otherwise we add a "special" property that throws an error when accessed.
 
             GlobalVariableProvider.add(missingPropertyWithError: "CacheStorage has not been provided for this worker", to: self.context, withName: "caches")
@@ -128,7 +122,6 @@ import JavaScriptCore
     /// https://github.com/axemclion/IndexedDBShim
     /// It's over 100KB, even minified, so it would be great to get rid of it some day.
     fileprivate func loadIndexedDBShim() throws {
-
         let file = Bundle(for: ServiceWorkerGlobalScope.self).bundleURL
             .appendingPathComponent("js-dist", isDirectory: true)
             .appendingPathComponent("indexeddbshim.js")
@@ -221,7 +214,6 @@ import JavaScriptCore
     /// the strings into URLs, then passes to the delegate (almost always ServiceWorkerExecutionEnvironment)
     internal func importScripts() {
         do {
-
             guard let delegate = self.delegate else {
                 throw ErrorMessage("No global scope delegate set, cannot import scripts")
             }

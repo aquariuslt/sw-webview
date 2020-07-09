@@ -5,7 +5,6 @@ import Foundation
 /// listen and forward these details to our webview. Made this very quickly, it should
 /// almost definitely actually be using NSNotificationCenter or similar.
 public class GlobalEventLog {
-
     // We only keep weak references to our listeners because if the object containing
     // the listener is disregarded, the listener should be as well.
     fileprivate static var listeners = NSHashTable<NSObject>.weakObjects()
@@ -32,7 +31,6 @@ public class GlobalEventLog {
 
 // Using NSObject to get around generic issues. Bad? Maybe.
 public class Listener<T>: NSObject {
-
     let funcToRun: (T) -> Void
 
     init(_ funcToRun: @escaping (T) -> Void) {

@@ -8,11 +8,9 @@ private struct MigrationAndVersion {
 /// This could probably be fleshed out a lot more than it is, but a very quick and dirty class to manage database
 /// migrations.
 public class DatabaseMigration {
-
     /// Creates a table with identifier and value fields - right now it's only ever used to insert one row
     /// called 'currentVersion'. But extendable for... something in the future.
     private static func ensureMigrationTableCreated(_ db: SQLiteConnection) throws {
-
         try db.exec(sql: """
             CREATE TABLE IF NOT EXISTS _migrations (
                  "identifier" text NOT NULL,
@@ -25,7 +23,6 @@ public class DatabaseMigration {
     }
 
     private static func getCurrentMigrationVersion(_ db: SQLiteConnection) throws -> Int {
-
         return try db.select(sql: "SELECT value FROM _migrations WHERE identifier = 'currentVersion'") { rs -> Int in
             if try rs.next() == false {
                 throw ErrorMessage("Could not find row for current migration version")
@@ -38,11 +35,9 @@ public class DatabaseMigration {
     }
 
     public static func check(dbPath: URL, migrationsPath: URL) throws -> Int {
-
         return try SQLiteConnection.inConnection(dbPath) { connection in
 
             try connection.inTransaction {
-
                 try self.ensureMigrationTableCreated(connection)
                 let currentVersion = try self.getCurrentMigrationVersion(connection)
 
@@ -66,7 +61,6 @@ public class DatabaseMigration {
                     .sorted(by: { $1.version > $0.version })
 
                 for migration in migrationFiles {
-
                     Log.info?("Processing migration file: " + migration.fileName.lastPathComponent)
                     let sql = try String(contentsOfFile: migration.fileName.path)
 

@@ -18,7 +18,6 @@ import JavaScriptCore
 /// Quick implementation of URLSearchParams: https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams
 /// does not store any information internally, just sets and gets from the underlying URLComponents.
 @objc public class URLSearchParams: NSObject, URLSearchParamsExport {
-
     var components: URLComponents
 
     init(components: URLComponents) {
@@ -47,7 +46,7 @@ import JavaScriptCore
     }
 
     public func delete(_ name: String) {
-        self.queryItems = self.queryItems.filter({ $0.name != name })
+        self.queryItems = self.queryItems.filter { $0.name != name }
     }
 
     fileprivate func toIterator(item: Any) -> JSValue? {
@@ -63,7 +62,6 @@ import JavaScriptCore
     }
 
     public func entries(_ name: String) -> JSValue? {
-
         let entriesArray = self.queryItems
             .filter { $0.name == name }
             .map { [$0.name, $0.value] }
@@ -78,7 +76,6 @@ import JavaScriptCore
     }
 
     public func getAll(_ name: String) -> [String] {
-
         var all: [String] = []
 
         self.queryItems.forEach { item in
@@ -97,11 +94,11 @@ import JavaScriptCore
     public func keys(_: String) -> JSValue? {
         var keys: [String] = []
 
-        self.queryItems.forEach({ item in
+        self.queryItems.forEach { item in
             if keys.contains(item.name) == false {
                 keys.append(item.name)
             }
-        })
+        }
 
         return self.toIterator(item: keys)
     }
@@ -120,7 +117,6 @@ import JavaScriptCore
     }
 
     public func values() -> JSValue? {
-
         let valuesArray = self.queryItems.map { $0.value }
 
         return self.toIterator(item: valuesArray)

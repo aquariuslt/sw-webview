@@ -1,12 +1,10 @@
-import XCTest
-@testable import ServiceWorker
 import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class GlobalScopeTests: XCTestCase {
-
     func testCanAccessGlobalVariables() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.evaluateScript("location.host")
@@ -17,7 +15,6 @@ class GlobalScopeTests: XCTestCase {
     }
 
     func testEventListenersWork() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
         sw.withJSContext { context in
 
@@ -38,7 +35,7 @@ class GlobalScopeTests: XCTestCase {
             return sw.dispatchEvent(ev)
         }
         .map {
-            return sw.withJSContext { context in
+            sw.withJSContext { context in
                 XCTAssertEqual(context.objectForKeyedSubscript("fired").toInt32(), 2)
             }
         }
@@ -46,7 +43,6 @@ class GlobalScopeTests: XCTestCase {
     }
 
     func testEventListenersHandleErrors() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
         sw.withJSContext { context in
 
@@ -62,7 +58,7 @@ class GlobalScopeTests: XCTestCase {
             return sw.dispatchEvent(ev)
         }
         .map { () -> Int in
-            return 1
+            1
         }
         .recover { error -> Guarantee<Int> in
             XCTAssertEqual((error as! ErrorMessage).message, "Error: oh no")
@@ -99,7 +95,6 @@ class GlobalScopeTests: XCTestCase {
     }
 
     func testHasLocation() {
-
         let sw = TestWorker(id: name, state: .activated, url: URL(string: "http://www.example.com/sw.js")!, content: "")
 
         sw.evaluateScript("[self.location, location]")

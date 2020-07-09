@@ -10,7 +10,6 @@ import Foundation
 
 // Can't use string enums because Objective C doesn't like them
 extension ClientType {
-
     var stringValue: String {
         switch self {
         case .SharedWorker:

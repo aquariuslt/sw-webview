@@ -3,7 +3,6 @@ import JavaScriptCore
 
 /// The part of our FetchHeaders object that will be available inside a JSContext
 @objc protocol FetchHeadersExports: JSExport {
-
     func set(_ name: String, _ value: String)
     func get(_ name: String) -> String?
     func delete(_ name: String)
@@ -15,7 +14,6 @@ import JavaScriptCore
 
 /// Replicating the Fetch APIs Headers object: https://developer.mozilla.org/en-US/docs/Web/API/Headers
 @objc public class FetchHeaders: NSObject, FetchHeadersExports {
-
     struct KeyValuePair {
         let key: String
         let value: String
@@ -24,7 +22,6 @@ import JavaScriptCore
     internal var values: [KeyValuePair] = []
 
     public func set(_ name: String, _ value: String) {
-
         self.delete(name)
         self.values.append(KeyValuePair(key: name.lowercased(), value: value))
     }
@@ -43,7 +40,7 @@ import JavaScriptCore
     }
 
     public func get(_ name: String) -> String? {
-        let all = getAll(name)
+        let all = self.getAll(name)
 
         if all.count == 0 {
             return nil
@@ -58,7 +55,7 @@ import JavaScriptCore
             .map { $0.value }
     }
 
-    public required override init() {
+    override public required init() {
         super.init()
     }
 
@@ -78,7 +75,6 @@ import JavaScriptCore
     /// - Returns: A complete FetchHeaders object with the headers provided in the JSON
     /// - Throws: If the JSON cannot be parsed successfully.
     public static func fromJSON(_ json: String) throws -> FetchHeaders {
-
         guard let jsonAsData = json.data(using: String.Encoding.utf8) else {
             throw ErrorMessage("Could not parse JSON string")
         }
@@ -107,7 +103,6 @@ import JavaScriptCore
     /// - Returns: A JSON string
     /// - Throws: if the JSON can't be encoded. Not sure what would ever cause this to happen.
     public func toJSON() throws -> String {
-
         var dictionaryArray: [[String: String]] = []
         keys().forEach { key in
             self.getAll(key).forEach { value in
@@ -127,7 +122,6 @@ import JavaScriptCore
     }
 
     public func filteredBy(allowedKeys: [String]) -> FetchHeaders {
-
         let lowercaseAllowed = allowedKeys.map { $0.lowercased() }
 
         let filteredHeaders = FetchHeaders()
@@ -145,7 +139,6 @@ import JavaScriptCore
     }
 
     public func filteredBy(disallowedKeys: [String]) -> FetchHeaders {
-
         let lowercaseDisallowed = disallowedKeys.map { $0.lowercased() }
 
         let filteredHeaders = FetchHeaders()

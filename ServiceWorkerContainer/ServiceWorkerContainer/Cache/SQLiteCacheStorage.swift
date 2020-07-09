@@ -1,10 +1,9 @@
 import Foundation
-import ServiceWorker
 import JavaScriptCore
 import PromiseKit
+import ServiceWorker
 
 @objc public class SQLiteCacheStorage: NSObject, CacheStorage {
-
     public static var CacheClass = SQLiteCache.self as Cache.Type
 
     //    let origin: URL
@@ -12,7 +11,6 @@ import PromiseKit
     weak var worker: ServiceWorker?
 
     public init(for worker: ServiceWorker) throws {
-
         self.worker = worker
 
         super.init()
@@ -21,7 +19,6 @@ import PromiseKit
     func getRequest(fromJSValue value: JSValue) throws -> FetchRequest {
         let request: FetchRequest
         if value.isString {
-
             guard let stringURL = value.toString() else {
                 throw ErrorMessage("Could not create native string from value provided")
             }
@@ -36,7 +33,6 @@ import PromiseKit
 
             request = FetchRequest(url: requestURL)
         } else if value.isInstance(of: FetchRequest.self) {
-
             guard let asRequest = value.toObjectOf(FetchRequest.self) as? FetchRequest else {
                 throw ErrorMessage("Could not convert to a FetchRequest")
             }
@@ -49,7 +45,6 @@ import PromiseKit
     }
 
     func createMatchWhere(fromRequest request: FetchRequest, andOptions options: [String: Any]?) throws -> (where: String, values: [Any?]) {
-
         let (urlNoQuery, query) = try self.separateQueryAndMakeSW(fromURL: request.url)
 
         var wheres: [String] = ["request_url_no_query = ?"]
@@ -89,7 +84,6 @@ import PromiseKit
     }
 
     func matchAll(_ stringOrRequest: JSValue, _ options: [String: Any]?, stopAfterFirst: Bool = false) -> Promise<[FetchResponseProtocol]> {
-
         do {
             let request = try self.getRequest(fromJSValue: stringOrRequest)
 
@@ -98,7 +92,7 @@ import PromiseKit
             let ignoreVary = options?["ignoreVary"] as? Bool ?? false
 
             let responses = try DBConnectionPool.inConnection(at: self.getDBURL(), type: .cache) { db in
-                return try db.select(sql: """
+                try db.select(sql: """
                     SELECT
                         rowid,
                         vary_by_headers,
@@ -115,9 +109,7 @@ import PromiseKit
                     var responses: [FetchResponseProtocol] = []
 
                     while try rs.next() {
-
                         if let varyHeadersJSON = try rs.string("vary_by_headers"), ignoreVary == false {
-
                             let varyHeaders = try FetchHeaders.fromJSON(varyHeadersJSON)
                             let hasFailedMatch = varyHeaders.keys().first(where: { varyHeaders.get($0) != request.headers.get($0) })
 
@@ -190,7 +182,6 @@ import PromiseKit
     }
 
     public func open(_ name: String) -> JSValue? {
-
         return firstly { () -> Promise<SQLiteCache> in
 
             try DBConnectionPool.inConnection(at: self.getDBURL(), type: .cache) { db in
@@ -203,7 +194,6 @@ import PromiseKit
     }
 
     public func delete(_ name: String) -> JSValue? {
-
         return firstly { () -> Promise<Bool> in
 
             let alreadyExists = try self.nativeHas(name)
@@ -220,10 +210,9 @@ import PromiseKit
     }
 
     public func keys() -> JSValue? {
-
         return firstly {
             try DBConnectionPool.inConnection(at: self.getDBURL(), type: DatabaseType.cache) { db in
-                return try db.select(sql: "SELECT cache_name FROM caches") { rs -> Promise<[String]> in
+                try db.select(sql: "SELECT cache_name FROM caches") { rs -> Promise<[String]> in
 
                     var names: [String] = []
                     while try rs.next() {
@@ -246,8 +235,7 @@ import PromiseKit
     fileprivate static var currentOpenConnections = NSHashTable<SQLiteConnection>.weakObjects()
 
     fileprivate static func getConnection(for url: URL) throws -> SQLiteConnection {
-
-        let existing = currentOpenConnections.allObjects.first(where: { $0.url.absoluteString == url.absoluteString })
+        let existing = self.currentOpenConnections.allObjects.first(where: { $0.url.absoluteString == url.absoluteString })
 
         if let doesExist = existing {
             return doesExist
@@ -259,7 +247,6 @@ import PromiseKit
     }
 
     func getDBURL() throws -> URL {
-
         guard let worker = self.worker else {
             throw ErrorMessage("SQLiteCacheStorage no longer has a reference to the worker")
         }
@@ -274,7 +261,6 @@ import PromiseKit
     }
 
     fileprivate func getVaryHeaders(varyHeader: String?, requestHeaders: FetchHeaders) -> FetchHeaders? {
-
         guard let varyString = varyHeader else {
             return nil
         }
@@ -325,7 +311,6 @@ import PromiseKit
     }
 
     func delete(cacheName _: String, request: FetchRequest, options: [String: Any]?) throws {
-
         let (fields, values) = try self.createMatchWhere(fromRequest: request, andOptions: options)
 
         try DBConnectionPool.inConnection(at: try self.getDBURL(), type: .cache) { db in
@@ -347,7 +332,6 @@ import PromiseKit
     //    }
 
     func put(cacheName: String, request: FetchRequest, response: CacheableFetchResponse) -> Promise<Void> {
-
         if request.method == "POST" {
             return Promise(error: ErrorMessage("Caching of POST requests is not supported"))
         }

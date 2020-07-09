@@ -3,7 +3,6 @@ import PromiseKit
 import ServiceWorker
 
 @objc public class ServiceWorkerContainer: NSObject, WindowClientProtocol {
-
     public var id: String
 
     public var url: URL
@@ -56,7 +55,7 @@ import ServiceWorker
 
             // remove controller if it has become redundant
 
-            if worker == self.controller && worker.state == .redundant {
+            if worker == self.controller, worker.state == .redundant {
                 self.controller = nil
             }
         }
@@ -95,7 +94,6 @@ import ServiceWorker
     }
 
     public func getRegistration(_ scope: URL? = nil) -> Promise<ServiceWorkerRegistration?> {
-
         do {
             var scopeToCheck = self.url
             if let specifiedScope = scope {
@@ -117,8 +115,7 @@ import ServiceWorker
     }
 
     public func register(workerURL: URL, options: ServiceWorkerRegistrationOptions?) -> Promise<ServiceWorkerRegistration> {
-
-        return firstly { ()->Promise<ServiceWorkerRegistration> in
+        return firstly { () -> Promise<ServiceWorkerRegistration> in
 
             if workerURL.host != url.host {
                 throw ErrorMessage("Service worker scope must be on the same domain as both the page and worker URL")
@@ -149,7 +146,6 @@ import ServiceWorker
             let maxScope = scopeURL
 
             if let scope = options?.scope {
-
                 // We have a custom scope. Let's say, "/test/sub-test/". That scope must
                 // fall under our maximum scope.
                 if scope.absoluteString.hasPrefix(maxScope.absoluteString) == false {

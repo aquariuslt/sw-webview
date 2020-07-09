@@ -17,11 +17,8 @@ import JavaScriptCore
 
 /// An implementation of the JS URL object: https://developer.mozilla.org/en-US/docs/Web/API/URL
 @objc public class JSURL: LocationBase, JSURLExports {
-
     public required init?(url: JSValue, relativeTo: JSValue) {
-
         do {
-
             var parsedRelative: URL?
 
             if relativeTo.isUndefined == false {

@@ -1,12 +1,11 @@
 import Foundation
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
 
 /// This represents a download from FetchSession. It is created as soon as status, headers etc are received,
 /// and contains promise methods to transform incoming data into a variety of formats. It's modelled on the
 /// Response object on the web, but our worker environments actually use FetchResponseProxy in that context.
 @objc public class FetchResponse: NSObject {
-
     /// The incoming data. In FetchSession it's assigned in a delegate method, but this could also
     /// be assigned as the result of response.clone(), or new Response()
     internal var streamPipe: StreamPipe?
@@ -47,7 +46,6 @@ import JavaScriptCore
     /// the data in a response more than once - for instance, to send one copy to the cache and the other to
     /// text()
     func clone() throws -> FetchResponse {
-
         guard let streamPipe = self.streamPipe else {
             throw ErrorMessage("Cannot clone response after stream has been removed")
         }
@@ -88,7 +86,7 @@ import JavaScriptCore
     /// chain off this to do whatever they need to with the data. Not in the web API spec, but is roughly
     /// a mirror of arrayBuffer()
     func data() -> Promise<Data> {
-        return firstly {() -> Promise<Data> in
+        return firstly { () -> Promise<Data> in
             try self.markBodyUsed()
 
             let memoryStream = OutputStream.toMemory()
@@ -106,7 +104,7 @@ import JavaScriptCore
 
                     return data
                 }
-            }
+        }
     }
 
     /// Another non-spec addition. Because we don't know the length of responses (might not have a Content-Length header,
@@ -116,7 +114,6 @@ import JavaScriptCore
     /// Once we have downloaded the file, we call the callback, which resolves to a promise. Once that promise is resolved
     /// (that is, we can do something asynchronous) we delete the temporarily stored file.
     public func fileDownload<T>(_ callback: @escaping (URL, Int64) throws -> Promise<T>) -> Promise<T> {
-
         // The resulting type of this promise is dictated by the object returned by the inner callback.
         // The idea being that the code using fileDownload() can relatively seamlessly pass a result back
         // into the main promise chain without worrying about manually deleting the temp file.
@@ -162,7 +159,6 @@ import JavaScriptCore
                     return try callback(downloadPath, size)
                 }
                 .ensure {
-
                     // Now that our promise has been resolved (successfully or not)
                     // we can delete the temporary file we just downloaded.
 
@@ -171,14 +167,13 @@ import JavaScriptCore
                     } catch {
                         Log.error?("Could not delete temporary fetch file at \(downloadPath.path)")
                     }
-            }
+                }
         }
     }
 
     /// Pretty much what you'd expect. Uses JSONSerialization to turn the data into
     /// a Dictionary, Array, nil, or whatever the JSON represents.
     func json() -> Promise<Any?> {
-
         return self.data()
             .map { data in
                 try JSONSerialization.jsonObject(with: data, options: [])
@@ -189,7 +184,6 @@ import JavaScriptCore
     /// to know what charset to decode with. We default to UTF8, but if the Content-Type header specifies
     /// a different charset, we use that instead.
     fileprivate static func guessCharsetFrom(headers: FetchHeaders) -> String.Encoding {
-
         var charset = String.Encoding.utf8
 
         if let contentTypeHeader = headers.get("Content-Type") {
@@ -198,7 +192,6 @@ import JavaScriptCore
                 let charsetMatches = charsetRegex.matches(in: contentTypeHeader, options: [], range: NSRange(location: 0, length: contentTypeHeader.count))
 
                 if let relevantMatch = charsetMatches.first {
-
                     let matchText = (contentTypeHeader as NSString).substring(with: relevantMatch.range).lowercased()
 
                     if matchText == "utf-16" {
@@ -219,8 +212,7 @@ import JavaScriptCore
 
     /// Transform the stream data into text.
     public func text() -> Promise<String> {
-
-        let encoding = FetchResponse.guessCharsetFrom(headers: headers)
+        let encoding = FetchResponse.guessCharsetFrom(headers: self.headers)
         return self.data()
             .map { data -> String in
                 guard let str = String(data: data, encoding: encoding) else {

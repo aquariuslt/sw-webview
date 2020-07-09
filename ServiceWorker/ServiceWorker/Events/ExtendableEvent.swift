@@ -10,7 +10,6 @@ import PromiseKit
 /// it lets us prolong the life of an event by sending a promise to waitUntil(). It's useful in the install and active events
 /// to not update the state of a worker until you've cached URLs, set up a database, etc.
 @objc public class ExtendableEvent: NSObject, ExtendableEventExports {
-
     public let type: String
 
     public init(type: String) {
@@ -31,7 +30,6 @@ import PromiseKit
     fileprivate var pendingPromises: [JSValue] = []
 
     func waitUntil(_ val: JSValue) {
-
         if self.state == .resolved {
             val.context.exception = JSValue(newErrorFromMessage: "You used waitUntil() too late - the event has already been resolved", in: val.context)
             return
@@ -49,7 +47,6 @@ import PromiseKit
     }
 
     public func resolve(in worker: ServiceWorker) -> Promise<Void> {
-
         self.state = .resolved
 
         // Create a native promise to bridge the JS promise success/failure
@@ -111,7 +108,6 @@ import PromiseKit
             }
         }
         .then {
-
             // Now that the withJSContext() code has executed, we return the original
             // promise we created, which will resolve once the jsFunc call above resolves
             // all the JS promises.
@@ -119,7 +115,6 @@ import PromiseKit
             promise
 
         }.ensure {
-
             // There's no point keeping onto the JSValues that were attached with waitUntil()
             // once the promise has been resolved or rejected, so we'll proactively clear them out.
 

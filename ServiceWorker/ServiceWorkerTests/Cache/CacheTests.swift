@@ -1,19 +1,16 @@
-import XCTest
-@testable import ServiceWorker
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class CacheTests: XCTestCase {
-
     static func stubReject() -> JSValue {
-
         let p = try! JSContextPromise(newPromiseInContext: JSContext.current())
         p.reject(ErrorMessage("Not using this"))
         return p.jsValue!
     }
 
     @objc class TestCache: NSObject, Cache {
-
         let name: String
         init(name: String) {
             self.name = name
@@ -45,7 +42,6 @@ class CacheTests: XCTestCase {
         }
 
         func keys(_: JSValue, _: [String: Any]?) -> JSValue? {
-
             let testKeys = ["\(self.name)-file1.js", "\(self.name)-file2.css"]
             return Promise.value(testKeys)
                 .toJSPromiseInCurrentContext()
@@ -53,7 +49,6 @@ class CacheTests: XCTestCase {
     }
 
     @objc class TestStorage: NSObject, CacheStorage {
-
         static var CacheClass: Cache.Type = TestCache.self
 
         let names: [String]
@@ -79,14 +74,12 @@ class CacheTests: XCTestCase {
         }
 
         func keys() -> JSValue? {
-
             return Promise.value(self.names)
                 .toJSPromiseInCurrentContext()
         }
     }
 
     func testShouldFailByDefault() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
 
         sw.evaluateScript("""
@@ -100,7 +93,6 @@ class CacheTests: XCTestCase {
     }
 
     func testShouldUseImplementationWhenProvided() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
         sw.cacheStorage = TestStorage(names: ["TestCache", "TestCache2"])
 
@@ -110,7 +102,7 @@ class CacheTests: XCTestCase {
         """)
             .then { (jsVal: JSContextPromise) in
 
-                return jsVal.resolve()
+                jsVal.resolve()
             }
             .map { (arr: [String]) -> Void in
 
@@ -121,7 +113,6 @@ class CacheTests: XCTestCase {
     }
 
     func testShouldOpenCacheAndGiveKeys() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
         sw.cacheStorage = TestStorage(names: ["TestCache"])
 
@@ -130,7 +121,7 @@ class CacheTests: XCTestCase {
             .then((cache) => cache.keys())
         """)
             .then { (jsVal: JSContextPromise) in
-                return jsVal.resolve()
+                jsVal.resolve()
             }
             .map { (items: [String]) -> Void in
                 XCTAssertEqual(items[0], "TestCache-file1.js")

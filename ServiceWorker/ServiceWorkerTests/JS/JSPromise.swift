@@ -1,12 +1,10 @@
-import XCTest
 import JavaScriptCore
-@testable import ServiceWorker
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class JSPromiseTests: XCTestCase {
-
     func testFulfillPromise() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
         var promise: JSContextPromise?
 

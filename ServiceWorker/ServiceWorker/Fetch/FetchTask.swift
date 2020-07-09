@@ -4,7 +4,6 @@ import PromiseKit
 /// Another part of our bridge between FetchSession and URLSession. We use both a URLSessionDataTask AND a
 /// URLSessionStreamTask as part of our download process, so we need a place where we can connect the two.
 class FetchTask: NSObject {
-
     /// When we receive the headers etc., we are using a data task...
     let dataTask: URLSessionDataTask
 
@@ -39,7 +38,6 @@ class FetchTask: NSObject {
     }
 
     deinit {
-
         // Haven't explored this extensively, but if the task gets deallocated it's because the
         // code is no longer using it. For example, calling fetch() and never running a data transformer.
         // If that happens, we terminate the download, so we're not wasting bandwidth with content we
@@ -56,7 +54,6 @@ class FetchTask: NSObject {
     fileprivate var redirected = false
 
     func shouldFollowRedirect() -> Bool {
-
         // As specified by the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Request/redirect
         // we need to change our behaviour based on what the user has specified.
 
@@ -98,7 +95,6 @@ class FetchTask: NSObject {
             }
 
             if keyString.lowercased() == "content-encoding" || keyString.lowercased() == "content-length" {
-
                 // URLSession automatically decodes content (which we don't actually want it to do)
                 // so if we pass along this response to a browser with the encoding header still set, it'll
                 // fail because it will try to decode non-compressed content. The content-length header is also

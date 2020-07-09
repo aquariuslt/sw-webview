@@ -1,17 +1,8 @@
-//
-//  CoreDatabase.swift
-//  ServiceWorkerContainer
-//
-//  Created by alastair.coote on 24/07/2017.
-//  Copyright © 2017 Guardian Mobile Innovation Lab. All rights reserved.
-//
+import Foundation
+import PromiseKit
+import ServiceWorker
 
- import Foundation
- import PromiseKit
- import ServiceWorker
-
- public class CoreDatabase {
-
+public class CoreDatabase {
     //    public static let dbPath = SharedResources.appGroupStorage.appendingPathComponent("core.db")
     public static var dbDirectory: URL?
 
@@ -24,13 +15,11 @@
     static var dbMigrationCheckDone = false
 
     fileprivate static func doMigrationCheck() throws {
-
         guard let dbPath = self.dbPath else {
             throw ErrorMessage("CoreDatabase.dbPath must be set on app startup")
         }
 
         if self.dbMigrationCheckDone == false {
-
             Log.info?("Migration check for core DB not done yet, doing it now...")
 
             let migrations = URL(fileURLWithPath: Bundle(for: Self.self).bundlePath, isDirectory: true)
@@ -42,7 +31,7 @@
             try FileManager.default.createDirectory(at: dbPath.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
 
             _ = try DatabaseMigration.check(dbPath: dbPath, migrationsPath: migrations)
-            dbMigrationCheckDone = true
+            self.dbMigrationCheckDone = true
         }
     }
 
@@ -50,7 +39,6 @@
     fileprivate static var conn: SQLiteConnection?
 
     public static func inConnection<T>(_ cb: (SQLiteConnection) throws -> T) throws -> T {
-
         guard let dbPath = self.dbPath else {
             throw ErrorMessage("CoreDatabase.dbPath must be set on app startup")
         }
@@ -71,7 +59,6 @@
     }
 
     public static func inConnection<T>(_ cb: @escaping (SQLiteConnection) throws -> Promise<T>) -> Promise<T> {
-
         return firstly { () -> Promise<T> in
 
             guard let dbPath = self.dbPath else {
@@ -80,7 +67,7 @@
             try self.doMigrationCheck()
 
             return try cb(self.getOrCreateConnection(dbPath))
-            }
+        }
     }
 
     static func createConnection() throws -> SQLiteConnection {
@@ -89,4 +76,4 @@
         }
         return try SQLiteConnection(dbPath)
     }
- }
+}

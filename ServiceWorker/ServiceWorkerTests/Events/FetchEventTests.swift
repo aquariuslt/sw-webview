@@ -1,11 +1,9 @@
-import XCTest
-@testable import ServiceWorker
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class FetchEventTests: XCTestCase {
-
     func testRespondWithString() {
-
         let sw = ServiceWorker.createTestWorker(id: name, content: """
             self.addEventListener('fetch',(e) => {
                 e.respondWith(new Response("hello"));
@@ -18,7 +16,7 @@ class FetchEventTests: XCTestCase {
 
         sw.dispatchEvent(fetch)
             .then {
-                return try fetch.resolve(in: sw)
+                try fetch.resolve(in: sw)
             }
             .then { res -> Promise<String> in
                 XCTAssertNotNil(res)
@@ -31,7 +29,6 @@ class FetchEventTests: XCTestCase {
     }
 
     func testRespondWithPromise() {
-
         let sw = ServiceWorker.createTestWorker(id: name, content: """
             self.addEventListener('fetch',(e) => {
                 e.respondWith(new Promise((fulfill) => {
@@ -46,7 +43,7 @@ class FetchEventTests: XCTestCase {
 
         sw.dispatchEvent(fetch)
             .then {
-                return try fetch.resolve(in: sw)
+                try fetch.resolve(in: sw)
             }
             .then { res -> Promise<String> in
                 XCTAssertNotNil(res)

@@ -5,7 +5,6 @@ import JavaScriptCore
 /// need to be different classes). Is basically a quick map between a URL object and
 /// the JS API: https://developer.mozilla.org/en-US/docs/Web/API/URL
 @objc public class LocationBase: NSObject {
-
     fileprivate var components: URLComponents
     @objc public let searchParams: URLSearchParams
 
@@ -43,7 +42,6 @@ import JavaScriptCore
 
     @objc public var `protocol`: String {
         get {
-
             if let scheme = components.scheme {
                 return scheme + ":"
             } else {
@@ -51,13 +49,12 @@ import JavaScriptCore
             }
         }
         set(value) {
-            components.scheme = value
+            self.components.scheme = value
         }
     }
 
     @objc public var host: String {
         get {
-
             var host = self.hostname
 
             if let port = self.components.port {
@@ -67,7 +64,6 @@ import JavaScriptCore
             return host
         }
         set(value) {
-
             guard let newComponents = URLComponents(string: value) else {
                 return
             }
@@ -146,14 +142,12 @@ import JavaScriptCore
     }
 
     internal static func getCurrentInstance<T: LocationBase>() -> T? {
-
         guard let currentContext = JSContext.current() else {
             Log.error?("Somehow called URL hash getter outside of a JSContext. Should never happen")
             return nil
         }
 
         guard let this = JSContext.currentThis().toObjectOf(T.self) as? T else {
-
             currentContext.exception = currentContext
                 .objectForKeyedSubscript("TypeError")
                 .construct(withArguments: ["self type check failed for Objective-C instance method"])
@@ -180,7 +174,6 @@ import JavaScriptCore
     }
 
     internal static func createJSValue(for context: JSContext) throws -> JSValue {
-
         guard let jsVal = JSValue(object: self, in: context) else {
             throw ErrorMessage("Could not create JSValue instance of class")
         }
@@ -189,8 +182,8 @@ import JavaScriptCore
         /// so we have to resort to this total hack to get hash back in JS environments.
 
         jsVal.objectForKeyedSubscript("prototype").defineProperty("hash", descriptor: [
-            "get": unsafeBitCast(hashGetter, to: AnyObject.self),
-            "set": unsafeBitCast(hashSetter, to: AnyObject.self)
+            "get": unsafeBitCast(self.hashGetter, to: AnyObject.self),
+            "set": unsafeBitCast(self.hashSetter, to: AnyObject.self)
         ])
 
         return jsVal

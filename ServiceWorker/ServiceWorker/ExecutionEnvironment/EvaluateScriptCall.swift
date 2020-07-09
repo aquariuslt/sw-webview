@@ -1,9 +1,8 @@
 import Foundation
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
 
 extension ServiceWorkerExecutionEnvironment {
-
     class PromiseWrappedCall: NSObject {
         internal let seal: Resolver<Any?>
         internal let promise: Promise<Any?>

@@ -1,12 +1,10 @@
-import XCTest
-@testable import ServiceWorker
 import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class ServiceWorkerTests: XCTestCase {
-
     func testLoadContentFunction() {
-
         let sw = ServiceWorker.createTestWorker(id: name, content: "var testValue = 'hello';")
 
         return sw.evaluateScript("testValue")
@@ -17,18 +15,16 @@ class ServiceWorkerTests: XCTestCase {
     }
 
     func testThreadFreezing() {
-
         let sw = ServiceWorker.createTestWorker(id: name, content: "var testValue = 'hello';")
 
         sw.withJSContext { _ in
 
             let semaphore = DispatchSemaphore(value: 0)
 
-            DispatchQueue.global().asyncAfter(deadline: .now() + 2, execute: {
-
+            DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
                 Log.info?("signalling")
                 semaphore.signal()
-            })
+            }
 
             DispatchQueue.global().async {
                 Log.info?("doing this now")
@@ -41,19 +37,17 @@ class ServiceWorkerTests: XCTestCase {
     }
 
     func testThreadFreezingInJS() {
-
         let sw = ServiceWorker.createTestWorker(id: name, content: "var testValue = 'hello';")
 
         let run: @convention(block) () -> Void = {
             let semaphore = DispatchSemaphore(value: 0)
-            DispatchQueue.global().asyncAfter(deadline: .now() + 2, execute: {
+            DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
                 _ = Promise.value
                     .map { () -> Void in
                         Log.info?("signalling")
                         semaphore.signal()
                     }
-
-            })
+            }
             Log.info?("wait")
             semaphore.wait()
         }
@@ -63,7 +57,7 @@ class ServiceWorkerTests: XCTestCase {
             context.globalObject.setValue(run, forProperty: "testFunc")
         }
         .then {
-            return sw.evaluateScript("testFunc()")
+            sw.evaluateScript("testFunc()")
         }
         .map { () -> Void in
             // compiler needs this to be here

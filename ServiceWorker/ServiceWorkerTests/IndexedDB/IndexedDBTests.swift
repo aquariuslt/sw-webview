@@ -1,15 +1,13 @@
-import XCTest
-@testable import ServiceWorker
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class IndexedDBTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
     }
 
     func testIndexedDB() {
-
         let sw = ServiceWorker.createTestWorker(id: self.name)
 
         sw.evaluateScript("""
@@ -32,16 +30,15 @@ class IndexedDBTests: XCTestCase {
             })
         """)
             .then { (jsVal: JSContextPromise) in
-                return jsVal.resolve()
+                jsVal.resolve()
             }
             .then {
-                return sw.ensureFinished()
+                sw.ensureFinished()
             }
             .assertResolves()
     }
 
     func testIndexedDBPutAndFetch() {
-
         // Stole this from here: https://gist.githubusercontent.com/BigstickCarpet/a0d6389a5d0e3a24814b/raw/fcc4d80489cbcb78f052b3f2c524a805af9b06dd/IndexedDB101.js
 
         let sw = ServiceWorker.createTestWorker(id: self.name)
@@ -70,7 +67,7 @@ class IndexedDBTests: XCTestCase {
                     // Add some data
                     store.put({id: 12345, name: {first: "John", last: "Doe"}, age: 42});
                     store.put({id: 67890, name: {first: "Bob", last: "Smith"}, age: 35});
-                    
+
                     var promises = [];
 
                     promises.push(new Promise((fulfill,reject) => {
@@ -96,12 +93,12 @@ class IndexedDBTests: XCTestCase {
                         db.close();
                         return data;
                     }));
-                   
+
                 }
             });
         """)
             .then { (jsVal: JSContextPromise) in
-                return jsVal.resolve()
+                jsVal.resolve()
             }
             .then { (arr: [String]) -> Promise<Void> in
 

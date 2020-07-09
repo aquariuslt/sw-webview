@@ -1,9 +1,8 @@
 import Foundation
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
 
 public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
-
     let storageURL: URL
 
     public init(storageURL: URL) {
@@ -15,13 +14,12 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
     }
 
     public func serviceWorker(_ worker: ServiceWorker, importScript script: URL, _ callback: @escaping (Error?, String?) -> Void) {
-
         var existing: String?
 
         do {
             existing = try DBConnectionPool.inConnection(at: self.getCoreDatabaseURL(), type: .core) { db -> String? in
 
-                return try db.select(sql: "SELECT content FROM worker_imported_scripts WHERE worker_id = ? AND url = ?", values: [script]) { resultSet in
+                try db.select(sql: "SELECT content FROM worker_imported_scripts WHERE worker_id = ? AND url = ?", values: [script]) { resultSet in
 
                     if try resultSet.next() {
                         guard let content = try resultSet.string("content") else {
@@ -54,7 +52,6 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
     }
 
     fileprivate func downloadAndCacheScript(id: String, url: URL) -> Promise<String> {
-
         return FetchSession.default.fetch(url: url)
 
             .then { res in
@@ -62,7 +59,7 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
                 // We have to download to a local file first, because we can't rely on a
                 // Content-Length header always existing.
 
-                res.internalResponse.fileDownload({ fileURL, fileSize in
+                res.internalResponse.fileDownload { fileURL, fileSize in
 
                     DBConnectionPool.inConnection(at: self.getCoreDatabaseURL(), type: .core) { db in
                         let rowID = try db.insert(sql: """
@@ -97,12 +94,11 @@ public class ServiceWorkerStorageProvider: ServiceWorkerDelegate {
                                 }
                             }
                     }
-                })
+                }
             }
     }
 
     public func serviceWorkerGetScriptContent(_ worker: ServiceWorker) throws -> String {
-
         return try DBConnectionPool.inConnection(at: self.getCoreDatabaseURL(), type: .core) { db in
 
             try db.select(sql: "SELECT content FROM workers WHERE worker_id = ?", values: [worker.id]) { rs in

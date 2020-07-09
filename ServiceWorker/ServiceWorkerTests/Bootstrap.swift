@@ -1,6 +1,6 @@
 import Foundation
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
 
 public class TestBootstrap: NSObject {
     override init() {

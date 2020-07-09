@@ -9,7 +9,6 @@ import JavaScriptCore
 /// mirror JSC console statements in our logs, too. There are no console events as such, so we have
 /// to override the functions on the console object itself.
 @objc class ConsoleMirror: NSObject, ConsoleMirrorExports {
-
     var originalConsole: JSValue?
 
     init(in context: JSContext) throws {
@@ -81,7 +80,6 @@ import JavaScriptCore
 
     /// The actual function that performs the logging
     fileprivate func mirror(_ level: String, _ msg: JSValue) {
-
         let values = msg.toArray()
             .map { val in
 

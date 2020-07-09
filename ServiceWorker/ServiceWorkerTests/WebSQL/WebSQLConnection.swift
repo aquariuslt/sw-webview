@@ -1,18 +1,16 @@
-import XCTest
-@testable import ServiceWorker
-import PromiseKit
-import SQLite3
 import JavaScriptCore
+import PromiseKit
+@testable import ServiceWorker
+import SQLite3
+import XCTest
 
 class WebSQLConnectionTests: XCTestCase {
-
     static let webSQLTestPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("websql", isDirectory: true)
 
     override func setUp() {
         super.setUp()
 
         do {
-
             if FileManager.default.fileExists(atPath: WebSQLConnectionTests.webSQLTestPath.path) {
                 try FileManager.default.removeItem(atPath: WebSQLConnectionTests.webSQLTestPath.path)
             }
@@ -49,7 +47,6 @@ class WebSQLConnectionTests: XCTestCase {
     }
 
     func injectOpenDBIntoWorker(_ sw: ServiceWorker) -> Promise<Void> {
-
         sw.delegate = WebSQLTestDelegate.instance
 
         return sw.getExecutionEnvironment()
@@ -66,12 +63,11 @@ class WebSQLConnectionTests: XCTestCase {
     }
 
     func testOpeningDatabase() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
-        injectOpenDBIntoWorker(sw)
+        self.injectOpenDBIntoWorker(sw)
             .then {
-                return sw.evaluateScript("""
+                sw.evaluateScript("""
                 var db = openDatabase('test', 1, 'pretty name', 1024);
                 var result = typeof db.transaction !== 'undefined';
 
@@ -86,13 +82,12 @@ class WebSQLConnectionTests: XCTestCase {
     }
 
     func testTransactionCallback() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
-        injectOpenDBIntoWorker(sw)
+        self.injectOpenDBIntoWorker(sw)
             .then {
-                return sw.evaluateScript("""
-                   
+                sw.evaluateScript("""
+
                      new Promise(function(fulfill, reject) {
                         var db = openDatabase('test', 1, 'pretty name', 1024);
                         var callbackCalled = false;
@@ -110,30 +105,29 @@ class WebSQLConnectionTests: XCTestCase {
                 """)
             }
             .then { (jsResult: JSContextPromise) in
-                return jsResult.resolve()
+                jsResult.resolve()
             }
             .then {
-                return sw.ensureFinished()
+                sw.ensureFinished()
             }
             .assertResolves()
     }
 
     func testResultSetSelect() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
-        injectOpenDBIntoWorker(sw)
+        self.injectOpenDBIntoWorker(sw)
             .then {
-                return sw.evaluateScript("""
+                sw.evaluateScript("""
                     var db = openDatabase('test', 1, 'pretty name', 1024);
                     new Promise(function(fulfill, reject) {
 
                        db.transaction(function(tx) {
-                            
+
                             tx.executeSql("SELECT 'test' as textval", [], function(tx,results) {
                                 fulfill(results.rows.item(0).textval)
                             }, function() {
-                               
+
                             })
                         }, function() {
                         })
@@ -142,7 +136,7 @@ class WebSQLConnectionTests: XCTestCase {
                 """)
             }
             .then { (jsResult: JSContextPromise) in
-                return jsResult.resolve()
+                jsResult.resolve()
             }
             .then { (promiseResult: String) -> Promise<Void> in
                 XCTAssertEqual(promiseResult, "test")
@@ -152,12 +146,11 @@ class WebSQLConnectionTests: XCTestCase {
     }
 
     func testMultipleQueries() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
-        injectOpenDBIntoWorker(sw)
+        self.injectOpenDBIntoWorker(sw)
             .then {
-                return sw.evaluateScript("""
+                sw.evaluateScript("""
 
                     var assert = {
                         equal: function (a,b) {
@@ -166,7 +159,7 @@ class WebSQLConnectionTests: XCTestCase {
                     }
 
                     var db = openDatabase('testdb', '1.0', 'yolo', 100000);
-                    
+
                     new Promise(function (resolve, reject) {
                       db.transaction(function (txn) {
                         txn.executeSql('SELECT 1 + 1', [], function (txn, result) {
@@ -198,30 +191,29 @@ class WebSQLConnectionTests: XCTestCase {
                 """)
             }
             .then { (jsResult: JSContextPromise) -> Promise<Void> in
-                return jsResult.resolve()
+                jsResult.resolve()
             }
             .then {
-                return sw.ensureFinished()
+                sw.ensureFinished()
             }
             .assertResolves()
     }
 
     func testCallsCompleteCallback() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
-        injectOpenDBIntoWorker(sw)
+        self.injectOpenDBIntoWorker(sw)
             .then {
-                return sw.evaluateScript("""
+                sw.evaluateScript("""
 
                         var assert = {
                         equal: function (a,b) {
                         if (a != b) throw new Error(a + " does not match " + b);
                         }
                         }
-                
-                
-                
+
+
+
                         var db = openDatabase(':memory:', '1.0', 'yolo', 100000);
 
                         var called = 0;
@@ -234,10 +226,10 @@ class WebSQLConnectionTests: XCTestCase {
                         });
                 """)
             }.then { (jsResult: JSContextPromise) in
-                return jsResult.resolve()
+                jsResult.resolve()
             }
             .then {
-                return sw.ensureFinished()
+                sw.ensureFinished()
             }
             .assertResolves()
     }

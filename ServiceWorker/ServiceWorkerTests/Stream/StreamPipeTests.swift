@@ -1,11 +1,9 @@
-import XCTest
-@testable import ServiceWorker
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class StreamPipeTests: XCTestCase {
-
     func testPipingAStream() {
-
         let testData = "THIS IS TEST DATA".data(using: String.Encoding.utf8)!
 
         let inputStream = InputStream(data: testData)
@@ -24,7 +22,6 @@ class StreamPipeTests: XCTestCase {
     }
 
     func testPipingAStreamOffMainThread() {
-
         let testData = "THIS IS TEST DATA".data(using: String.Encoding.utf8)!
 
         let inputStream = InputStream(data: testData)
@@ -54,7 +51,6 @@ class StreamPipeTests: XCTestCase {
     }
 
     func testPipingToMultipleStreams() {
-
         let testData = "THIS IS TEST DATA".data(using: String.Encoding.utf8)!
 
         let inputStream = InputStream(data: testData)

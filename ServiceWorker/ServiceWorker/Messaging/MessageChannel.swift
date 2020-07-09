@@ -14,11 +14,11 @@ import JavaScriptCore
     public let port1: SWMessagePort
     public let port2: SWMessagePort
 
-    public required override init() {
+    override public required init() {
         self.port1 = SWMessagePort()
         self.port2 = SWMessagePort()
         super.init()
-        self.port1.targetPort = port2
+        self.port1.targetPort = self.port2
         self.port2.targetPort = self.port1
     }
 }

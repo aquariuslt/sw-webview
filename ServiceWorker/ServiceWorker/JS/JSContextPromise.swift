@@ -1,12 +1,11 @@
 import Foundation
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
 
 /// One of the more important classes in the project, this wraps JavaScript promises
 /// (which, thankfully, are native in JSContext) and lets us fulfill and reject them
 /// from native code.
 @objc public class JSContextPromise: NSObject {
-
     // We can fulfill and reject promises we create ourselves, but not existing promises.
     // So we keep track which type this is, in order to write more meaningful error messages.
     fileprivate enum PromiseCreationMethod {
@@ -63,7 +62,6 @@ import JavaScriptCore
     /// - Parameter context: The JSContext to create the promise in
     /// - Throws: If there is no worker thread (i.e. this class is used on a non-service worker JSContext)
     public init(newPromiseInContext context: JSContext) throws {
-
         self.creationMethod = .natively
 
         guard let exec = ServiceWorkerExecutionEnvironment.contexts.object(forKey: context) else {
@@ -119,7 +117,6 @@ import JavaScriptCore
 
     /// Does exactly what you'd expect - fulfills the JavaScript promise.
     public func fulfill(_ val: Any) {
-
         if self.resolved == true {
             Log.error?("Tried to resolve a promise that has already been resolved")
             return
@@ -128,7 +125,6 @@ import JavaScriptCore
         self.resolved = true
 
         if let fulfill = self.fulfillJSValue {
-
             // Actually run the JS function:
             fulfill.perform(#selector(JSValue.call(withArguments:)), on: self.thread, with: [val], waitUntilDone: false)
 
@@ -139,7 +135,6 @@ import JavaScriptCore
             self.fulfillJSValue = nil
 
         } else {
-
             if self.creationMethod == .fromJSValue {
                 Log.error?("Tried to fulfill a promise captured from JSContext. We can only resolve promises we create natively")
             } else {
@@ -153,7 +148,6 @@ import JavaScriptCore
     }
 
     public func reject(_ error: Error) {
-
         if self.resolved == true {
             Log.error?("Tried to resolve a promise that has already been resolved")
             return
@@ -190,7 +184,6 @@ import JavaScriptCore
     /// running on the worker thread. It will attempt to resolve a JS promise and
     /// send the result to our native environment.
     @objc fileprivate func resolveOnThread(_ returnVal: PromisePassthrough) {
-
         self.checkThread()
 
         // the fulfill function we'll make JS compatible and pass into the context:
@@ -226,7 +219,6 @@ import JavaScriptCore
     /// The wrapper around resolveOnThread() that can be called from anywhere. Is also a Swift generic, so
     /// the Promise passthrough will convert the resolved value to whatever we want (if it can)
     public func resolve<T>() -> Promise<T> {
-
         let (promise, passthrough) = Promise<T>.makePassthrough()
 
         self.perform(#selector(JSContextPromise.resolveOnThread(_:)), on: self.thread, with: passthrough, waitUntilDone: false)

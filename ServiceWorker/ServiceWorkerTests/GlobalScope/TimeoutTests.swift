@@ -1,14 +1,13 @@
-import XCTest
-@testable import ServiceWorker
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class TimeoutTests: XCTestCase {
-
     func promiseDelay(delay: Double) -> Promise<Void> {
         return Promise<Void> { resolver in
-            DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 1000), execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 1000)) {
                 resolver.fulfill(())
-            })
+            }
         }
     }
 
@@ -16,7 +15,7 @@ class TimeoutTests: XCTestCase {
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.evaluateScript("""
-            
+
             var ticks = 0;
 
             setTimeout(function() {
@@ -29,10 +28,10 @@ class TimeoutTests: XCTestCase {
 
         """)
             .then {
-                return self.promiseDelay(delay: 20)
+                self.promiseDelay(delay: 20)
             }
             .then {
-                return sw.evaluateScript("ticks")
+                sw.evaluateScript("ticks")
             }
             .map { (response: Int) -> Void in
                 XCTAssertEqual(response, 1)
@@ -66,7 +65,7 @@ class TimeoutTests: XCTestCase {
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.evaluateScript("""
-            
+
             var ticks = 0;
 
             var interval = setInterval(function() {
@@ -75,10 +74,10 @@ class TimeoutTests: XCTestCase {
 
         """)
             .then {
-                return self.promiseDelay(delay: 25)
+                self.promiseDelay(delay: 25)
             }
             .then {
-                return sw.evaluateScript("clearInterval(interval); ticks")
+                sw.evaluateScript("clearInterval(interval); ticks")
             }
             .then { (response: Int?) -> Promise<Void> in
                 XCTAssertEqual(response, 2)
@@ -86,7 +85,7 @@ class TimeoutTests: XCTestCase {
                 return self.promiseDelay(delay: 10)
             }
             .then { () -> Promise<Int> in
-                return sw.evaluateScript("ticks")
+                sw.evaluateScript("ticks")
             }
             .map { (response: Int) -> Void in
                 XCTAssertEqual(response, 2)

@@ -1,11 +1,10 @@
 import Foundation
-import PromiseKit
 import JavaScriptCore
+import PromiseKit
 
 /// An attempt at wrapping URLSession and it's various delegates into something that will allow us to fetch
 /// a URL, grab headers and then a stream of the body being sent.
 @objc public class FetchSession: NSObject, URLSessionDelegate, URLSessionDataDelegate, URLSessionStreamDelegate {
-
     /// This is what we use for almost all our fetch operations. But we could make individual sessions for
     /// each worker that tie to their threads. Not sure if that's necessary, haven't done it yet.
     public static let `default` = FetchSession(qos: DispatchQoS.utility)
@@ -50,16 +49,15 @@ import JavaScriptCore
     /// on whatever piping/data transformation is needed.
     public func fetch(_ request: FetchRequest, fromOrigin: URL? = nil) -> Promise<FetchResponseProtocol> {
         return Promise.value(())
-            .then(on: self.dispatchQueue, flags: nil, {
+            .then(on: self.dispatchQueue, flags: nil) {
                 self.performCORSCheck(for: request, inOrigin: fromOrigin)
-                })
+            }
 
-            .then(on: self.dispatchQueue, flags: nil, { corsRestrictions -> Promise<FetchResponseProtocol> in
+            .then(on: self.dispatchQueue, flags: nil) { corsRestrictions -> Promise<FetchResponseProtocol> in
 
                 var requestToUse = request
 
                 if corsRestrictions.isCrossDomain {
-
                     // CORS requests are subject to allowed header restrictions - if the preflight response
                     // has limited the headers we can use, we need to clone our original response then
                     // overwrite which headers we're actually sending.
@@ -86,35 +84,33 @@ import JavaScriptCore
                 task.resume()
 
                 return fetchTask.hasResponse
-                    .compactMap(on: self.dispatchQueue, flags: nil, { response -> FetchResponseProtocol in
+                    .compactMap(on: self.dispatchQueue, flags: nil) { response -> FetchResponseProtocol in
 
                         // Depending on the nature of the request, mode, cross-domain, etc., we
                         // want to return the correct response type.
 
-                        if request.mode == .NoCORS && corsRestrictions.isCrossDomain == true {
+                        if request.mode == .NoCORS, corsRestrictions.isCrossDomain == true {
                             return FetchResponseProxy(from: response, type: .Opaque)
-                        } else if request.mode == .CORS && corsRestrictions.isCrossDomain == true {
+                        } else if request.mode == .CORS, corsRestrictions.isCrossDomain == true {
                             return FetchResponseProxy(from: response, type: .CORS)
                         } else {
                             return FetchResponseProxy(from: response, type: .Basic)
                         }
-                    })
-                    .ensure(on: self.dispatchQueue, flags: nil, { () -> Void in
+                    }
+                    .ensure(on: self.dispatchQueue, flags: nil) { () -> Void in
 
                         // Now that we have a reference to the response below (which itself contains
                         // the task) we can remove the fetch task from our set.
 
                         self.runningTasks.remove(fetchTask)
-
-                    })
-            })
+                    }
+            }
     }
 
     /// If we have a fetch operation that has an origin (as all worker-based ones do) we need to run a CORS
     /// OPTIONS request before running the actual HTTP Request itself for all requests sent to different origins.
     /// There's probably some work to be done on caching these calls, but in theory URLSession does that itself.
     fileprivate func performCORSCheck(for request: FetchRequest, inOrigin: URL?) -> Promise<FetchCORSRestrictions> {
-
         guard let origin = inOrigin else {
             // No origin - no CORS check to perform
             return Promise.value(FetchCORSRestrictions(isCrossDomain: false, allowedHeaders: []))
@@ -148,7 +144,7 @@ import JavaScriptCore
         optionsRequest.headers.set("Access-Control-Request-Method", request.method)
 
         return self.fetch(optionsRequest)
-            .map(on: self.dispatchQueue, flags: nil, { res -> FetchCORSRestrictions in
+            .map(on: self.dispatchQueue, flags: nil) { res -> FetchCORSRestrictions in
 
                 // The OPTIONS response is required to specify which origins are allowed. A wildcard
                 // response is valid: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
@@ -157,7 +153,7 @@ import JavaScriptCore
                     throw ErrorMessage("OPTIONS request did not return a Access-Control-Allow-Origin header")
                 }
 
-                if allowedOrigin != "*" && allowedOrigin != scheme + "://" + host {
+                if allowedOrigin != "*", allowedOrigin != scheme + "://" + host {
                     throw ErrorMessage("Access-Control-Allow-Origin does not match worker origin")
                 }
 
@@ -188,13 +184,12 @@ import JavaScriptCore
                 }
 
                 return FetchCORSRestrictions(isCrossDomain: isCrossOrigin, allowedHeaders: allowedHeaders)
-            })
+            }
     }
 
     /// This delegate method is called whenever a task encounters a redirect. Based on whatever our request's redirect
     /// attribute says, we'll either follow that redirect, ignore it and download the original request, or throw an error.
     public func urlSession(_: URLSession, task: URLSessionTask, willPerformHTTPRedirection _: HTTPURLResponse, newRequest: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-
         guard let taskWrapper = self.runningTasks.first(where: { $0.dataTask == task }) else {
             Log.error?("Could not find a wrapper for an active fetch task")
             return completionHandler(nil)
@@ -211,7 +206,6 @@ import JavaScriptCore
     /// complete with status, headers, etc. This is the point at which we first create our FetchResponse. Then
     /// we tell URLSession to turn the remainder into a stream.
     public func urlSession(_: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-
         guard let httpResponse = response as? HTTPURLResponse else {
             Log.error?("URLResponse was not an HTTPURLResponse")
             return completionHandler(.cancel)
@@ -229,7 +223,6 @@ import JavaScriptCore
     /// After we call completionHandler(.becomeStream), *this* delegate method is called. Here, we tell URLSession
     /// to convert our SessionStreamTask to an actual pair of Input and Output streams.
     public func urlSession(_: URLSession, dataTask: URLSessionDataTask, didBecome streamTask: URLSessionStreamTask) {
-
         guard let taskWrapper = self.runningTasks.first(where: { $0.dataTask == dataTask }) else {
             Log.error?("Could not find a wrapper for an active fetch task")
             return dataTask.cancel()
@@ -245,7 +238,6 @@ import JavaScriptCore
     /// in the download stops, essentially. We're not currently using the OutputStream, but in the future we could, in order
     /// to allow us to upload streams.
     public func urlSession(_: URLSession, streamTask: URLSessionStreamTask, didBecome inputStream: InputStream, outputStream _: OutputStream) {
-
         guard let taskWrapper = self.runningTasks.first(where: { $0.streamTask == streamTask }) else {
             Log.error?("Could not find a wrapper for an active fetch task")
             return

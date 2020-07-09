@@ -8,7 +8,6 @@ import JavaScriptCore
 }
 
 @objc class WebSQLResultSet: NSObject, WebSQLResultSetProtocol {
-
     let insertId: Int64
     let rowsAffected: Int
     var rows: WebSQLResultRows
@@ -24,13 +23,11 @@ import JavaScriptCore
     }
 
     init(resultSet: SQLiteResultSet, connection _: SQLiteConnection) throws {
-
         self.insertId = -1
         self.rowsAffected = 0
         var rows: [Any] = []
 
         while try resultSet.next() {
-
             var row = [String: Any?]()
 
             try resultSet.columnNames.forEach { name in

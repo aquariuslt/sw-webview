@@ -1,9 +1,8 @@
-import XCTest
-@testable import ServiceWorker
 import JavaScriptCore
+@testable import ServiceWorker
+import XCTest
 
 class MessageChannelTests: XCTestCase {
-
     func testMessageChannelInJS() {
         let channel = MessageChannel()
         let jsc = JSContext()!

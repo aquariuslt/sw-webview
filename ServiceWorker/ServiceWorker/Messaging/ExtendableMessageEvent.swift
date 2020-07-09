@@ -10,7 +10,6 @@ import JavaScriptCore
 /// data and an array of transferrables (right now just MessagePort):
 /// https://developer.mozilla.org/en-US/docs/Web/API/ExtendableMessageEvent
 @objc public class ExtendableMessageEvent: ExtendableEvent, MessageEventExports {
-
     public let data: Any
     public let ports: [SWMessagePort]
 

@@ -1,10 +1,8 @@
-import XCTest
 import ServiceWorker
+import XCTest
 
 class PassthroughStreamTests: XCTestCase {
-
     func testPassthroughStream() {
-
         let originalData = "TEST DATA".data(using: String.Encoding.utf8)!
 
         let originalInput = InputStream(data: originalData)

@@ -6,7 +6,6 @@ import PromiseKit
 /// separate from ServiceWorker itself so that we can create relatively lightwight ServiceWorker
 /// classes in response to getRegistration() etc but only create the JS environment when needed.
 @objc public class ServiceWorkerExecutionEnvironment: NSObject, ServiceWorkerGlobalScopeDelegate {
-
     unowned let worker: ServiceWorker
 
     // We use this in deinit, by which point the worker is gone
@@ -169,7 +168,6 @@ import PromiseKit
     /// thread could be frozen) so we use the EvaluateScriptCall wrapper to asynchronously
     /// send back the response.
     @objc func evaluateScript(_ call: EvaluateScriptCall) {
-
         self.checkOnThread()
 
         do {
@@ -214,7 +212,6 @@ import PromiseKit
     /// thread entirely while we fetch the contents of our scripts. We use a DispatchSemaphore
     /// to do that, while running our delegate function on another queue.
     func importScripts(urls: [URL]) throws {
-
         self.checkOnThread()
 
         // We actually loop through the URL array, calling importScripts() over and over, removing
@@ -272,7 +269,6 @@ import PromiseKit
         if let err = error {
             throw err
         } else if let hasContent = content {
-
             // Provide our import has run successfully, we can now actually evaluate
             // the script. withSourceURL means that the source in Safari debugger will
             // be attributed correctly.
@@ -280,7 +276,6 @@ import PromiseKit
             self.jsContext.evaluateScript(hasContent, withSourceURL: url)
 
             if let exception = self.jsContext.exception {
-
                 // If an error occurred in the process of importing the script,
                 // bail out
 
@@ -295,7 +290,6 @@ import PromiseKit
             return try self.importScripts(urls: mutableURLs)
 
         } else {
-
             // It's actually possible for a faulty delegate to return neither an error
             // nor a result. So we need to factor that in.
 
@@ -307,7 +301,6 @@ import PromiseKit
     /// manually manipulate JSValues etc, so we can't use evaluateScript() directly. Instead,
     /// this lets us run a (synchronous) piece of code on the correct thread.
     @objc internal func withJSContext(_ call: WithJSContextCall) {
-
         self.checkOnThread()
         do {
             try call.funcToRun(self.jsContext)
@@ -321,7 +314,6 @@ import PromiseKit
     /// the majority of triggers are set in the worker context. Like evaluateScript, it must
     /// be called on the worker thread, which ServiceWorker does.
     @objc func dispatchEvent(_ call: DispatchEventCall) {
-
         self.checkOnThread()
         self.globalScope.dispatchEvent(call.event)
 
@@ -336,7 +328,6 @@ import PromiseKit
     /// fetch() can be run with either a string or a full Request object. This separates them
     /// out, as well as parsing strings to native URL objects.
     func fetch(_ requestOrString: JSValue) -> JSValue? {
-
         return firstly { () -> Promise<FetchResponseProtocol> in
 
             var request: FetchRequest
@@ -344,7 +335,6 @@ import PromiseKit
             if let fetchInstance = requestOrString.toObjectOf(FetchRequest.self) as? FetchRequest {
                 request = fetchInstance
             } else if requestOrString.isString {
-
                 guard let requestString = requestOrString.toString() else {
                     throw ErrorMessage("Could not convert request to string")
                 }

@@ -1,12 +1,11 @@
-import XCTest
-@testable import ServiceWorker
 import GCDWebServers
 import JavaScriptCore
 import PromiseKit
+@testable import ServiceWorker
 @testable import ServiceWorkerContainer
+import XCTest
 
 class ServiceWorkerRegistrationTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         CoreDatabase.clearForTests()
@@ -21,21 +20,19 @@ class ServiceWorkerRegistrationTests: XCTestCase {
     let factory = WorkerRegistrationFactory(withWorkerFactory: WorkerFactory())
 
     func testCreateBlankRegistration() {
-
         var reg: ServiceWorkerRegistration?
 
-        XCTAssertNoThrow(reg = try factory.create(scope: URL(string: "https://www.example.com")!))
+        XCTAssertNoThrow(reg = try self.factory.create(scope: URL(string: "https://www.example.com")!))
         XCTAssertEqual(reg!.scope.absoluteString, "https://www.example.com")
 
         // An attempt to create a registration when one already exists should fail
-        XCTAssertThrowsError(try factory.create(scope: URL(string: "https://www.example.com")!))
+        XCTAssertThrowsError(try self.factory.create(scope: URL(string: "https://www.example.com")!))
     }
 
     func testFailRegistrationOutOfScope() {
-
         var reg: ServiceWorkerRegistration?
 
-        XCTAssertNoThrow(reg = try factory.create(scope: URL(string: "https://www.example.com/one")!))
+        XCTAssertNoThrow(reg = try self.factory.create(scope: URL(string: "https://www.example.com/one")!))
         XCTAssertEqual(reg!.scope.absoluteString, "https://www.example.com/one")
 
         reg!.register(URL(string: "https://www.example.com/two/test.js")!)
@@ -43,7 +40,6 @@ class ServiceWorkerRegistrationTests: XCTestCase {
     }
 
     func testShouldPopulateWorkerFields() {
-
         XCTAssertNoThrow(try CoreDatabase.inConnection { connection in
 
             let registrationValues = ["https://www.example.com", "TEST_ID", "TEST_ID_active", "TEST_ID_installing", "TEST_ID_waiting", "TEST_ID_redundant"]
@@ -66,7 +62,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
         })
 
         var reg: ServiceWorkerRegistration?
-        XCTAssertNoThrow(reg = try factory.get(byScope: URL(string: "https://www.example.com")!)!)
+        XCTAssertNoThrow(reg = try self.factory.get(byScope: URL(string: "https://www.example.com")!)!)
 
         XCTAssert(reg!.active!.id == "TEST_ID_active")
         XCTAssert(reg!.installing!.id == "TEST_ID_installing")
@@ -75,7 +71,6 @@ class ServiceWorkerRegistrationTests: XCTestCase {
     }
 
     func testShouldInstallWorker() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             GCDWebServerDataResponse(data: """
 
@@ -190,9 +185,9 @@ class ServiceWorkerRegistrationTests: XCTestCase {
 
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { result -> Promise<ServiceWorker?> in
-                    return result.registerComplete
+                    result.registerComplete
                         .then { _ -> Promise<ServiceWorker?> in
-                            return .value(nil)
+                            .value(nil)
                         }
                         .recover { error -> Guarantee<ServiceWorker?> in
                             XCTAssertEqual("\(error)", "no")
@@ -237,7 +232,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                         .then { register -> Promise<Void> in
                             register.registerComplete
                         }
-                        .then { reg -> Promise<Void> in
+                        .then { _ -> Promise<Void> in
                             XCTFail("Should not succeed!")
                             return .value
                         }
@@ -273,7 +268,6 @@ class ServiceWorkerRegistrationTests: XCTestCase {
     }
 
     func testShouldNotUpdateWhenBytesMatch() {
-
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             GCDWebServerDataResponse(data: """
 
@@ -309,7 +303,6 @@ class ServiceWorkerRegistrationTests: XCTestCase {
     }
 
     func testShouldUpdateWhenBytesChange() {
-
         var content = "'WORKERCONTENT1'"
 
         TestWeb.server!.addHandler(forMethod: "GET", path: "/test.js", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in

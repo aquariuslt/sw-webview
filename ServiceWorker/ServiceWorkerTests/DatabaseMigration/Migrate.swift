@@ -1,8 +1,7 @@
-import XCTest
 @testable import ServiceWorker
+import XCTest
 
 class Migrate: XCTestCase {
-
     let migrateTempPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("migrations", isDirectory: true)
 
     override func setUp() {
@@ -28,7 +27,6 @@ class Migrate: XCTestCase {
     }
 
     func testBasicMigrations() {
-
         let testMigration = """
             CREATE TABLE test (
                 "val" text NOT NULL
@@ -39,19 +37,19 @@ class Migrate: XCTestCase {
             INSERT INTO test VALUES ("success")
         """
 
-        XCTAssertNoThrow(try testMigration.data(using: String.Encoding.utf8)!.write(to: migrateTempPath.appendingPathComponent("1_one.sql")))
+        XCTAssertNoThrow(try testMigration.data(using: String.Encoding.utf8)!.write(to: self.migrateTempPath.appendingPathComponent("1_one.sql")))
 
-        let dbPath = migrateTempPath.appendingPathComponent("test.db")
+        let dbPath = self.migrateTempPath.appendingPathComponent("test.db")
 
         var version = -1
 
-        XCTAssertNoThrow(version = try DatabaseMigration.check(dbPath: dbPath, migrationsPath: migrateTempPath))
+        XCTAssertNoThrow(version = try DatabaseMigration.check(dbPath: dbPath, migrationsPath: self.migrateTempPath))
 
         XCTAssertEqual(version, 1)
 
-        XCTAssertNoThrow(try testMigrationTwo.data(using: String.Encoding.utf8)!.write(to: migrateTempPath.appendingPathComponent("2_two.sql")))
+        XCTAssertNoThrow(try testMigrationTwo.data(using: String.Encoding.utf8)!.write(to: self.migrateTempPath.appendingPathComponent("2_two.sql")))
 
-        XCTAssertNoThrow(version = try DatabaseMigration.check(dbPath: dbPath, migrationsPath: migrateTempPath))
+        XCTAssertNoThrow(version = try DatabaseMigration.check(dbPath: dbPath, migrationsPath: self.migrateTempPath))
 
         XCTAssertEqual(version, 2)
 

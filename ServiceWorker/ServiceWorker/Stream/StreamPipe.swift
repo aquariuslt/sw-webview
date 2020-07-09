@@ -9,7 +9,6 @@ let logFunction: ((String) -> Void)? = nil
 /// sorts of logging messages in here that I don't want to get rid of just yet, because I'm had some weirdly
 /// inconsistent bugs pop up from time to time, and they're useful in debugging.
 public class StreamPipe: NSObject, StreamDelegate {
-
     typealias ReadPosition = (start: Int, length: Int)
 
     let from: InputStream
@@ -41,7 +40,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     }
 
     func start() {
-
         if self.started == true {
             return
         }
@@ -75,7 +73,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     fileprivate static var currentlyRunning = Set<StreamPipe>()
 
     public static func pipe(from: InputStream, to: OutputStream, bufferSize: Int) -> Promise<Void> {
-
         let pipe = StreamPipe(from: from, bufferSize: bufferSize)
 
         return Promise.value(())
@@ -90,7 +87,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     /// Quick utility function to also record the hash of all the data in the pipe. Used when saving
     /// worker content.
     public static func pipeSHA256(from: InputStream, to: OutputStream, bufferSize: Int) -> Promise<Data> {
-
         var hashToUse = CC_SHA256_CTX()
         CC_SHA256_Init(&hashToUse)
 
@@ -101,7 +97,7 @@ public class StreamPipe: NSObject, StreamDelegate {
         }
 
         return firstly { () -> Promise<Data> in
-                try pipe.add(stream: to)
+            try pipe.add(stream: to)
 
             return pipe.pipe()
                 .map { () -> Data in
@@ -113,7 +109,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     }
 
     func doRead() {
-
         // OK. Having multiple streams really confuses this. Because different output streams can accept
         // bytes at different points, we need to make sure ALL streams have consumed the currently
         // read data before continuing.
@@ -124,7 +119,6 @@ public class StreamPipe: NSObject, StreamDelegate {
         let newReadPosition: ReadPosition = (0, self.from.read(self.buffer, maxLength: self.bufferSize))
 
         if newReadPosition.length == 0 {
-
             // Special case here - if we went to get new data, and there is none, then the stream
             // has ended. In which case we need to do no writes, and just do an early return.
             if self.outputStreamLeftovers.count == 0 {
@@ -149,7 +143,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     }
 
     func doWrite(to stream: OutputStream, with position: ReadPosition) {
-
         // So now we have either a collection of leftover data or a new read. Either way, we now go
         // through and write to each destination.
 
@@ -161,17 +154,15 @@ public class StreamPipe: NSObject, StreamDelegate {
             return
         }
 
-        let lengthWritten = stream.write(buffer.advanced(by: position.start), maxLength: position.length)
+        let lengthWritten = stream.write(self.buffer.advanced(by: position.start), maxLength: position.length)
 
         if lengthWritten == position.length {
-
             // If we've written all the data in the read, we can just remove this position
             // entirely from our store
 
             self.outputStreamLeftovers.removeValue(forKey: stream)
 
         } else {
-
             // Otherwise, we now record our new position.
 
             self.outputStreamLeftovers[stream] = (start: position.start + lengthWritten, length: position.length - lengthWritten)
@@ -181,7 +172,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     deinit {
         self.buffer.deallocate()
         if self.completePromise.promise.isPending {
-
             // This isn't strictly necessary, but PromiseKit logs a warning about
             // an unresolved promise if we don't do this. For our purposes, it's entirely
             // expected that a StreamPipe might not be resolved - for instance when we use
@@ -213,7 +203,6 @@ public class StreamPipe: NSObject, StreamDelegate {
     }
 
     public func stream(_ source: Stream, handle eventCode: Stream.Event) {
-
         logFunction?("Stream event! \(eventCode)")
 
         if eventCode == .openCompleted {
@@ -226,9 +215,9 @@ public class StreamPipe: NSObject, StreamDelegate {
             if self.outputStreamLeftovers.count == 0 {
                 logFunction?("\(self.from) has data and we're going to pipe it")
                 self.doRead()
-                self.outputStreamLeftovers.forEach({ stream, position in
+                self.outputStreamLeftovers.forEach { stream, position in
                     self.doWrite(to: stream, with: position)
-                })
+                }
             } else {
                 logFunction?("\(self.from) has data but we have leftover data, so we're going to ignore that")
             }
@@ -281,7 +270,7 @@ public class StreamPipe: NSObject, StreamDelegate {
             logFunction?("END? \(source)")
         }
 
-        if source == self.from && eventCode == .endEncountered && self.outputStreamLeftovers.count == 0 {
+        if source == self.from, eventCode == .endEncountered, self.outputStreamLeftovers.count == 0 {
             logFunction?("end")
             self.finish()
         }

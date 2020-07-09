@@ -7,7 +7,6 @@ import JavaScriptCore
 }
 
 @objc class WebSQLResultRows: NSObject, WebSQLResultRowsExports {
-
     let rows: [Any]
 
     init(rows: [Any]) {

@@ -82,7 +82,6 @@ public enum FetchRequestMode: String {
     }
 
     public func clone() -> FetchRequest {
-
         let request = FetchRequest(url: self.url)
         request.method = self.method
         request.body = self.body
@@ -97,7 +96,6 @@ public enum FetchRequestMode: String {
 
     public required convenience init?(url: JSValue, options: JSValue) {
         do {
-
             if url.isString == false {
                 throw ErrorMessage("Must provide a string URL")
             }
@@ -133,7 +131,6 @@ public enum FetchRequestMode: String {
         if let headers = opts["headers"] as? FetchHeaders {
             self.headers = headers
         } else if let headers = opts["headers"] as? [String: String] {
-
             let headersInstance = FetchHeaders()
 
             for (key, val) in headers {
@@ -145,7 +142,6 @@ public enum FetchRequestMode: String {
     }
 
     internal func applyOptions(opts: [String: AnyObject]) throws {
-
         if let method = opts["method"] as? String {
             self.method = method
         }
@@ -176,7 +172,6 @@ public enum FetchRequestMode: String {
         }
 
         if let redirect = opts["redirect"] as? String {
-
             guard let redirectVal = FetchRequestRedirect(rawValue: redirect) else {
                 throw ErrorMessage("Did not understand value for attribute 'redirect'")
             }
@@ -188,7 +183,6 @@ public enum FetchRequestMode: String {
     /// Turn this into a native URLRequest that we can use with URLSession. We could probably
     /// actually have FetchRequest inherit from URLRequest instead of doing this, but oh well.
     internal func toURLRequest() -> URLRequest {
-
         var cachePolicy: URLRequest.CachePolicy = .returnCacheDataElseLoad
         if self.cache == FetchRequestCache.NoCache {
             cachePolicy = .reloadIgnoringLocalCacheData

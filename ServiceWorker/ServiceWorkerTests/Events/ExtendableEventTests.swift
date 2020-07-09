@@ -1,12 +1,10 @@
-import XCTest
 import JavaScriptCore
-@testable import ServiceWorker
 import PromiseKit
+@testable import ServiceWorker
+import XCTest
 
 class ExtendableEventTests: XCTestCase {
-
     func testExtendingAnEvent() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.withJSContext { context in
@@ -28,7 +26,7 @@ class ExtendableEventTests: XCTestCase {
             ev.resolve(in: sw)
         }
         .then {
-            return sw.evaluateScript("testResult")
+            sw.evaluateScript("testResult")
         }
         .map { (result: Bool) in
             XCTAssertEqual(result, true)
@@ -38,7 +36,6 @@ class ExtendableEventTests: XCTestCase {
     }
 
     func testPromiseRejection() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.withJSContext { context in
@@ -68,7 +65,6 @@ class ExtendableEventTests: XCTestCase {
     }
 
     func testMultiplePromises() {
-
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.withJSContext { context in
@@ -96,7 +92,7 @@ class ExtendableEventTests: XCTestCase {
             ev.resolve(in: sw)
         }
         .then {
-            return sw.evaluateScript("resultArray")
+            sw.evaluateScript("resultArray")
         }
         .map { (results: [Int]?) -> Void in
 

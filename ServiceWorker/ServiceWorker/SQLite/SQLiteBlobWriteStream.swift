@@ -5,7 +5,6 @@ import SQLite3
 /// to note that the SQLite streaming functions cannot change the size of a BLOB field. It must be
 /// created in an INSERT or UPDATE query beforehand.
 public class SQLiteBlobWriteStream: OutputStreamImplementation {
-
     let dbPointer: SQLiteBlobStreamPointer
 
     init(_ db: SQLiteConnection, table: String, column: String, row: Int64) {
@@ -17,7 +16,7 @@ public class SQLiteBlobWriteStream: OutputStreamImplementation {
         self.streamStatus = .notOpen
     }
 
-    public override func open() {
+    override public func open() {
         do {
             try self.dbPointer.open()
             self.emitEvent(event: .openCompleted)
@@ -28,7 +27,7 @@ public class SQLiteBlobWriteStream: OutputStreamImplementation {
         }
     }
 
-    public override var hasSpaceAvailable: Bool {
+    override public var hasSpaceAvailable: Bool {
         guard let state = self.dbPointer.openState else {
             // As specified in docs: https://developer.apple.com/documentation/foundation/inputstream/1409410-hasbytesavailable
             // both hasSpaceAvailable and hasBytesAvailable should return true when the actual state is unknown.
@@ -37,14 +36,13 @@ public class SQLiteBlobWriteStream: OutputStreamImplementation {
         return state.currentPosition < state.blobLength
     }
 
-    public override func close() {
+    override public func close() {
         self.dbPointer.close()
         self.streamStatus = .closed
     }
 
-    public override func write(_ buffer: UnsafePointer<UInt8>, maxLength len: Int) -> Int {
+    override public func write(_ buffer: UnsafePointer<UInt8>, maxLength len: Int) -> Int {
         do {
-
             guard let state = self.dbPointer.openState else {
                 throw ErrorMessage("Cannot write to a stream that is not open")
             }

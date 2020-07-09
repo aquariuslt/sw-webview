@@ -5,7 +5,6 @@ import JavaScriptCore
 /// add that support into the context. All public methods are exactly as you'd expect. As documented:
 /// https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout
 class TimeoutManager: NSObject {
-
     @objc fileprivate class TimeoutArguments: NSObject {
         let delay: Double
         let funcToRun: JSValue
@@ -39,9 +38,9 @@ class TimeoutManager: NSObject {
 
         // In order to add these to a JSContext, we have to cast our functions to Obj-C conventions, then to AnyObject.
 
-        let clearTimeout = unsafeBitCast((self.clearTimeout as @convention(block) (Int64) -> Void), to: AnyObject.self)
-        let setTimeout = unsafeBitCast((self.setTimeout as @convention(block) () -> Int64), to: AnyObject.self)
-        let setInterval = unsafeBitCast((self.setInterval as @convention(block) () -> Int64), to: AnyObject.self)
+        let clearTimeout = unsafeBitCast(self.clearTimeout as @convention(block) (Int64) -> Void, to: AnyObject.self)
+        let setTimeout = unsafeBitCast(self.setTimeout as @convention(block) () -> Int64, to: AnyObject.self)
+        let setInterval = unsafeBitCast(self.setInterval as @convention(block) () -> Int64, to: AnyObject.self)
 
         // Then actually attach them to the specific variable names. clearTimeout and clearInterval do the exact
         // same thing so we just reuse the same function.
@@ -77,9 +76,7 @@ class TimeoutManager: NSObject {
     }
 
     @objc fileprivate func runTimeout(_ timeout: TimeoutArguments) {
-
         if self.cancelledTimeouts.contains(timeout.timeoutIndex) == true {
-
             // There isn't any way to proactively cancel this before it runs, but when it does
             // we check to see if the index is in our collection of cancelled timeouts. If it is,
             // we return immediately.
@@ -89,7 +86,6 @@ class TimeoutManager: NSObject {
             return
 
         } else if self.stopAllTimeouts {
-
             // If we've stopped all execution (i.e. the worker is shutting down) then we shouldn't
             // fire either.
 
@@ -101,7 +97,6 @@ class TimeoutManager: NSObject {
         timeout.funcToRun.call(withArguments: timeout.args)
 
         if timeout.isInterval {
-
             // If this was a setInterval call as opposed to a setTimeout call, we need to keep firing
             // the function repeatedly until clearInterval is called.
 
@@ -113,12 +108,10 @@ class TimeoutManager: NSObject {
     /// the function and delay, the rest are arguments to be sent to the function
     /// when it runs. So we need to run a specific handler for this.
     fileprivate func getArgumentsForSetCall(isInterval: Bool) -> TimeoutArguments? {
-
         ServiceWorkerExecutionEnvironment.ensureContextIsOnCorrectThread()
 
         do {
             guard var args = JSContext.currentArguments() else {
-
                 // This shouldn't ever really happen as this function is always
                 // run in a JSContext, but you never know...
                 throw ErrorMessage("Could not get current argument list")
@@ -135,7 +128,6 @@ class TimeoutManager: NSObject {
             var timeout: Double = 0
 
             if args.count > 0 {
-
                 // The delay argument is optional, but if it's provided we need to
                 // parse it into a Double (so that division by 1000 isn't rounded to
                 // a whole number)
@@ -161,7 +153,6 @@ class TimeoutManager: NSObject {
             return TimeoutArguments(delay: timeout / 1000, funcToRun: funcToRun, args: args, timeoutIndex: self.lastTimeoutIndex, isInterval: isInterval)
 
         } catch {
-
             if let ctx = JSContext.current() {
                 let err = JSValue(newErrorFromMessage: "\(error)", in: ctx)
                 ctx.exception = err
