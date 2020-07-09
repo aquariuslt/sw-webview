@@ -1,11 +1,10 @@
 import Foundation
-import WebKit
-import ServiceWorkerContainer
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
+import ServiceWorkerContainer
+import WebKit
 
 public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandler {
-
     static let serviceWorkerRequestMethod = "SW_REQUEST"
     static let graftedRequestBodyHeader = "X-Grafted-Request-Body"
     static let eventStreamPath = "/___events___"
@@ -26,7 +25,6 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
     var eventStreams = Set<EventStream>()
 
     public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
-
         firstly { () -> Promise<Any?> in
             guard let body = message.body as? [String: Any] else {
                 throw ErrorMessage("Could not parse body")
@@ -63,7 +61,6 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
     }
 
     public func webView(_ webview: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-
         // WKURLSchemeTask can fail even when using didFailWithError if the task
         // has already been closed. We handle that in SWURLSchemeTask but first
         // we need to create one. So one first catch:
@@ -90,7 +87,6 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
             }
 
             if requestURL.path == SWWebViewBridge.eventStreamPath {
-
                 try self.startEventStreamTask(modifiedTask, webview: swWebView)
 
                 // Since the event stream stays alive indefinitely, we just early return
@@ -217,7 +213,6 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
     //    }
 
     func startEventStreamTask(_ task: SWURLSchemeTask, webview: SWWebView) throws {
-
         guard let containerDelegate = webview.containerDelegate else {
             throw ErrorMessage("SWWebView has no containerDelegate set, cannot start service worker functionality")
         }
@@ -244,7 +239,6 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
     }
 
     public func webView(_ webview: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
-
         guard let existingTask = SWURLSchemeTask.getExistingTask(for: urlSchemeTask) else {
             Log.error?("Stopping a task that isn't currently running - this should never happen")
             return

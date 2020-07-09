@@ -1,10 +1,9 @@
 import Foundation
-import WebKit
 import ServiceWorker
 import ServiceWorkerContainer
+import WebKit
 
 public class EventStream: NSObject {
-
     // We add a strong reference to the container here, so that we retain
     // any workers relevant to this webview. The rest of the operations rely
     // on ServiceWorkerContainer.get(), but that's fine, since this event stream
@@ -69,9 +68,10 @@ public class EventStream: NSObject {
             .map { regs in
                 // Registrations send down their corresponding worker objects, so we don't
                 // need to push those too.
-                regs.forEach {reg in
+                regs.forEach { reg in
                     let serviceWorkerReg: ServiceWorkerRegistration = reg
-                    self.sendUpdate(identifier: "serviceworkeregistration", object: serviceWorkerReg) }
+                    self.sendUpdate(identifier: "serviceworkeregistration", object: serviceWorkerReg)
+                }
             }
             .catch { error in
                 Log.error?("Failed to send existing registrations to event stream: \(error)")
@@ -79,7 +79,6 @@ public class EventStream: NSObject {
     }
 
     func shutdown() {
-
         if let workerListener = self.workerListener {
             GlobalEventLog.removeListener(workerListener)
         } else {

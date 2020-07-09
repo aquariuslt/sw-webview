@@ -1,6 +1,6 @@
 import Foundation
-import ServiceWorkerContainer
 import ServiceWorker
+import ServiceWorkerContainer
 
 /// Ideally we would have a separate container for each usage, but we can't detect from
 /// the WKURLSchemeHandler which instance of a URL is sending a command. So instead, we
@@ -12,7 +12,6 @@ struct ContainerAndUsageNumber {
 }
 
 public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClientsDelegate, CacheStorageProviderDelegate {
-
     let workerFactory: WorkerFactory
     let registrationFactory: WorkerRegistrationFactory
     let storageURL: URL
@@ -29,7 +28,6 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
     var inUseContainers: [ContainerAndUsageNumber] = []
 
     public func container(_ webview: SWWebView, createContainerFor url: URL) throws -> ServiceWorkerContainer {
-
         if var alreadyExists = self.inUseContainers.first(where: { $0.webview == webview && $0.container.url.absoluteString == url.absoluteString }) {
             alreadyExists.numUsing += 1
             Log.info?("Returning existing ServiceWorkerContainer for \(url.absoluteString). It has \(alreadyExists.numUsing) other clients")
@@ -45,12 +43,10 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
     }
 
     public func container(_ webview: SWWebView, getContainerFor url: URL) -> ServiceWorkerContainer? {
-
         return self.inUseContainers.first(where: { $0.webview == webview && $0.container.url.absoluteString == url.absoluteString })?.container
     }
 
     public func container(_ webview: SWWebView, freeContainer container: ServiceWorkerContainer) {
-
         guard let containerIndex = self.inUseContainers.index(where: { $0.webview == webview && $0.container == container }) else {
             Log.error?("Tried to remove a ServiceWorkerContainer that doesn't exist")
             return
@@ -70,8 +66,7 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
     }
 
     public func clientsClaim(_ worker: ServiceWorker, _ cb: (Error?) -> Void) {
-
-        if worker.state != .activated && worker.state != .activating {
+        if worker.state != .activated, worker.state != .activating {
             cb(ErrorMessage("Service worker can only claim clients when in activated or activating state"))
             return
         }

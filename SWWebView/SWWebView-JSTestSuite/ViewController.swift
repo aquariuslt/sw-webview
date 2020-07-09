@@ -1,13 +1,12 @@
-import UIKit
-import SWWebView
-import WebKit
 import GCDWebServers
-import ServiceWorkerContainer
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
+import ServiceWorkerContainer
+import SWWebView
+import UIKit
+import WebKit
 
 class ViewController: UIViewController {
-
     var coordinator: SWWebViewCoordinator?
 
     private let refreshButton = UIButton(type: .custom)
@@ -35,26 +34,26 @@ class ViewController: UIViewController {
 
         self.coordinator = SWWebViewCoordinator(storageURL: storageURL)
 
-        swView = SWWebView(frame: self.view.frame, configuration: config)
+        self.swView = SWWebView(frame: self.view.frame, configuration: config)
         // This will move to a delegate method eventually
-        swView.serviceWorkerPermittedDomains.append("localhost:4567")
-        swView.containerDelegate = self.coordinator!
-        self.view.addSubview(swView)
+        self.swView.serviceWorkerPermittedDomains.append("localhost:4567")
+        self.swView.containerDelegate = self.coordinator!
+        self.view.addSubview(self.swView)
 
         title = "SWWebView"
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refresh))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(self.refresh))
 
         let url = URLComponents(string: "sw://localhost:4567/scope/")!
         URLCache.shared.removeAllCachedResponses()
         print("Loading \(url.url!.absoluteString)")
-        _ = swView.load(URLRequest(url: url.url!))
+        _ = self.swView.load(URLRequest(url: url.url!))
 
-        view.addSubview(refreshButton)
+        view.addSubview(self.refreshButton)
     }
 
     @objc private func refresh() {
-        swView.reload()
+        self.swView.reload()
     }
 
     func addStubs() {

@@ -1,13 +1,11 @@
 import Foundation
-import WebKit
-import ServiceWorkerContainer
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
+import ServiceWorkerContainer
+import WebKit
 
 class ServiceWorkerRegistrationCommands {
-
     static func unregister(eventStream: EventStream, json: AnyObject?) throws -> Promise<Any?>? {
-
         guard let registrationID = json?["id"] as? String else {
             throw ErrorMessage("Must provide registration ID in JSON body")
         }
@@ -24,6 +22,6 @@ class ServiceWorkerRegistrationCommands {
                         "success": true
                     ]
                 }
-        }
+            }
     }
 }

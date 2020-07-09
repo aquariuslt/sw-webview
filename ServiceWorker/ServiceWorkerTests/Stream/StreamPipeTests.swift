@@ -9,7 +9,7 @@ class StreamPipeTests: XCTestCase {
         let inputStream = InputStream(data: testData)
         let outputStream = OutputStream.toMemory()
 
-        StreamPipe.pipe(from: inputStream, to: outputStream, bufferSize: 1)
+        StreamPipe.pipe(from: inputStream, to: outputStream, bufferSize: testData.count)
             .map { _ -> Void in
 
                 let transferredData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
@@ -29,10 +29,8 @@ class StreamPipeTests: XCTestCase {
 
         let (promise, resolver) = Promise<Void>.pending()
 
-        let queue = DispatchQueue.global()
-
         DispatchQueue.global().async {
-            StreamPipe.pipe(from: inputStream, to: outputStream, bufferSize: 1)
+            StreamPipe.pipe(from: inputStream, to: outputStream, bufferSize: testData.count)
                 .map { _ -> Void in
 
                     let transferredData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data

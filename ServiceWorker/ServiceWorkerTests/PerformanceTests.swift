@@ -2,12 +2,14 @@
 import XCTest
 
 class PerformanceTests: XCTestCase {
-    //    func testPerformanceExample() {
-    //        // This is an example of a performance test case.
-    //        self.measure {
-    //            let testSw = ServiceWorker.createTestWorker(id: "PERFORMANCE")
-    //            testSw.evaluateScript("console.log('hi')")
-    //                .assertResolves()
-    //        }
-    //    }
+    func testPerformanceExample() {
+        self.measure {
+            let testSw = ServiceWorker.createTestWorker(id: "PERFORMANCE")
+            testSw.evaluateScript("console.log('hi'); 'succeed!'")
+                .map { (result: String) -> Void in
+                    XCTAssertEqual(result, "succeed!")
+                }
+                .assertResolves()
+        }
+    }
 }

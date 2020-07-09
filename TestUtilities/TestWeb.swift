@@ -12,7 +12,7 @@ import PromiseKit
 
 class TestWeb {
 
-    static var server: GCDWebServer?
+    static var server: GCDWebServer!
 
     static var serverURL: URL {
         var url = URLComponents(string: "http://localhost")!

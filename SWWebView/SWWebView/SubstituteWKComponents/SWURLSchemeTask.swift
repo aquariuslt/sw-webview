@@ -1,10 +1,9 @@
 import Foundation
-import WebKit
 import ServiceWorker
+import WebKit
 
 /// Because of the URL and body mapping we do, we need to wrap the WKURLSchemeTask class.
 public class SWURLSchemeTask {
-
     public let request: URLRequest
     fileprivate let underlyingTask: WKURLSchemeTask
     public var open: Bool = true
@@ -25,7 +24,6 @@ public class SWURLSchemeTask {
     static var currentlyActiveTasks: [Int: SWURLSchemeTask] = [:]
 
     init(underlyingTask: WKURLSchemeTask) throws {
-
         self.underlyingTask = underlyingTask
 
         guard let requestURL = underlyingTask.request.url else {
@@ -61,7 +59,6 @@ public class SWURLSchemeTask {
         //        }
 
         if let referer = underlyingTask.request.value(forHTTPHeaderField: "Referer") {
-
             guard let referrerURL = URL(swWebViewString: referer) else {
                 throw ErrorMessage("Could not parse Referer header correctly")
             }
@@ -102,7 +99,6 @@ public class SWURLSchemeTask {
     }
 
     public func didReceiveHeaders(statusCode: Int, headers: [String: String] = [:]) throws {
-
         var modifiedHeaders = headers
         // Always want to make sure API responses aren't cached
         modifiedHeaders["Cache-Control"] = "no-cache"
@@ -123,7 +119,6 @@ public class SWURLSchemeTask {
     }
 
     public func didFinish() throws {
-
         if self.open == false {
             Log.warn?("URL task trying to finish an already closed connection")
             return

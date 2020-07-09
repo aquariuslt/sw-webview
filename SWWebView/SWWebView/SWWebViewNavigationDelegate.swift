@@ -1,11 +1,9 @@
 import Foundation
-import WebKit
 import ServiceWorker
+import WebKit
 
 class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
-
     func isServiceWorkerPermittedURL(_ webview: SWWebView, url: URL) -> Bool {
-
         guard let host = url.host else {
             return false
         }
@@ -20,16 +18,15 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func makeServiceWorkerSuitableURLRequest(_ webview: SWWebView, request: URLRequest) -> URLRequest {
-
         guard let url = request.url else {
             // If there is no URL there is nothing to do here
             return request
         }
 
-        if url.scheme == SWWebView.ServiceWorkerScheme && self.isServiceWorkerPermittedURL(webview, url: url) == true {
+        if url.scheme == SWWebView.ServiceWorkerScheme, self.isServiceWorkerPermittedURL(webview, url: url) == true {
             // already the correct scheme
             return request
-        } else if url.scheme != SWWebView.ServiceWorkerScheme && self.isServiceWorkerPermittedURL(webview, url: url) == false {
+        } else if url.scheme != SWWebView.ServiceWorkerScheme, self.isServiceWorkerPermittedURL(webview, url: url) == false {
             // also correct (but non-SW) scheme
             return request
         }
@@ -82,7 +79,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func makeNonServiceWorker(urlRequest request: URLRequest) -> URLRequest {
-
         if request.url?.scheme != SWWebView.ServiceWorkerScheme {
             return request
         }
@@ -100,7 +96,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
         guard let swWebView = webView as? SWWebView else {
             Log.error?("Trying to use SWNavigationDelegate on a non-SWWebView class")
             return decisionHandler(.allow)
@@ -115,12 +110,10 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
             // we're using a domain allowed by our configuration.
 
             if self.isServiceWorkerPermittedURL(swWebView, url: url) {
-
                 // It's a permitted domain, but if we have a navigation delegate we want to forward
                 // the (non-SW) URL to that to see if we should continue.
 
                 if let delegate = swWebView.navigationDelegate {
-
                     let nonSWRequest = self.makeNonServiceWorker(urlRequest: navigationAction.request)
 
                     let nonSWAction = SWNavigationAction(request: nonSWRequest, sourceFrame: navigationAction.sourceFrame, targetFrame: navigationAction.targetFrame, navigationType: navigationAction.navigationType)
@@ -136,7 +129,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
                 return
 
             } else {
-
                 // If it is not a permitted domain, we disallow the navigation, then immediately forward
                 // the webview to a URL without the SW scheme
                 decisionHandler(.cancel)
@@ -159,7 +151,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-
         guard let swWebView = webView as? SWWebView else {
             Log.error?("Trying to use SWNavigationDelegate on a non-SWWebView class")
             return decisionHandler(.allow)
@@ -170,7 +161,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
         }
 
         if url.scheme != SWWebView.ServiceWorkerScheme {
-
             // If the URL is not a service worker one, then we just pass it straight through.
 
             guard swWebView.navigationDelegate?.webView?(webView, decidePolicyFor: navigationResponse, decisionHandler: decisionHandler) != nil else {
@@ -178,7 +168,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
             }
 
         } else {
-
             // If it is a SW URL we need to manually construct a shimmed response with the correct URL, to pass
             // back out to our navigation delegate, if it exists.
 
@@ -189,7 +178,6 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
             let nonSWNavResponse = SWNavigationResponse(response: response, isForMainFrame: navigationResponse.isForMainFrame, canShowMIMEType: navigationResponse.canShowMIMEType)
 
             guard swWebView.navigationDelegate?.webView?(webView, decidePolicyFor: nonSWNavResponse, decisionHandler: decisionHandler) != nil else {
-
                 // If there is no delegate, or it doesn't implement this method, we just allow it.
 
                 decisionHandler(.allow)

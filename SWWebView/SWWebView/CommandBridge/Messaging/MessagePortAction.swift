@@ -1,7 +1,6 @@
 import Foundation
 
 class MessagePortAction: ToJSON {
-
     enum ActionType: String {
         case message
         case close

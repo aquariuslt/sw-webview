@@ -3,7 +3,6 @@ import ServiceWorkerContainer
 
 extension ServiceWorkerRegistration: ToJSON {
     func toJSONSuitableObject() -> Any {
-
         return [
             "id": self.id,
             "scope": self.scope.sWWebviewSuitableAbsoluteString ?? "",

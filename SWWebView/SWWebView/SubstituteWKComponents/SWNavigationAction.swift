@@ -3,7 +3,6 @@ import WebKit
 
 /// We can't manually create WKNavigationActions, so instead we have to do this
 class SWNavigationAction: WKNavigationAction {
-
     fileprivate let _request: URLRequest
     override var request: URLRequest {
         return self._request

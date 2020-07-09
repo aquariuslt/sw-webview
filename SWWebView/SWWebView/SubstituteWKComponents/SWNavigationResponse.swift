@@ -2,7 +2,6 @@ import Foundation
 import WebKit
 
 class SWNavigationResponse: WKNavigationResponse {
-
     fileprivate let _canShowMIMEType: Bool
     override var canShowMIMEType: Bool {
         return self._canShowMIMEType

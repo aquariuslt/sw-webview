@@ -1,16 +1,13 @@
 import Foundation
-import WebKit
-import ServiceWorkerContainer
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
+import ServiceWorkerContainer
+import WebKit
 
 class ServiceWorkerContainerCommands {
-
     static func getRegistration(eventStream: EventStream, json: AnyObject?) throws -> Promise<Any?>? {
-
         var scope: URL?
         if let scopeString = json?["scope"] as? String {
-
             guard let specifiedScope = URL(string: scopeString) else {
                 throw ErrorMessage("Did not understand passed in scope argument")
             }
@@ -32,7 +29,6 @@ class ServiceWorkerContainerCommands {
     }
 
     static func register(eventStream: EventStream, json: AnyObject?) throws -> Promise<Any?>? {
-
         guard let workerURLString = json?["url"] as? String else {
             throw ErrorMessage("URL must be provided")
         }
@@ -44,7 +40,6 @@ class ServiceWorkerContainerCommands {
         var options: ServiceWorkerRegistrationOptions?
 
         if let specifiedScope = json?["scope"] as? String {
-
             guard let specifiedScopeURL = URL(string: specifiedScope, relativeTo: eventStream.container.url) else {
                 throw ErrorMessage("Could not parse scope URL")
             }

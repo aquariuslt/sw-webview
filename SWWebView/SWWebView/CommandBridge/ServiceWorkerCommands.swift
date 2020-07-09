@@ -4,15 +4,12 @@ import ServiceWorker
 import ServiceWorkerContainer
 
 class ServiceWorkerCommands {
-
     fileprivate static func deserializeTransferables(message: Any, transfered: [SWMessagePort]) throws -> Any {
-
         if let array = message as? [Any] {
             return try array.map { try deserializeTransferables(message: $0, transfered: transfered) }
         } else if message is String || message is Int || message is Float || message is Bool {
             return message
         } else if let dict = message as? [String: Any] {
-
             if let transferrableIndex = (dict["__transferable"] as? [String: Int])?["index"] {
                 // This is a transferred object. Replace it with the real thing.
                 return transfered[transferrableIndex]
@@ -28,7 +25,6 @@ class ServiceWorkerCommands {
     }
 
     static func postMessage(eventStream: EventStream, json: AnyObject?) throws -> Promise<Any?> {
-
         return firstly { () -> Promise<Any?> in
 
             guard let workerID = json?["id"] as? String else {
@@ -65,7 +61,6 @@ class ServiceWorkerCommands {
             let event = ExtendableMessageEvent(data: deserializedMessage, ports: transferredPorts)
 
             DispatchQueue.global().async {
-
                 // We make this async because we need it to execute after the webview
                 // has received the transferred array specified below. But this is a
                 // performance hit - should find a better way to do this.

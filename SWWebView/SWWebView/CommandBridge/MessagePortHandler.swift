@@ -1,12 +1,10 @@
 import Foundation
-import ServiceWorkerContainer
-import ServiceWorker
 import PromiseKit
+import ServiceWorker
+import ServiceWorkerContainer
 
 class MessagePortHandler {
-
     static func proxyMessage(eventStream: EventStream, json: AnyObject?) throws -> Promise<Any?> {
-
         return firstly { () -> Promise<Any?> in
 
             guard let portID = json?["id"] as? String else {

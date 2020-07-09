@@ -18,7 +18,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testFetchResponseText() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
             return res
@@ -35,7 +35,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testGzipResponse() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test-gzip.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test-gzip.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
 
             var res: GCDWebServerDataResponse?
 
@@ -64,7 +64,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testFetchResponseJSON() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.json", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.json", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(jsonObject: [
                 "test": "value"
             ])
@@ -86,7 +86,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testResponseInWorker() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
             return res
@@ -108,7 +108,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testFetchResponseClone() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
             return res
@@ -133,7 +133,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testDataResponse() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.dat", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.dat", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
 
             let d = Data(bytes: [1, 2, 3, 4, 254])
             let res = GCDWebServerDataResponse(data: d, contentType: "application/binary")
@@ -159,7 +159,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testArrayBufferResponse() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.dat", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.dat", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
 
             let d = Data(bytes: [1, 2, 3, 4, 255])
             let res = GCDWebServerDataResponse(data: d, contentType: "application/binary")
@@ -174,8 +174,7 @@ class FetchResponseTests: XCTestCase {
             .then(function(res) { return res.arrayBuffer() })
             .then(function(arrBuffer) {
                 let arr = new Uint8Array(arrBuffer);
-
-            return [arr[0],arr[1],arr[2],arr[3],arr[4]]
+                return [arr[0], arr[1], arr[2], arr[3], arr[4]]
             })
         """)
             .then { (val: JSContextPromise) in
@@ -193,7 +192,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testResponseToFileDownload() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
             return res
@@ -222,7 +221,7 @@ class FetchResponseTests: XCTestCase {
     }
 
     func testResponseToFileDownloadHandlesErrors() {
-        TestWeb.server!.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
+        TestWeb.server.addHandler(forMethod: "GET", path: "/test.txt", request: GCDWebServerRequest.self) { (_) -> GCDWebServerResponse? in
             let res = GCDWebServerDataResponse(text: "THIS IS TEST CONTENT")
             res!.statusCode = 200
             return res

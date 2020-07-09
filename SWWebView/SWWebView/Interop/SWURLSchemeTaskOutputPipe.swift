@@ -2,13 +2,11 @@ import Foundation
 import ServiceWorker
 
 class SWURLSchemeTaskOutputStream: OutputStreamImplementation {
-
     let task: SWURLSchemeTask
     let statusCode: Int
     let headers: [String: String]
 
     init(task: SWURLSchemeTask, statusCode: Int, headers: [String: String]) throws {
-
         self.task = task
         self.statusCode = statusCode
         self.headers = headers
@@ -17,7 +15,6 @@ class SWURLSchemeTaskOutputStream: OutputStreamImplementation {
     }
 
     convenience init(task: SWURLSchemeTask, response: FetchResponseProtocol) throws {
-
         var headers: [String: String] = [:]
         response.headers.keys().forEach { key in
             if let value = response.headers.get(key) {

@@ -1,9 +1,8 @@
 import Foundation
-import WebKit
 import ServiceWorker
+import WebKit
 
 public class SWWebView: WKWebView {
-
     static let ServiceWorkerScheme = "sw"
 
     public var serviceWorkerPermittedDomains: [String] = []
@@ -17,7 +16,7 @@ public class SWWebView: WKWebView {
     /// navigation delegates - one internal, that handles the URL mapping,
     /// and one external, that in theory is ignorant of this not being a
     /// WKWebView.
-    public override var navigationDelegate: WKNavigationDelegate? {
+    override public var navigationDelegate: WKNavigationDelegate? {
         get {
             return self.outerNavigationDelegate
         }
@@ -27,7 +26,6 @@ public class SWWebView: WKWebView {
     }
 
     fileprivate static func addSWHooksToConfiguration(_ configuration: WKWebViewConfiguration, bridge: SWWebViewBridge) {
-
         let pathToJS = Bundle(for: SWWebView.self).bundleURL
             .appendingPathComponent("js-dist", isDirectory: true)
             .appendingPathComponent("runtime.js")
@@ -67,14 +65,13 @@ public class SWWebView: WKWebView {
     static func wrapScriptInWebviewSettings(_ script: String) -> String {
         return """
         (function() {
-        var swwebviewSettings = \(javascriptConfigDictionary);
+        var swwebviewSettings = \(self.javascriptConfigDictionary);
         \(script)
         })()
         """
     }
 
-    public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
-
+    override public init(frame: CGRect, configuration: WKWebViewConfiguration) {
         self.bridge = SWWebViewBridge()
         SWWebView.addSWHooksToConfiguration(configuration, bridge: self.bridge)
         self.swNavigationDelegate = SWWebViewNavigationDelegate()
@@ -87,8 +84,7 @@ public class SWWebView: WKWebView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func load(_ request: URLRequest) -> WKNavigation? {
-
+    override public func load(_ request: URLRequest) -> WKNavigation? {
         if request.url == nil {
             // not sure how this would happen, but still
             return super.load(request)
@@ -103,7 +99,7 @@ public class SWWebView: WKWebView {
     }
 
     /// We need to ensure that we return the non-SW scheme URL no matter what.
-    public override var url: URL? {
+    override public var url: URL? {
         if let url = super.url {
             if let navigationDelegate = self.swNavigationDelegate, url.scheme == SWWebView.ServiceWorkerScheme {
                 return navigationDelegate.makeNonServiceWorker(url: url)

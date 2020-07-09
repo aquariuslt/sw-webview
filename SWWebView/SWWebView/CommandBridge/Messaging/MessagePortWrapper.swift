@@ -2,7 +2,6 @@ import Foundation
 import ServiceWorker
 
 class MessagePortWrapper: NSObject, MessagePortTarget {
-
     // We keep a reference to this because the MessagePort itself only
     // has a weak reference to this as its target. We keep a strong
     // reference until the port has been closed, at which point we remove it.
@@ -35,7 +34,6 @@ class MessagePortWrapper: NSObject, MessagePortTarget {
     }
 
     func receiveMessage(_ evt: ExtendableMessageEvent) {
-
         // A MessagePort message can, in turn, send its own ports. If that's happened
         // we need to create new wrappers for these ports too.
 
