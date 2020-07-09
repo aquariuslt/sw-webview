@@ -96,7 +96,7 @@ class ClientsTests: XCTestCase {
             .then { (val: JSContextPromise) in
                 return val.resolve()
             }
-            .then { (returnArray: [Any]) -> Void in
+            .map { (returnArray: [Any]) -> Void in
                 XCTAssertEqual(returnArray.count, 4)
                 XCTAssertEqual(returnArray[0] as? String, "TESTCLIENT")
                 XCTAssertEqual(returnArray[1] as? String, "http://www.example.com")
@@ -135,7 +135,7 @@ class ClientsTests: XCTestCase {
             .then { (val: JSContextPromise) in
                 return val.resolve()
             }
-            .then { (val: [String: Any]) -> Void in
+            .map { (val: [String: Any]) -> Void in
 
                 let all = val["all"] as? [String]
                 let uncontrolled = val["uncontrolled"] as? [String]
@@ -179,7 +179,7 @@ class ClientsTests: XCTestCase {
             .then { (val: JSContextPromise) in
                 return val.resolve()
             }
-            .then {
+            .map {
                 XCTAssertEqual(claimed, true)
             }
             .assertResolves()

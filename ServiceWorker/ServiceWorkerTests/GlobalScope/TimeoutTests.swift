@@ -5,9 +5,9 @@ import PromiseKit
 class TimeoutTests: XCTestCase {
 
     func promiseDelay(delay: Double) -> Promise<Void> {
-        return Promise<Void> { fulfill, _ in
+        return Promise<Void> { resolver in
             DispatchQueue.main.asyncAfter(deadline: .now() + (delay / 1000), execute: {
-                fulfill(())
+                resolver.fulfill(())
             })
         }
     }

@@ -78,7 +78,7 @@ class ConsoleMirrorTests: XCTestCase {
         let testWorker = ServiceWorker.createTestWorker(id: name)
 
         testWorker.evaluateScript("console.debug({test:'looks', like: 'this'})")
-            .then {
+            .map {
                 self.wait(for: [expect], timeout: 1)
             }
             .assertResolves()

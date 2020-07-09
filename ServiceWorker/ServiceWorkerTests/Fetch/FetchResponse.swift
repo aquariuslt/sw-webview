@@ -26,7 +26,7 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.txt"))
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
             .then { res in
                 res.text()
             }
@@ -55,9 +55,7 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test-gzip.txt"))
-
-        FetchSession.default.fetch(request)
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test-gzip.txt"))
             .then { response -> Promise<Void> in
                 XCTAssertNil(response.headers.get("Content-Length"))
 
@@ -78,11 +76,11 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.json"))
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.json"))
             .then { response in
                 response.json()
             }
-            .then { obj -> Void in
+            .map { obj -> Void in
 
                 let json = obj as! [String: Any]
 
@@ -108,7 +106,7 @@ class FetchResponseTests: XCTestCase {
             .then { (val: JSContextPromise) in
                 return val.resolve()
             }
-            .then { (val: String) in
+            .map { (val: String) in
                 XCTAssertEqual(val, "THIS IS TEST CONTENT")
             }
             .assertResolves()
@@ -122,7 +120,7 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.txt"))
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
             .then { res -> Promise<Void> in
 
                 let clone = try res.clone()
@@ -132,7 +130,7 @@ class FetchResponseTests: XCTestCase {
                 let originalText = res.text()
 
                 return when(fulfilled: [originalText, cloneText])
-                    .then { results -> Void in
+                    .map { results -> Void in
                         XCTAssertEqual(results.count, 2)
                         results.forEach { XCTAssertEqual($0, "THIS IS TEST CONTENT") }
                     }
@@ -149,8 +147,8 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.dat"))
-            .map { res in
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.dat"))
+            .then { res in
                 res.data()
             }
             .map { data -> Void in
@@ -208,25 +206,23 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.txt"))
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
             .then { res in
                 res.internalResponse.fileDownload { localFile, _ in
 
                     // test that we can use async promises here
 
-                    Promise<Void> { (fulfill: @escaping () -> Void, _: (Error) -> Void) in
+                    Promise<Void> { resolver in
                         DispatchQueue.global(qos: .background).async {
-
-                            fulfill()
+                            resolver.fulfill(())
                         }
                     }
-                    .then { () -> String in
-
+                    .map { () -> String in
                         return try String(contentsOfFile: localFile.path)
                     }
                 }
             }
-            .then { contents in
+            .map { contents in
                 XCTAssertEqual(contents, "THIS IS TEST CONTENT")
             }
             .assertResolves()
@@ -239,7 +235,7 @@ class FetchResponseTests: XCTestCase {
             return res
         }
 
-        FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.txt"))
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
             .then { res in
                 res.internalResponse.fileDownload { _, _ in
 

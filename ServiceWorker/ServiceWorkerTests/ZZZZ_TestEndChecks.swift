@@ -11,7 +11,7 @@ class ZZZZ_TestEndChecks: XCTestCase {
 
         let queues = ServiceWorkerExecutionEnvironment.contexts
 
-        Promise(value: ())
+        Promise.value
             .then { () -> Promise<Void> in
 
                 let allContexts = ServiceWorkerExecutionEnvironment.contexts.keyEnumerator().allObjects as! [JSContext]
@@ -25,14 +25,13 @@ class ZZZZ_TestEndChecks: XCTestCase {
 
                 let worker = ServiceWorker.createTestWorker(id: self.name)
                 return worker.getExecutionEnvironment()
-                    .then { _ -> Void in
+                    .map { _ -> Void in
                         XCTAssertEqual(ServiceWorkerExecutionEnvironment.contexts.keyEnumerator().allObjects.count, 1)
                     }
 
             }.then { _ -> Promise<Void> in
 
-                Promise<Void> { fulfill, _ in
-
+                Promise<Void> { resolver in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
                         print("Performing check")
 
@@ -46,7 +45,7 @@ class ZZZZ_TestEndChecks: XCTestCase {
                         }
 
                         XCTAssertEqual(ServiceWorkerExecutionEnvironment.contexts.keyEnumerator().allObjects.count, 0)
-                        fulfill(())
+                        resolver.fulfill(())
                     })
                 }
             }

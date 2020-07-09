@@ -1,6 +1,7 @@
 import XCTest
 @testable import ServiceWorker
 import JavaScriptCore
+import PromiseKit
 
 class GlobalScopeTests: XCTestCase {
 
@@ -9,7 +10,7 @@ class GlobalScopeTests: XCTestCase {
         let sw = ServiceWorker.createTestWorker(id: name)
 
         sw.evaluateScript("location.host")
-            .then { (val: String?) in
+            .map { (val: String?) in
                 XCTAssertEqual(val, "www.example.com")
             }
             .assertResolves()
@@ -32,11 +33,11 @@ class GlobalScopeTests: XCTestCase {
                 })
             """)
         }
-        .then {
+        .then { () -> Promise<Void> in
             let ev = ExtendableEvent(type: "test")
             return sw.dispatchEvent(ev)
         }
-        .then {
+        .map {
             return sw.withJSContext { context in
                 XCTAssertEqual(context.objectForKeyedSubscript("fired").toInt32(), 2)
             }
@@ -56,18 +57,18 @@ class GlobalScopeTests: XCTestCase {
                 });
             """)
         }
-        .then {
+        .then { () -> Promise<Void> in
             let ev = ExtendableEvent(type: "activate")
             return sw.dispatchEvent(ev)
         }
-        .then { () -> Int in
+        .map { () -> Int in
             return 1
         }
-        .recover { error -> Int in
+        .recover { error -> Guarantee<Int> in
             XCTAssertEqual((error as! ErrorMessage).message, "Error: oh no")
-            return 0
+            return .value(0)
         }
-        .then { val in
+        .map { val in
             XCTAssertEqual(val, 0)
         }
 

@@ -63,13 +63,13 @@ class SQLiteTests: XCTestCase {
 
         SQLiteConnection.inConnection(self.dbPath) { db -> Promise<Int> in
 
-            Promise { fulfill, _ in
+            Promise { resolver in
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     do {
                         try db.select(sql: "SELECT 1 as num") { resultSet in
                             XCTAssertEqual(try resultSet.next(), true)
-                            fulfill(try resultSet.int("num")!)
+                            resolver.fulfill(try resultSet.int("num")!)
                         }
                     } catch {
                         XCTFail()
@@ -77,7 +77,7 @@ class SQLiteTests: XCTestCase {
                 }
             }
 
-        }.then { intVal -> Void in
+        }.map { intVal -> Void in
             XCTAssertEqual(intVal, 1)
         }
         .assertResolves()
@@ -270,7 +270,7 @@ class SQLiteTests: XCTestCase {
             let output = OutputStream.toMemory()
 
             StreamPipe.pipe(from: stream, to: output, bufferSize: 1)
-                .then { () -> Void in
+                .map { () -> Void in
 
                     let result = output.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
                     let str = String(data: result, encoding: .utf8)
@@ -298,7 +298,7 @@ class SQLiteTests: XCTestCase {
         let output = OutputStream.toMemory()
 
         StreamPipe.pipe(from: stream, to: output, bufferSize: 1)
-            .then { () -> Void in
+            .map { () -> Void in
 
                 let result = output.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
                 let str = String(data: result, encoding: .utf8)

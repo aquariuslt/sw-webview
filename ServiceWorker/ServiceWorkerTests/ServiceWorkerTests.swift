@@ -10,7 +10,7 @@ class ServiceWorkerTests: XCTestCase {
         let sw = ServiceWorker.createTestWorker(id: name, content: "var testValue = 'hello';")
 
         return sw.evaluateScript("testValue")
-            .then { (val: String?) -> Void in
+            .map { (val: String?) -> Void in
                 XCTAssertEqual(val, "hello")
             }
             .assertResolves()
@@ -47,9 +47,8 @@ class ServiceWorkerTests: XCTestCase {
         let run: @convention(block) () -> Void = {
             let semaphore = DispatchSemaphore(value: 0)
             DispatchQueue.global().asyncAfter(deadline: .now() + 2, execute: {
-
-                Promise(value: ())
-                    .then { () -> Void in
+                _ = Promise.value
+                    .map { () -> Void in
                         Log.info?("signalling")
                         semaphore.signal()
                     }
@@ -66,7 +65,7 @@ class ServiceWorkerTests: XCTestCase {
         .then {
             return sw.evaluateScript("testFunc()")
         }
-        .then { () -> Void in
+        .map { () -> Void in
             // compiler needs this to be here
         }
         .assertResolves()

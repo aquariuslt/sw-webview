@@ -70,7 +70,7 @@ class CacheTests: XCTestCase {
         }
 
         func open(_ cacheName: String) -> JSValue? {
-            return Promise(value: TestCache(name: cacheName))
+            return Promise.value(TestCache(name: cacheName))
                 .toJSPromiseInCurrentContext()
         }
 
@@ -92,9 +92,9 @@ class CacheTests: XCTestCase {
         sw.evaluateScript("""
             self.caches.keys()
         """)
-            .recover { error -> JSValue? in
+            .recover { error -> Guarantee<JSValue?> in
                 XCTAssertEqual("\(error)", "Error: CacheStorage has not been provided for this worker")
-                return nil
+                return .value(nil)
             }
             .assertResolves()
     }
@@ -112,7 +112,7 @@ class CacheTests: XCTestCase {
 
                 return jsVal.resolve()
             }
-            .then { (arr: [String]) -> Void in
+            .map { (arr: [String]) -> Void in
 
                 XCTAssertEqual(arr[0], "TestCache")
                 XCTAssertEqual(arr[1], "TestCache2")

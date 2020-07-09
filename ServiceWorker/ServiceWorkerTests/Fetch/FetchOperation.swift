@@ -28,10 +28,8 @@ class FetchOperationTests: XCTestCase {
             return res
         }
 
-        let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
-
-        FetchSession.default.fetch(request)
-            .then { response -> Void in
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt"))
+            .map { response -> Void in
                 XCTAssertEqual(response.status, 201)
                 XCTAssertEqual(response.headers.get("X-Test-Header"), "TEST-VALUE")
             }
@@ -55,7 +53,7 @@ class FetchOperationTests: XCTestCase {
             .then { response -> Promise<Any?> in
                 return response.json()
             }
-            .then { obj -> Void in
+            .map { obj -> Void in
                 let json = obj as! [String: String]
                 XCTAssertEqual(json["blah"], "value")
             }
@@ -79,20 +77,20 @@ class FetchOperationTests: XCTestCase {
         }
 
         when(fulfilled: [
-            FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.txt")).then { $0.text() },
-            FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test2.txt")).then { $0.text() }
+            FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt")).then { $0.text() },
+            FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test2.txt")).then { $0.text() }
         ])
-            .then { responses -> Void in
+            .map { responses -> Void in
                 XCTAssertEqual(responses[0], "this is some text")
                 XCTAssertEqual(responses[1], "this is some text two")
             }
             .assertResolves()
 
         when(fulfilled: [
-            FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test2.txt")).then { $0.text() },
-            FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("/test.txt")).then { $0.text() }
+            FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test2.txt")).then { $0.text() },
+            FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/test.txt")).then { $0.text() }
         ])
-            .then { responses -> Void in
+            .map { responses -> Void in
                 XCTAssertEqual(responses[0], "this is some text two")
                 XCTAssertEqual(responses[1], "this is some text")
             }
@@ -101,7 +99,7 @@ class FetchOperationTests: XCTestCase {
 
     func testFailedFetch() {
 
-        FetchSession.default.fetch(URL(string: "http://localhost:23423")!)
+        FetchSession.default.fetch(url: URL(string: "http://localhost:23423")!)
             .assertRejects()
     }
 
@@ -126,10 +124,8 @@ class FetchOperationTests: XCTestCase {
 
         self.setupRedirectURLs()
 
-        let request = FetchRequest(url: TestWeb.serverURL.appendingPathComponent("/redirect-me"))
-
-        FetchSession.default.fetch(request)
-            .then { response -> Void in
+        FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("/redirect-me"))
+            .map { response -> Void in
                 XCTAssertEqual(response.status, 201)
 
                 XCTAssertEqual(response.url!.absoluteString, TestWeb.serverURL.appendingPathComponent("/test.txt").absoluteString)
@@ -146,12 +142,13 @@ class FetchOperationTests: XCTestCase {
         noRedirectRequest.redirect = .Manual
 
         FetchSession.default.fetch(noRedirectRequest)
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssert(response.status == 301, "Should be a 301 status")
                 XCTAssert(response.headers.get("Location") == "/test.txt", "URL should be correct")
                 XCTAssert(response.url!.absoluteString == TestWeb.serverURL.appendingPathComponent("/redirect-me").absoluteString)
                 expectNotRedirect.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 
@@ -189,7 +186,7 @@ class FetchOperationTests: XCTestCase {
 
         let fulfilled = expectation(description: "The promise returned")
         FetchSession.default.fetch(postRequest)
-            .then { _ in
+            .map { _ in
                 fulfilled.fulfill()
             }
             .catch { error in
@@ -234,7 +231,8 @@ class FetchOperationTests: XCTestCase {
         """)
             .then { (val: JSContextPromise) in
                 return val.resolve()
-            }.then { (obj: [String: Int]) -> Void in
+            }
+            .map { (obj: [String: Int]) -> Void in
 
                 for (key, val) in obj {
                     XCTAssert(val != -1, "Property \(key) should exist")

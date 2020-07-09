@@ -35,7 +35,7 @@ class FetchPerformance: XCTestCase {
 
     func testFetch() {
         self.measure {
-            FetchSession.default.fetch(TestWeb.serverURL.appendingPathComponent("data"))
+            FetchSession.default.fetch(url: TestWeb.serverURL.appendingPathComponent("data"))
                 .then { res in
                     res.data()
                 }

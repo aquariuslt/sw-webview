@@ -2,6 +2,7 @@ import XCTest
 @testable import ServiceWorker
 import GCDWebServers
 import JavaScriptCore
+import PromiseKit
 
 class FetchOperationCORSTests: XCTestCase {
 
@@ -48,7 +49,7 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call fails")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { _ in
+            .map { _ in
                 XCTFail("This should not succeed")
             }
             .catch { _ in
@@ -80,7 +81,7 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call works")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssert(response.responseType == ResponseType.CORS)
                 expect.fulfill()
             }
@@ -113,10 +114,11 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call fails")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssert(response.responseType == ResponseType.CORS)
                 expect.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 
@@ -144,7 +146,7 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call fails")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { _ in
+            .map { _ in
                 XCTFail("Should not succeed")
             }
             .catch { _ in
@@ -175,7 +177,7 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call works")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssert(response.responseType == ResponseType.CORS)
                 expect.fulfill()
             }
@@ -208,12 +210,13 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call is missing header")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssert(response.responseType == ResponseType.CORS)
                 XCTAssertNil(response.headers.get("X-Additional-Header"))
                 XCTAssertNil(response.headers.get("X-Header-Two"))
                 expect.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 
@@ -247,12 +250,13 @@ class FetchOperationCORSTests: XCTestCase {
         let fetchExpectation = expectation(description: "Fetch call should return")
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssert(response.responseType == ResponseType.CORS)
                 XCTAssertEqual(response.headers.get("X-Additional-Header"), "TESTVALUE")
                 XCTAssertEqual(response.headers.get("X-Header-Two"), "TESTVALUE2")
                 fetchExpectation.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 
@@ -292,9 +296,10 @@ class FetchOperationCORSTests: XCTestCase {
         fetchRequest.headers.set("x-custom-header", "test-value")
 
         FetchSession.default.fetch(fetchRequest, fromOrigin: URL(string: "http://not-localhost"))
-            .then { _ -> Void in
+            .map { _ -> Void in
                 fetchExpectation.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 
@@ -334,9 +339,10 @@ class FetchOperationCORSTests: XCTestCase {
         fetchRequest.headers.set("X-Custom-Header", "test-value")
 
         FetchSession.default.fetch(fetchRequest, fromOrigin: URL(string: "http://not-localhost"))
-            .then { _ -> Void in
+            .map { _ -> Void in
                 fetchExpectation.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 
@@ -353,11 +359,11 @@ class FetchOperationCORSTests: XCTestCase {
         request.mode = .NoCORS
 
         FetchSession.default.fetch(request, fromOrigin: URL(string: "http://not-localhost"))
-            .then { response in
+            .then { response -> Promise<String> in
                 XCTAssert(response.responseType == .Opaque)
                 return response.text()
             }
-            .then { text in
+            .map { text in
                 XCTAssertEqual(text, "")
             }
             .assertResolves()
@@ -377,11 +383,12 @@ class FetchOperationCORSTests: XCTestCase {
         let expect = expectation(description: "Fetch call works")
 
         FetchSession.default.fetch(request, fromOrigin: TestWeb.serverURL)
-            .then { response -> Void in
+            .map { response -> Void in
                 XCTAssertEqual(response.headers.get("X-Custom-Header"), "TEST")
                 XCTAssert(response.responseType == .Basic)
                 expect.fulfill()
-            }.catch { _ in
+            }
+            .catch { _ in
                 XCTFail()
             }
 

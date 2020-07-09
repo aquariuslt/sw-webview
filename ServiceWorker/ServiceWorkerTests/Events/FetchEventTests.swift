@@ -1,5 +1,6 @@
 import XCTest
 @testable import ServiceWorker
+import PromiseKit
 
 class FetchEventTests: XCTestCase {
 
@@ -19,7 +20,8 @@ class FetchEventTests: XCTestCase {
             .then {
                 return try fetch.resolve(in: sw)
             }
-            .then { res in
+            .then { res -> Promise<String> in
+                XCTAssertNotNil(res)
                 return res!.text()
             }
             .map { responseText in
@@ -46,10 +48,11 @@ class FetchEventTests: XCTestCase {
             .then {
                 return try fetch.resolve(in: sw)
             }
-            .then { res in
+            .then { res -> Promise<String> in
+                XCTAssertNotNil(res)
                 return res!.text()
             }
-            .map { responseText in
+            .compactMap { responseText in
                 XCTAssertEqual(responseText, "hello")
             }
             .assertResolves()

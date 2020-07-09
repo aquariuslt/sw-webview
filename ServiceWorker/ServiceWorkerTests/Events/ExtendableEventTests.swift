@@ -30,7 +30,7 @@ class ExtendableEventTests: XCTestCase {
         .then {
             return sw.evaluateScript("testResult")
         }
-        .then { (result: Bool) in
+        .map { (result: Bool) in
             XCTAssertEqual(result, true)
         }
 
@@ -57,7 +57,7 @@ class ExtendableEventTests: XCTestCase {
         .then { (ev: ExtendableEvent) in
             ev.resolve(in: sw)
         }
-        .then {
+        .map {
             XCTFail("Promise should not resolve")
         }
         .recover { error in
@@ -98,7 +98,7 @@ class ExtendableEventTests: XCTestCase {
         .then {
             return sw.evaluateScript("resultArray")
         }
-        .then { (results: [Int]?) -> Void in
+        .map { (results: [Int]?) -> Void in
 
             XCTAssertEqual(results?.count, 2)
             XCTAssertEqual(results?[0] as? Int, 1)
@@ -113,7 +113,7 @@ class ExtendableEventTests: XCTestCase {
 
         let ev = ExtendableEvent(type: "test")
         ev.resolve(in: sw)
-            .then { () -> Void in
+            .map { () -> Void in
                 // compiler requires this
             }
             .assertResolves()
