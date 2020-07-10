@@ -47,8 +47,6 @@ class ViewController: UIViewController {
         URLCache.shared.removeAllCachedResponses()
         print("Loading \(url.url!.absoluteString)")
         _ = self.swView.load(URLRequest(url: url.url!))
-
-        view.addSubview(self.refreshButton)
     }
 
     @objc private func refresh() {

@@ -10,7 +10,7 @@ class FetchEventTests: XCTestCase {
             });
         """)
 
-        let request = FetchRequest(url: URL(string: "https://www.apple.com")!)
+        let request = FetchRequest(url: URL(string: "http://www.example.com/scope/")!)
 
         let fetch = FetchEvent(request: request)
 
@@ -22,7 +22,7 @@ class FetchEventTests: XCTestCase {
                 XCTAssertNotNil(res)
                 return res?.text() ?? .value("")
             }
-            .map { responseText in
+            .compactMap { responseText in
                 XCTAssertEqual(responseText, "hello")
             }
             .assertResolves()
@@ -37,7 +37,7 @@ class FetchEventTests: XCTestCase {
             });
         """)
 
-        let request = FetchRequest(url: URL(string: "https://www.apple.com")!)
+        let request = FetchRequest(url: URL(string: "http://www.example.com/scope/")!)
 
         let fetch = FetchEvent(request: request)
 

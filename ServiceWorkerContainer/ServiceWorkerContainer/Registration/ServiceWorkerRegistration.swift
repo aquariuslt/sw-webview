@@ -88,7 +88,7 @@ import ServiceWorker
             let request = try self.factory.workerFactory.getUpdateRequest(forExistingWorker: worker)
 
             return FetchSession.default.fetch(request)
-                .done { res in
+                .then { res -> Promise<Void> in
 
                     if res.status == 304 {
                         Log.info?("Ran update check for \(worker.url), received Not Modified response")
@@ -100,7 +100,7 @@ import ServiceWorker
 
                     let newWorker = try self.factory.createNewInstallingWorker(for: request.url, in: self)
 
-                    _ = self.processHTTPResponse(res, newWorker: newWorker, byteCompareWorker: worker)
+                    return self.processHTTPResponse(res, newWorker: newWorker, byteCompareWorker: worker)
                 }
         }
     }

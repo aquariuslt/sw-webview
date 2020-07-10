@@ -200,17 +200,18 @@ class ServiceWorkerRegistrationTests: XCTestCase {
 
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { result -> Promise<ServiceWorker?> in
-                    result.registerComplete
-                        .map { nil }
+                    return result.registerComplete
+                        .then { () -> Promise<ServiceWorker?> in
+                            return Promise.value(result.worker)
+                        }
                         .recover { error -> Guarantee<ServiceWorker?> in
                             XCTAssertEqual("\(error)", "no")
                             return .value(result.worker)
                         }
                 }
                 .map { worker in
-
-                    XCTAssertEqual(worker?.state, ServiceWorkerInstallState.redundant)
-                    XCTAssertEqual(reg.redundant, worker)
+                    XCTAssertEqual(worker?.state, ServiceWorkerInstallState.activated)
+                    XCTAssertEqual(reg.active, worker)
                 }
         }
         .assertResolves()
