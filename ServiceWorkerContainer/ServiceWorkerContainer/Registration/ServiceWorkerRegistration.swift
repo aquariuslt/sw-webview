@@ -149,12 +149,14 @@ import ServiceWorker
                 }
 
                 return self.install(worker: newWorker)
-                    .done {
+                    .then { _  -> Promise<Void> in
                         // Workers move from installed directly to activating if they have called
                         // self.skipWaiting() OR if we have no active worker currently.
 
                         if newWorker.skipWaitingStatus == true || self.active == nil {
-                            _ = self.activate(worker: newWorker)
+                            return self.activate(worker: newWorker)
+                        } else {
+                            return Promise.value
                         }
                     }
             }
@@ -284,7 +286,7 @@ import ServiceWorker
             self._unregistered = true
             GlobalEventLog.notifyChange(self)
 
-            return Promise.value(())
+            return Promise.value
 
             //            let allWorkers = [self.active, self.waiting, self.installing, self.redundant]
             //

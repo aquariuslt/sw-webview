@@ -9,7 +9,6 @@ import WebKit
 class ViewController: UIViewController {
     var coordinator: SWWebViewCoordinator?
 
-    private let refreshButton = UIButton(type: .custom)
     private var swView: SWWebView!
 
     override func viewDidLoad() {
@@ -18,7 +17,7 @@ class ViewController: UIViewController {
         self.addStubs()
         let config = WKWebViewConfiguration()
 
-        Log.info = { print($0) }
+        Log.info = { print("INFO: \($0)") }
 
         let storageURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("testapp-db", isDirectory: true)

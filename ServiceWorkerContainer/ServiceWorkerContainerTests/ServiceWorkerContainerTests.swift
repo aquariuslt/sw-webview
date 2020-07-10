@@ -1,4 +1,5 @@
 import PromiseKit
+@testable import ServiceWorker
 @testable import ServiceWorkerContainer
 import XCTest
 
@@ -7,7 +8,19 @@ class ServiceWorkerContainerTests: XCTestCase {
         super.setUp()
         CoreDatabase.clearForTests()
 
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        CoreDatabase.dbDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("testDB", isDirectory: true)
+        do {
+            if FileManager.default.fileExists(atPath: CoreDatabase.dbDirectory!.path) == false {
+                try FileManager.default.createDirectory(at: CoreDatabase.dbDirectory!, withIntermediateDirectories: true, attributes: nil)
+            }
+        } catch {
+            fatalError()
+        }
+
+        factory.workerFactory.serviceWorkerDelegateProvider = ServiceWorkerStorageProvider(storageURL: CoreDatabase.dbDirectory!)
+        CoreDatabase.inConnection { connection -> Promise<Bool> in
+            return .value(connection.open)
+        }.assertResolves()
     }
 
     override func tearDown() {

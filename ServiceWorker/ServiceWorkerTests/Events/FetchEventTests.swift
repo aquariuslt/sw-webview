@@ -5,7 +5,7 @@ import XCTest
 class FetchEventTests: XCTestCase {
     func testRespondWithString() {
         let sw = ServiceWorker.createTestWorker(id: name, content: """
-            self.addEventListener('fetch',(e) => {
+            self.addEventListener('fetch', (e) => {
                 e.respondWith(new Response("hello"));
             });
         """)

@@ -6,18 +6,33 @@ import PromiseKit
 import XCTest
 
 class ServiceWorkerRegistrationTests: XCTestCase {
+
+    let factory = WorkerRegistrationFactory(withWorkerFactory: WorkerFactory())
+
     override func setUp() {
         super.setUp()
         CoreDatabase.clearForTests()
         TestWeb.createServer()
         URLCache.shared.removeAllCachedResponses()
+
+        CoreDatabase.dbDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("testDB", isDirectory: true)
+        do {
+            if FileManager.default.fileExists(atPath: CoreDatabase.dbDirectory!.path) == false {
+                try FileManager.default.createDirectory(at: CoreDatabase.dbDirectory!, withIntermediateDirectories: true, attributes: nil)
+            }
+        } catch {
+            fatalError()
+        }
+
+        factory.workerFactory.serviceWorkerDelegateProvider = ServiceWorkerStorageProvider(storageURL: CoreDatabase.dbDirectory!)
+        CoreDatabase.inConnection { connection -> Promise<Bool> in
+            return .value(connection.open)
+        }.assertResolves()
     }
 
     override func tearDown() {
         TestWeb.destroyServer()
     }
-
-    let factory = WorkerRegistrationFactory(withWorkerFactory: WorkerFactory())
 
     func testCreateBlankRegistration() {
         var reg: ServiceWorkerRegistration?
@@ -89,12 +104,12 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                 .then { result in
                     result.registerComplete
                 }
-                .then { (_) -> Promise<JSValue?> in
+                .then { _ -> Promise<Bool> in
                     XCTAssertNotNil(reg.active)
                     return reg.active!.evaluateScript("installed")
                 }
                 .map { jsVal -> Void in
-                    XCTAssertEqual(jsVal!.toBool(), true)
+                    XCTAssertEqual(jsVal, true)
                 }
         }
         .assertResolves()
@@ -186,9 +201,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
             return reg.register(TestWeb.serverURL.appendingPathComponent("test.js"))
                 .then { result -> Promise<ServiceWorker?> in
                     result.registerComplete
-                        .then { _ -> Promise<ServiceWorker?> in
-                            .value(nil)
-                        }
+                        .map { nil }
                         .recover { error -> Guarantee<ServiceWorker?> in
                             XCTAssertEqual("\(error)", "no")
                             return .value(result.worker)
@@ -291,7 +304,7 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                 }
                 .map {
                     XCTAssertNil(reg.waiting)
-                    return try CoreDatabase.inConnection { db in
+                    try CoreDatabase.inConnection { db in
                         try db.select(sql: "SELECT count(*) AS workercount FROM workers") { resultSet in
                             _ = try? resultSet.next()
                             XCTAssertEqual(try resultSet.int("workercount"), 1)

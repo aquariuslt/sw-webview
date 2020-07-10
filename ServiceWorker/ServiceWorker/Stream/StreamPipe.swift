@@ -93,7 +93,9 @@ public class StreamPipe: NSObject, StreamDelegate {
         let pipe = StreamPipe(from: from, bufferSize: bufferSize)
 
         pipe.hashListener = { bytes, count in
-            CC_SHA256_Update(&hashToUse, bytes, CC_LONG(count))
+            if count > 0 {
+                CC_SHA256_Update(&hashToUse, bytes, CC_LONG(count))
+            }
         }
 
         return firstly { () -> Promise<Data> in

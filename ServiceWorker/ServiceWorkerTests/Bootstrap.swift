@@ -7,9 +7,9 @@ public class TestBootstrap: NSObject {
         super.init()
         //        Log.enable()
 
-        Log.debug = { print($0) }
-        Log.info = { print($0) }
-        Log.warn = { print($0) }
-        Log.error = { print($0) }
+        Log.debug = { print("DEBUG: \($0)") }
+        Log.info = { print("INFO: \($0)") }
+        Log.warn = { print("WARN: \($0)") }
+        Log.error = { print("ERROR: \($0)") }
     }
 }
