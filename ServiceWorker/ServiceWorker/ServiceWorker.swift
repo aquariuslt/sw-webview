@@ -244,9 +244,14 @@ import PromiseKit
             return call.resolveVoid()
 
         } else {
-            return self.getExecutionEnvironment()
-                .done { exec in
+            return self
+                .getExecutionEnvironment()
+                .then { exec -> Promise<Void> in
                     exec.perform(#selector(ServiceWorkerExecutionEnvironment.dispatchEvent), on: exec.thread, with: call, waitUntilDone: false)
+                    return .value
+                }
+                .then { () -> Promise<Void> in
+                    call.resolveVoid()
                 }
         }
     }
