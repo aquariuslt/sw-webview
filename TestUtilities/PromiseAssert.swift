@@ -30,8 +30,8 @@ extension Promise {
         let expect = XCTestExpectation(description: "Promise resolves")
 
         compactMap { _ in
-            XCTFail("Promise should reject")
         }.catch { _ in
+            XCTAssertTrue(true, "Promise should reject")
             expect.fulfill()
         }
 
