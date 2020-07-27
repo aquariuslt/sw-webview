@@ -143,6 +143,20 @@ import PromiseKit
 
         optionsRequest.headers.set("Access-Control-Request-Method", request.method)
 
+        if
+            let requestComponents = URLComponents(url: optionsRequest.url, resolvingAgainstBaseURL: false),
+            let scheme = requestComponents.scheme,
+            let host = requestComponents.host
+        {
+            var originComponents = URLComponents()
+            originComponents.scheme = scheme
+            originComponents.host = host
+            if let originUrl = originComponents.url {
+                optionsRequest.headers.set("Origin", originUrl.absoluteString)
+            }
+        }
+        optionsRequest.headers.set("Referer", origin.absoluteString)
+
         return self.fetch(optionsRequest)
             .map(on: self.dispatchQueue, flags: nil) { res -> FetchCORSRestrictions in
 
