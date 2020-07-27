@@ -41,7 +41,8 @@ class ViewController: UIViewController {
 
         title = "SWWebView"
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(self.refresh))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refresh))
+        navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Back", style: .plain, target: self, action: #selector(back))
 
         let url = URLComponents(string: "sw://localhost:4567/scope/")!
         URLCache.shared.removeAllCachedResponses()
@@ -49,8 +50,14 @@ class ViewController: UIViewController {
         _ = self.swView.load(URLRequest(url: url.url!))
     }
 
+    @objc private func back() {
+        if swView.canGoBack {
+            swView.goBack()
+        }
+    }
+
     @objc private func refresh() {
-        self.swView.reload()
+        swView.reload()
     }
 
     func addStubs() {
