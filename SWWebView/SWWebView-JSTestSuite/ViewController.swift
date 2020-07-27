@@ -35,7 +35,6 @@ class ViewController: UIViewController {
 
         self.swView = SWWebView(frame: self.view.frame, configuration: config)
         // This will move to a delegate method eventually
-        self.swView.serviceWorkerPermittedDomains.append("localhost:4567")
         self.swView.containerDelegate = self.coordinator!
         self.view.addSubview(self.swView)
 
@@ -44,10 +43,18 @@ class ViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refresh))
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Back", style: .plain, target: self, action: #selector(back))
 
-        let url = URLComponents(string: "sw://localhost:4567/scope/")!
+        // MARK: - Home URL
+
+        let urlString = "sw://localhost:4567"
+
+        guard let urlComps = URLComponents(string: urlString), let host = urlComps.host else {
+            fatalError("must provide a valid url")
+        }
+
+        swView.serviceWorkerPermittedDomains.append(host)
         URLCache.shared.removeAllCachedResponses()
-        print("Loading \(url.url!.absoluteString)")
-        _ = self.swView.load(URLRequest(url: url.url!))
+        print("Loading \(urlComps.url!.absoluteString)")
+        _ = self.swView.load(URLRequest(url: urlComps.url!))
     }
 
     @objc private func back() {
