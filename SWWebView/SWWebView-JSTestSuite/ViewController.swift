@@ -45,13 +45,17 @@ class ViewController: UIViewController {
 
         // MARK: - Home URL
 
-        let urlString = "sw://localhost:4567"
+        let urlString = "sw://localhost:4567/scope/"
 
         guard let urlComps = URLComponents(string: urlString), let host = urlComps.host else {
             fatalError("must provide a valid url")
         }
 
-        swView.serviceWorkerPermittedDomains.append(host)
+        let domain = {
+            urlComps.port != 80 && urlComps.port != 443 ? "\(host):\(urlComps.port!)" : host
+        }()
+
+        swView.serviceWorkerPermittedDomains.append(domain)
         URLCache.shared.removeAllCachedResponses()
         print("Loading \(urlComps.url!.absoluteString)")
         _ = self.swView.load(URLRequest(url: urlComps.url!))
