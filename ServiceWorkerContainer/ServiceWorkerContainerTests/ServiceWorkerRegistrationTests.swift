@@ -208,8 +208,8 @@ class ServiceWorkerRegistrationTests: XCTestCase {
                         }
                 }
                 .done { worker in
-                    XCTAssertEqual(worker?.state, ServiceWorkerInstallState.activated)
-                    XCTAssertEqual(reg.active, worker)
+                    XCTAssertEqual(worker?.state, ServiceWorkerInstallState.redundant)
+                    XCTAssertEqual(reg.redundant, worker)
                 }
         }
         .assertResolves()
