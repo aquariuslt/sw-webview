@@ -51,8 +51,11 @@ class ViewController: UIViewController {
             fatalError("must provide a valid url")
         }
 
-        let domain = {
-            urlComps.port != 80 && urlComps.port != 443 ? "\(host):\(urlComps.port!)" : host
+        let domain: String = {
+            if let port = urlComps.port, port != 80 && port != 443 {
+                return "\(host):\(port)"
+            }
+            return host
         }()
 
         swView.serviceWorkerPermittedDomains.append(domain)
