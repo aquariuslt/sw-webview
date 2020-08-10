@@ -63,6 +63,8 @@ public class SWURLSchemeTask {
                 throw ErrorMessage("Could not parse Referer header correctly")
             }
             self.referrer = referrerURL
+        } else if let url = underlyingTask.request.url, url.path != "/" {
+            self.referrer = url.pathExtension.isEmpty ? url : url.deletingLastPathComponent()
         } else {
             self.referrer = nil
         }

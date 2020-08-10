@@ -75,12 +75,11 @@ public class StreamPipe: NSObject, StreamDelegate {
     public static func pipe(from: InputStream, to: OutputStream, bufferSize: Int) -> Promise<Void> {
         let pipe = StreamPipe(from: from, bufferSize: bufferSize)
 
-        return Promise.value(())
-            .compactMap {
+        return Promise.value
+            .map {
                 try pipe.add(stream: to)
-            }
-            .done {
                 _ = pipe.pipe()
+                return Void()
             }
     }
 
@@ -218,7 +217,9 @@ public class StreamPipe: NSObject, StreamDelegate {
                 logFunction?("\(self.from) has data and we're going to pipe it")
                 self.doRead()
                 self.outputStreamLeftovers.forEach { stream, position in
-                    self.doWrite(to: stream, with: position)
+                    if position.length >= 0 {
+                        self.doWrite(to: stream, with: position)
+                    }
                 }
             } else {
                 logFunction?("\(self.from) has data but we have leftover data, so we're going to ignore that")

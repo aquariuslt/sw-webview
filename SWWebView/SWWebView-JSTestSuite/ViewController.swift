@@ -18,6 +18,9 @@ class ViewController: UIViewController {
         let config = WKWebViewConfiguration()
 
         Log.info = { print("INFO: \($0)") }
+        Log.debug = { print("DEBUG: \($0)") }
+        Log.error = { print("ERROR: \($0)") }
+        Log.warn = { print("WARN: \($0)") }
 
         let storageURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
             .appendingPathComponent("testapp-db", isDirectory: true)
@@ -45,7 +48,7 @@ class ViewController: UIViewController {
 
         // MARK: - Home URL
 
-        let urlString = "sw://localhost:4567/scope/"
+        let urlString = "sw://localhost:4567/static/"
 
         guard let urlComps = URLComponents(string: urlString), let host = urlComps.host else {
             fatalError("must provide a valid url")

@@ -27,4 +27,23 @@ extension URL {
             return nil
         }
     }
+
+    func hasSameScope(with url: URL) -> Bool {
+        guard host == url.host && port == url.port else {
+            return false
+        }
+
+        var lhsPath = path
+        var rhsPath = url.path
+
+        if !pathExtension.isEmpty {
+            lhsPath = deletingPathExtension().absoluteString
+        }
+
+        if !url.pathExtension.isEmpty {
+            rhsPath = url.deletingPathExtension().absoluteString
+        }
+
+        return lhsPath == rhsPath
+    }
 }
