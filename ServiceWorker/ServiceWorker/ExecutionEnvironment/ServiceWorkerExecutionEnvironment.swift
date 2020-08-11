@@ -47,11 +47,11 @@ import PromiseKit
     // This controls the title that appears in the Safari debugger - helpful to indentify
     // which worker you are looking at when multiple are running at once.
     var jsContextName: String {
-        set(value) {
-            self.jsContext.name = value
-        }
         get {
             return self.jsContext.name
+        }
+        set(value) {
+            self.jsContext.name = value
         }
     }
 

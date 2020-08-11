@@ -45,10 +45,10 @@ public class StreamPipe: NSObject, StreamDelegate {
         }
         self.started = true
 
-        self.from.schedule(in: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
+        self.from.schedule(in: RunLoop.main, forMode: RunLoop.Mode.default)
         self.from.open()
         self.to.forEach { to in
-            to.schedule(in: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
+            to.schedule(in: RunLoop.main, forMode: RunLoop.Mode.default)
             to.open()
         }
     }
@@ -104,7 +104,7 @@ public class StreamPipe: NSObject, StreamDelegate {
                 .map { () -> Data in
                     var hashData: [UInt8] = Array(repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
                     CC_SHA256_Final(&hashData, &hashToUse)
-                    return Data(bytes: hashData)
+                    return Data(hashData)
                 }
         }
     }
@@ -195,8 +195,8 @@ public class StreamPipe: NSObject, StreamDelegate {
 
         self.to.forEach { $0.close() }
         self.from.close()
-        self.from.remove(from: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
-        self.to.forEach { $0.remove(from: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode) }
+        self.from.remove(from: RunLoop.main, forMode: RunLoop.Mode.default)
+        self.to.forEach { $0.remove(from: RunLoop.main, forMode: RunLoop.Mode.default) }
 
         if self.completePromise.promise.isPending {
             self.completePromise.resolver.fulfill(())

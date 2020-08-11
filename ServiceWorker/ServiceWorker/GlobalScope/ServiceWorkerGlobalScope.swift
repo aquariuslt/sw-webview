@@ -206,7 +206,9 @@ import JavaScriptCore
                 return
             }
 
-            GlobalVariableProvider.add(variable: targetObj.objectForKeyedSubscript(key), to: self.context, withName: key)
+            if let variable = targetObj.objectForKeyedSubscript(key) {
+                GlobalVariableProvider.add(variable: variable, to: self.context, withName: key)
+            }
         }
     }
 

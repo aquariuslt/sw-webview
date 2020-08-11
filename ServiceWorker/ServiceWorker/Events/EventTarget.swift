@@ -55,7 +55,7 @@ import JavaScriptCore
     }
 
     func removeEventListener<T>(_ listener: SwiftEventListener<T>) {
-        guard let idx = self.listeners.index(where: { existingListener in
+        guard let idx = self.listeners.firstIndex(where: { existingListener in
 
             if let swiftListener = existingListener as? SwiftEventListener<T> {
                 return swiftListener == listener
@@ -70,7 +70,7 @@ import JavaScriptCore
     }
 
     func removeEventListener(_ name: String, _ funcToRun: JSValue) {
-        guard let existing = listeners.index(where: { listener in
+        guard let existing = listeners.firstIndex(where: { listener in
 
             guard let jsListener = listener as? JSEventListener else {
                 return false

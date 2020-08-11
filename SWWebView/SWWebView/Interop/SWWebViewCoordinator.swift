@@ -57,7 +57,7 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
     }
 
     public func container(_ webview: SWWebView, freeContainer container: ServiceWorkerContainer) {
-        guard let containerIndex = self.inUseContainers.index(where: { $0.webview == webview && $0.container == container }) else {
+        guard let containerIndex = self.inUseContainers.firstIndex(where: { $0.webview == webview && $0.container == container }) else {
             Log.error?("Tried to remove a ServiceWorkerContainer that doesn't exist")
             return
         }

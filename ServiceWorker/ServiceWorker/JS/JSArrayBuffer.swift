@@ -43,6 +43,37 @@ class JSArrayBuffer: NSObject {
         // when the deallocator is run.
         let instancePointer = Unmanaged.passUnretained(instance).toOpaque()
 
+        // NOTE: Fixed an unclear issue around ArrayBuffer
+
+        let ptr: UnsafeMutableBufferPointer<UInt8> = .allocate(capacity: data.count)
+
+        instance.data.withUnsafeBytes { (contentsPrt: UnsafePointer<UInt8>) -> Void in
+            _ = ptr.initialize(from: UnsafeBufferPointer(start: contentsPrt, count: data.count))
+        }
+        var exception: JSValueRef?
+
+        let deallocator: JSTypedArrayBytesDeallocator = { ptr, reference in
+            JSArrayBuffer.unassign(bytes: ptr, reference: reference)
+            ptr?.deallocate()
+        }
+
+        let arrayBuffJSRef = JSObjectMakeArrayBufferWithBytesNoCopy(
+            context.jsGlobalContextRef,
+            ptr.baseAddress,
+            data.count,
+            deallocator,
+            instancePointer,
+            &exception)
+
+        if exception != nil {
+            context.exception = JSValue(jsValueRef: exception, in: context)
+            return JSValue(jsValueRef: nil, in: context)
+        }
+
+        return JSValue(jsValueRef: arrayBuffJSRef, in: context)
+
+        /* // Since the following implemtantion always responses wrong data.
+
         // Now we make our actual array buffer JSValue using the data and deallocation callback
         let jsInstance = instance.data.withUnsafeMutableBytes { pointer -> JSObjectRef in
 
@@ -52,5 +83,6 @@ class JSArrayBuffer: NSObject {
         }
 
         return JSValue(jsValueRef: jsInstance, in: context)
+         */
     }
 }

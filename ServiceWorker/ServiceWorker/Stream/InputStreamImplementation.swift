@@ -35,7 +35,7 @@ open class InputStreamImplementation: InputStream {
         }
     }
 
-    var runLoops: [RunLoop: Set<RunLoopMode>] = [:]
+    var runLoops: [RunLoop: Set<RunLoop.Mode>] = [:]
 
     var pendingEvents: [Stream.Event] = []
 
@@ -64,8 +64,8 @@ open class InputStreamImplementation: InputStream {
         }
     }
 
-    override open func schedule(in aRunLoop: RunLoop, forMode mode: RunLoopMode) {
-        var modeArray = self.runLoops[aRunLoop] ?? Set<RunLoopMode>()
+    override open func schedule(in aRunLoop: RunLoop, forMode mode: RunLoop.Mode) {
+        var modeArray = self.runLoops[aRunLoop] ?? Set<RunLoop.Mode>()
         modeArray.insert(mode)
         self.runLoops[aRunLoop] = modeArray
 
@@ -74,7 +74,7 @@ open class InputStreamImplementation: InputStream {
         self.pendingEvents.removeAll()
     }
 
-    override open func remove(from aRunLoop: RunLoop, forMode mode: RunLoopMode) {
+    override open func remove(from aRunLoop: RunLoop, forMode mode: RunLoop.Mode) {
         guard var existing = self.runLoops[aRunLoop] else {
             return
         }
