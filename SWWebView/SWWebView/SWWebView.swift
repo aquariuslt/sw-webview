@@ -84,6 +84,7 @@ public class SWWebView: WKWebView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @discardableResult
     override public func load(_ request: URLRequest) -> WKNavigation? {
         if request.url == nil {
             // not sure how this would happen, but still

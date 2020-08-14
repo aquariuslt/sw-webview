@@ -60,6 +60,7 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
         }
     }
 
+    @available(iOS 11.0, *)
     public func webView(_ webview: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         // WKURLSchemeTask can fail even when using didFailWithError if the task
         // has already been closed. We handle that in SWURLSchemeTask but first
@@ -238,6 +239,7 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
         self.eventStreams.insert(newStream)
     }
 
+    @available(iOS 11.0, *)
     public func webView(_ webview: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
         guard let existingTask = SWURLSchemeTask.getExistingTask(for: urlSchemeTask) else {
             Log.error?("Stopping a task that isn't currently running - this should never happen")
