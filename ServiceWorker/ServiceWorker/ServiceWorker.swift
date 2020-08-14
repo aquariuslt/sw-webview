@@ -167,7 +167,9 @@ import PromiseKit
             let finalChain = promise
                 .map { (_) -> ServiceWorkerExecutionEnvironment in
                     self._executionEnvironment = env
+                    #if DEBUG
                     self.setJSContextDebuggingName()
+                    #endif
                     return env
                 }
                 .ensure {

@@ -123,9 +123,9 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
                         decisionHandler(.allow)
                         return
                     }
+                } else {
+                    decisionHandler(.allow)
                 }
-
-                decisionHandler(.allow)
                 return
 
             } else {
@@ -195,7 +195,7 @@ class SWWebViewNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-        webView.navigationDelegate?.webView?(webView, didStartProvisionalNavigation: navigation)
+        webView.navigationDelegate?.webView?(webView, didReceiveServerRedirectForProvisionalNavigation: navigation)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
