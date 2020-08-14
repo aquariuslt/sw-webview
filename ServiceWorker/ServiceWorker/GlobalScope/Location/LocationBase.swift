@@ -18,7 +18,7 @@ import JavaScriptCore
 
     @objc public var href: String {
         get {
-            return self.components.url?.absoluteString ?? ""
+            self.components.query.map { "?\($0)" } ?? ""
         }
         set(value) {
             do {
