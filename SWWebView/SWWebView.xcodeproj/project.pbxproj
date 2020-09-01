@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2983D7A09844ABE26195A6C1 /* Pods_SWWebView_JSTestSuite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E56010080F27A5DA343866B /* Pods_SWWebView_JSTestSuite.framework */; };
 		8A181A991F718E10005CED14 /* ServiceWorkerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A181A981F718E10005CED14 /* ServiceWorkerCommands.swift */; };
 		8A181A9B1F719465005CED14 /* MessagePortHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A181A9A1F719465005CED14 /* MessagePortHandler.swift */; };
 		8A181AA21F72C128005CED14 /* MessagePortWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A181AA11F72C128005CED14 /* MessagePortWrapper.swift */; };
@@ -39,6 +40,7 @@
 		8AF85D751F3A2747001B0A87 /* ServiceWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; };
 		8AF85D941F3A3A39001B0A87 /* js-dist in Resources */ = {isa = PBXBuildFile; fileRef = 8AF85D931F3A39D3001B0A87 /* js-dist */; };
 		8AF85DB41F3B6900001B0A87 /* EventStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF85DB31F3B6900001B0A87 /* EventStream.swift */; };
+		C8B501477E60D6FEB7CDDDAE /* Pods_SWWebView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA74474CDAD30134121E17A8 /* Pods_SWWebView.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +68,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7E56010080F27A5DA343866B /* Pods_SWWebView_JSTestSuite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SWWebView_JSTestSuite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A181A981F718E10005CED14 /* ServiceWorkerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceWorkerCommands.swift; sourceTree = "<group>"; };
 		8A181A9A1F719465005CED14 /* MessagePortHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagePortHandler.swift; sourceTree = "<group>"; };
 		8A181AA11F72C128005CED14 /* MessagePortWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagePortWrapper.swift; sourceTree = "<group>"; };
@@ -102,6 +105,7 @@
 		8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceWorker.framework; path = "../../../Library/Developer/Xcode/DerivedData/SWWebView-asilpmvykkqkfehhurjnoakeivko/Build/Products/Debug-iphonesimulator/ServiceWorker.framework"; sourceTree = "<group>"; };
 		8AF85D931F3A39D3001B0A87 /* js-dist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "js-dist"; sourceTree = "<group>"; };
 		8AF85DB31F3B6900001B0A87 /* EventStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStream.swift; sourceTree = "<group>"; };
+		BA74474CDAD30134121E17A8 /* Pods_SWWebView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SWWebView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8AABC41F1F6082DA00429EF3 /* SWWebView.framework in Frameworks */,
+				2983D7A09844ABE26195A6C1 /* Pods_SWWebView_JSTestSuite.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +124,7 @@
 			files = (
 				8AF85D751F3A2747001B0A87 /* ServiceWorker.framework in Frameworks */,
 				8AF85D531F38BA1D001B0A87 /* ServiceWorkerContainer.framework in Frameworks */,
+				C8B501477E60D6FEB7CDDDAE /* Pods_SWWebView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,6 +226,8 @@
 				8A5D980B1F3DF55B002E521F /* ServiceWorker.framework */,
 				8A5D980A1F3DF55B002E521F /* ServiceWorkerContainer.framework */,
 				8AF85D521F38BA1D001B0A87 /* ServiceWorkerContainer.framework */,
+				BA74474CDAD30134121E17A8 /* Pods_SWWebView.framework */,
+				7E56010080F27A5DA343866B /* Pods_SWWebView_JSTestSuite.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -265,11 +273,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8A5D98331F3E0D77002E521F /* Build configuration list for PBXNativeTarget "SWWebView-JSTestSuite" */;
 			buildPhases = (
+				C713D205EA3E9EAC820D7A19 /* [CP] Check Pods Manifest.lock */,
 				8A5D98201F3E0D77002E521F /* Sources */,
 				8A5D98211F3E0D77002E521F /* Frameworks */,
 				8A5D98221F3E0D77002E521F /* Resources */,
 				8A5D983B1F3E1030002E521F /* Copy Carthage Dependencies */,
 				8AABC4211F6082DA00429EF3 /* Embed Frameworks */,
+				E9802E8471CA696E4F7B54D1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -285,6 +295,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8AA76F621F38B81700EFB4E1 /* Build configuration list for PBXNativeTarget "SWWebView" */;
 			buildPhases = (
+				98FDA5E2D7F7CBDFA60E8254 /* [CP] Check Pods Manifest.lock */,
 				8A5B361F1F604B6F009F72AC /* SwiftFormat */,
 				8A5B36201F604B8A009F72AC /* SwiftLint */,
 				8AF85DAF1F3A4780001B0A87 /* Compile runtime JS */,
@@ -423,6 +434,68 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${SRCROOT}/js-src\n#npm run build\n";
 		};
+		98FDA5E2D7F7CBDFA60E8254 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SWWebView-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C713D205EA3E9EAC820D7A19 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SWWebView-JSTestSuite-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E9802E8471CA696E4F7B54D1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SWWebView-JSTestSuite/Pods-SWWebView-JSTestSuite-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SWWebView-JSTestSuite/Pods-SWWebView-JSTestSuite-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -496,6 +569,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gdnmobilelab.SWWebView-JSTestSuite";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s arm64-apple-ios x86_64 x86";
 			};
 			name = Debug;
 		};
@@ -510,6 +584,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.gdnmobilelab.SWWebView-JSTestSuite";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s arm64-apple-ios x86_64 x86";
 			};
 			name = Release;
 		};
@@ -575,6 +650,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s arm64-apple-ios x86 x86_64";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -635,6 +711,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s arm64-apple-ios x86 x86_64";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -658,6 +735,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64 arm64-apple-ios x86";
 			};
 			name = Debug;
 		};
