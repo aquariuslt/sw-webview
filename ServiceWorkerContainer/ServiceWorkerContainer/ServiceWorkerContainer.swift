@@ -114,6 +114,8 @@ import ServiceWorker
         }
     }
 
+
+    // 实现 iOS service worker register 的关键方法，通过单独实现的 worker 线程?(进程??) 来搞定
     public func register(workerURL: URL, options: ServiceWorkerRegistrationOptions?) -> Promise<ServiceWorkerRegistration> {
         return firstly { () -> Promise<ServiceWorkerRegistration> in
 

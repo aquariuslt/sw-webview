@@ -1,11 +1,118 @@
-var swwebview = (function (exports,swwebviewSettings) {
-'use strict';
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.swwebview = {})));
+}(this, (function (exports) { 'use strict';
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+// import { assert } from "chai";
+// import { API_REQUEST_METHOD } from "swwebview-settings";
+// import { describeIfApp } from "../test-bootstrap";
+// import { eventStream } from "../../src/event-stream";
+// describeIfApp("Fetch grafts", () => {
+//     xit("Grafts fetch bodies", () => {
+//         return eventStream.ready
+//             .then(() => {
+//                 return fetch("/ping-with-body", {
+//                     method: API_REQUEST_METHOD,
+//                     body: JSON.stringify({ value: "test-string" })
+//                 });
+//             })
+//             .then(res => res.json())
+//             .then(json => {
+//                 assert.equal(json.pong, "test-string");
+//             });
+//     });
+//     xit("Grafts XMLHttpRequest bodies", done => {
+//         return eventStream.ready.then(() => {
+//             var xhttp = new XMLHttpRequest();
+//             xhttp.onreadystatechange = function() {
+//                 if (this.readyState == 4 && this.status == 200) {
+//                     try {
+//                         let data = JSON.parse(this.responseText);
+//                         assert.equal(data.pong, "test-string");
+//                     } catch (error) {
+//                         done(error);
+//                     }
+//                     done();
+//                 }
+//             };
+//             xhttp.open(
+//                 API_REQUEST_METHOD,
+//                 getFullAPIURL("/ping-with-body"),
+//                 true
+//             );
+//             xhttp.send(JSON.stringify({ value: "test-string" }));
+//         });
+//     });
+// });
 
+// import { apiRequest, APIError } from "../../src/util/api-request";
+// import { assert } from "chai";
+// import { StreamingXHR } from "../../src/util/streaming-xhr";
+// import { describeIfApp } from "../test-bootstrap";
+// import { API_REQUEST_METHOD, EVENT_STREAM_PATH } from "swwebview-settings";
+// describeIfApp("Basic HTTP hooks for Service Worker API", () => {
+//     it("Returns 404 when trying to access a command we don't know", () => {
+//         return apiRequest("/does_not_exist").catch((error: APIError) => {
+//             assert.equal(error.message, "Route not found");
+//         });
+//     });
+//     it("Returns JSON response when URL is known", () => {
+//         return apiRequest<any>("/ping").then(json => {
+//             assert.equal(json.pong, true);
+//         });
+//     });
+//     it("Can use a streaming XHR request", function(done) {
+//         let stream = new StreamingXHR(EVENT_STREAM_PATH + "?path=/");
+//         stream.open();
+//         stream.addEventListener(
+//             "serviceworkercontainer",
+//             (ev: MessageEvent) => {
+//                 assert.equal(ev.data.readyRegistration, null);
+//                 stream.close();
+//                 done();
+//             }
+//         );
+//         // stream.addEventListener("test-event2", (ev: MessageEvent) => {
+//         //     assert.equal(ev.data.test, "hello2");
+//         //     assert.equal(receivedFirstEvent, true);
+//         //     stream.close();
+//         //     done();
+//         // });
+//         // stream.addEventListener("error", (ev: ErrorEvent) => {
+//         //     done(ev.error);
+//         // });
+//     });
+// });
 
+function execInWorker(worker, js) {
+    return new Promise(function (fulfill, reject) {
+        var channel = new MessageChannel();
+        worker.postMessage({
+            action: "exec",
+            js: js,
+            port: channel.port1
+        }, [channel.port1]);
+        channel.port2.onmessage = function (e) {
+            if (e.data.error) {
+                reject(new Error(e.data.error));
+            }
+            fulfill(e.data.response);
+        };
+    });
+}
 
-
+function waitUntilWorkerIsActivated(worker) {
+    return new Promise(function (fulfill, reject) {
+        var listener = function (e) {
+            if (worker.state !== "activated")
+                return;
+            worker.removeEventListener("statechange", listener);
+            fulfill(worker);
+        };
+        worker.addEventListener("statechange", listener);
+    });
+}
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -52,7 +159,7 @@ function exclude () {
  * Primary Exports
  */
 
-var index$2 = AssertionError;
+var assertionError = AssertionError;
 
 /**
  * ### AssertionError
@@ -79,8 +186,8 @@ function AssertionError (message, _props, ssf) {
   }
 
   // capture stack trace
-  ssf = ssf || arguments.callee;
-  if (ssf && Error.captureStackTrace) {
+  ssf = ssf || AssertionError;
+  if (Error.captureStackTrace) {
     Error.captureStackTrace(this, ssf);
   } else {
     try {
@@ -411,7 +518,7 @@ function setPathValue(obj, path, val) {
   return obj;
 }
 
-var index$6 = {
+var pathval = {
   hasProperty: hasProperty$1,
   getPathInfo: getPathInfo$1,
   getPathValue: getPathValue,
@@ -459,7 +566,7 @@ var flag$1 = function flag(obj, key, value) {
  */
 
 /*!
- * Module dependancies
+ * Module dependencies
  */
 
 
@@ -481,35 +588,34 @@ var test$1 = function test(obj, args) {
   return negate ? !expr : expr;
 };
 
-var index$8 = createCommonjsModule(function (module) {
-'use strict';
-
 /* !
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
-var promiseExists = typeof Promise === 'function';
-var globalObject = typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : self; // eslint-disable-line
-var isDom = 'location' in globalObject && 'document' in globalObject;
-var symbolExists = typeof Symbol !== 'undefined';
-var mapExists = typeof Map !== 'undefined';
-var setExists = typeof Set !== 'undefined';
-var weakMapExists = typeof WeakMap !== 'undefined';
-var weakSetExists = typeof WeakSet !== 'undefined';
-var dataViewExists = typeof DataView !== 'undefined';
-var symbolIteratorExists = symbolExists && typeof Symbol.iterator !== 'undefined';
-var symbolToStringTagExists = symbolExists && typeof Symbol.toStringTag !== 'undefined';
-var setEntriesExists = setExists && typeof Set.prototype.entries === 'function';
-var mapEntriesExists = mapExists && typeof Map.prototype.entries === 'function';
-var setIteratorPrototype = setEntriesExists && Object.getPrototypeOf(new Set().entries());
-var mapIteratorPrototype = mapEntriesExists && Object.getPrototypeOf(new Map().entries());
-var arrayIteratorExists = symbolIteratorExists && typeof Array.prototype[Symbol.iterator] === 'function';
-var arrayIteratorPrototype = arrayIteratorExists && Object.getPrototypeOf([][Symbol.iterator]());
-var stringIteratorExists = symbolIteratorExists && typeof String.prototype[Symbol.iterator] === 'function';
-var stringIteratorPrototype = stringIteratorExists && Object.getPrototypeOf(''[Symbol.iterator]());
-var toStringLeftSliceLength = 8;
-var toStringRightSliceLength = -1;
+const promiseExists = typeof Promise === 'function';
+
+/* eslint-disable no-undef */
+const globalObject = typeof self === 'object' ? self : global; // eslint-disable-line id-blacklist
+
+const symbolExists = typeof Symbol !== 'undefined';
+const mapExists = typeof Map !== 'undefined';
+const setExists = typeof Set !== 'undefined';
+const weakMapExists = typeof WeakMap !== 'undefined';
+const weakSetExists = typeof WeakSet !== 'undefined';
+const dataViewExists = typeof DataView !== 'undefined';
+const symbolIteratorExists = symbolExists && typeof Symbol.iterator !== 'undefined';
+const symbolToStringTagExists = symbolExists && typeof Symbol.toStringTag !== 'undefined';
+const setEntriesExists = setExists && typeof Set.prototype.entries === 'function';
+const mapEntriesExists = mapExists && typeof Map.prototype.entries === 'function';
+const setIteratorPrototype = setEntriesExists && Object.getPrototypeOf(new Set().entries());
+const mapIteratorPrototype = mapEntriesExists && Object.getPrototypeOf(new Map().entries());
+const arrayIteratorExists = symbolIteratorExists && typeof Array.prototype[Symbol.iterator] === 'function';
+const arrayIteratorPrototype = arrayIteratorExists && Object.getPrototypeOf([][Symbol.iterator]());
+const stringIteratorExists = symbolIteratorExists && typeof String.prototype[Symbol.iterator] === 'function';
+const stringIteratorPrototype = stringIteratorExists && Object.getPrototypeOf(''[Symbol.iterator]());
+const toStringLeftSliceLength = 8;
+const toStringRightSliceLength = -1;
 /**
  * ### typeOf (obj)
  *
@@ -520,7 +626,7 @@ var toStringRightSliceLength = -1;
  * @return {String} object type
  * @api public
  */
-module.exports = function typeDetect(obj) {
+function typeDetect(obj) {
   /* ! Speed optimisation
    * Pre:
    *   string literal     x 3,039,035 ops/sec ±1.62% (78 runs sampled)
@@ -535,7 +641,7 @@ module.exports = function typeDetect(obj) {
    *   undefined          x 32,363,368 ops/sec ±1.07% (82 runs sampled)
    *   function           x 31,296,870 ops/sec ±0.96% (83 runs sampled)
    */
-  var typeofObj = typeof obj;
+  const typeofObj = typeof obj;
   if (typeofObj !== 'object') {
     return typeofObj;
   }
@@ -583,7 +689,9 @@ module.exports = function typeDetect(obj) {
     return 'Array';
   }
 
-  if (isDom) {
+  // Not caching existence of `window` and related properties due to potential
+  // for `window` to be unset before tests in quasi-browser environments.
+  if (typeof window === 'object' && window !== null) {
     /* ! Spec Conformance
      * (https://html.spec.whatwg.org/multipage/browsers.html#location)
      * WhatWG HTML$7.7.3 - The `Location` interface
@@ -591,7 +699,7 @@ module.exports = function typeDetect(obj) {
      *  - IE <=11 === "[object Object]"
      *  - IE Edge <=13 === "[object Object]"
      */
-    if (obj === globalObject.location) {
+    if (typeof window.location === 'object' && obj === window.location) {
       return 'Location';
     }
 
@@ -614,70 +722,78 @@ module.exports = function typeDetect(obj) {
      *  - IE 11 === "[object HTMLDocument]"
      *  - IE Edge <=13 === "[object HTMLDocument]"
      */
-    if (obj === globalObject.document) {
+    if (typeof window.document === 'object' && obj === window.document) {
       return 'Document';
     }
 
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/webappapis.html#mimetypearray)
-     * WhatWG HTML$8.6.1.5 - Plugins - Interface MimeTypeArray
-     * Test: `Object.prototype.toString.call(navigator.mimeTypes)``
-     *  - IE <=10 === "[object MSMimeTypesCollection]"
-     */
-    if (obj === (globalObject.navigator || {}).mimeTypes) {
-      return 'MimeTypeArray';
+    if (typeof window.navigator === 'object') {
+      /* ! Spec Conformance
+       * (https://html.spec.whatwg.org/multipage/webappapis.html#mimetypearray)
+       * WhatWG HTML$8.6.1.5 - Plugins - Interface MimeTypeArray
+       * Test: `Object.prototype.toString.call(navigator.mimeTypes)``
+       *  - IE <=10 === "[object MSMimeTypesCollection]"
+       */
+      if (typeof window.navigator.mimeTypes === 'object' &&
+          obj === window.navigator.mimeTypes) {
+        return 'MimeTypeArray';
+      }
+
+      /* ! Spec Conformance
+       * (https://html.spec.whatwg.org/multipage/webappapis.html#pluginarray)
+       * WhatWG HTML$8.6.1.5 - Plugins - Interface PluginArray
+       * Test: `Object.prototype.toString.call(navigator.plugins)``
+       *  - IE <=10 === "[object MSPluginsCollection]"
+       */
+      if (typeof window.navigator.plugins === 'object' &&
+          obj === window.navigator.plugins) {
+        return 'PluginArray';
+      }
     }
 
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/webappapis.html#pluginarray)
-     * WhatWG HTML$8.6.1.5 - Plugins - Interface PluginArray
-     * Test: `Object.prototype.toString.call(navigator.plugins)``
-     *  - IE <=10 === "[object MSPluginsCollection]"
-     */
-    if (obj === (globalObject.navigator || {}).plugins) {
-      return 'PluginArray';
-    }
+    if ((typeof window.HTMLElement === 'function' ||
+        typeof window.HTMLElement === 'object') &&
+        obj instanceof window.HTMLElement) {
+      /* ! Spec Conformance
+      * (https://html.spec.whatwg.org/multipage/webappapis.html#pluginarray)
+      * WhatWG HTML$4.4.4 - The `blockquote` element - Interface `HTMLQuoteElement`
+      * Test: `Object.prototype.toString.call(document.createElement('blockquote'))``
+      *  - IE <=10 === "[object HTMLBlockElement]"
+      */
+      if (obj.tagName === 'BLOCKQUOTE') {
+        return 'HTMLQuoteElement';
+      }
 
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/webappapis.html#pluginarray)
-     * WhatWG HTML$4.4.4 - The `blockquote` element - Interface `HTMLQuoteElement`
-     * Test: `Object.prototype.toString.call(document.createElement('blockquote'))``
-     *  - IE <=10 === "[object HTMLBlockElement]"
-     */
-    if (obj instanceof HTMLElement && obj.tagName === 'BLOCKQUOTE') {
-      return 'HTMLQuoteElement';
-    }
+      /* ! Spec Conformance
+       * (https://html.spec.whatwg.org/#htmltabledatacellelement)
+       * WhatWG HTML$4.9.9 - The `td` element - Interface `HTMLTableDataCellElement`
+       * Note: Most browsers currently adher to the W3C DOM Level 2 spec
+       *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-82915075)
+       *       which suggests that browsers should use HTMLTableCellElement for
+       *       both TD and TH elements. WhatWG separates these.
+       * Test: Object.prototype.toString.call(document.createElement('td'))
+       *  - Chrome === "[object HTMLTableCellElement]"
+       *  - Firefox === "[object HTMLTableCellElement]"
+       *  - Safari === "[object HTMLTableCellElement]"
+       */
+      if (obj.tagName === 'TD') {
+        return 'HTMLTableDataCellElement';
+      }
 
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/#htmltabledatacellelement)
-     * WhatWG HTML$4.9.9 - The `td` element - Interface `HTMLTableDataCellElement`
-     * Note: Most browsers currently adher to the W3C DOM Level 2 spec
-     *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-82915075)
-     *       which suggests that browsers should use HTMLTableCellElement for
-     *       both TD and TH elements. WhatWG separates these.
-     * Test: Object.prototype.toString.call(document.createElement('td'))
-     *  - Chrome === "[object HTMLTableCellElement]"
-     *  - Firefox === "[object HTMLTableCellElement]"
-     *  - Safari === "[object HTMLTableCellElement]"
-     */
-    if (obj instanceof HTMLElement && obj.tagName === 'TD') {
-      return 'HTMLTableDataCellElement';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/#htmltableheadercellelement)
-     * WhatWG HTML$4.9.9 - The `td` element - Interface `HTMLTableHeaderCellElement`
-     * Note: Most browsers currently adher to the W3C DOM Level 2 spec
-     *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-82915075)
-     *       which suggests that browsers should use HTMLTableCellElement for
-     *       both TD and TH elements. WhatWG separates these.
-     * Test: Object.prototype.toString.call(document.createElement('th'))
-     *  - Chrome === "[object HTMLTableCellElement]"
-     *  - Firefox === "[object HTMLTableCellElement]"
-     *  - Safari === "[object HTMLTableCellElement]"
-     */
-    if (obj instanceof HTMLElement && obj.tagName === 'TH') {
-      return 'HTMLTableHeaderCellElement';
+      /* ! Spec Conformance
+       * (https://html.spec.whatwg.org/#htmltableheadercellelement)
+       * WhatWG HTML$4.9.9 - The `td` element - Interface `HTMLTableHeaderCellElement`
+       * Note: Most browsers currently adher to the W3C DOM Level 2 spec
+       *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-82915075)
+       *       which suggests that browsers should use HTMLTableCellElement for
+       *       both TD and TH elements. WhatWG separates these.
+       * Test: Object.prototype.toString.call(document.createElement('th'))
+       *  - Chrome === "[object HTMLTableCellElement]"
+       *  - Firefox === "[object HTMLTableCellElement]"
+       *  - Safari === "[object HTMLTableCellElement]"
+       */
+      if (obj.tagName === 'TH') {
+        return 'HTMLTableHeaderCellElement';
+      }
     }
   }
 
@@ -703,12 +819,12 @@ module.exports = function typeDetect(obj) {
   *   Int8Array          x 6,606,078 ops/sec ±1.74% (81 runs sampled)
   *   Uint8ClampedArray  x 6,602,224 ops/sec ±1.77% (83 runs sampled)
   */
-  var stringTag = (symbolToStringTagExists && obj[Symbol.toStringTag]);
+  const stringTag = (symbolToStringTagExists && obj[Symbol.toStringTag]);
   if (typeof stringTag === 'string') {
     return stringTag;
   }
 
-  var objPrototype = Object.getPrototypeOf(obj);
+  const objPrototype = Object.getPrototypeOf(obj);
   /* ! Speed optimisation
   * Pre:
   *   regex literal      x 1,772,385 ops/sec ±1.85% (77 runs sampled)
@@ -849,10 +965,14 @@ module.exports = function typeDetect(obj) {
     .toString
     .call(obj)
     .slice(toStringLeftSliceLength, toStringRightSliceLength);
-};
+}
 
-module.exports.typeDetect = module.exports;
+
+var typeDetect$1 = Object.freeze({
+	default: typeDetect
 });
+
+var type$1 = ( typeDetect$1 && typeDetect ) || typeDetect$1;
 
 /*!
  * Chai - expectTypes utility
@@ -895,10 +1015,10 @@ var expectTypes$1 = function expectTypes(obj, types) {
     return or + art + ' ' + t;
   }).join(', ');
 
-  var objType = index$8(obj).toLowerCase();
+  var objType = type$1(obj).toLowerCase();
 
   if (!types.some(function (expected) { return objType === expected; })) {
-    throw new index$2(
+    throw new assertionError(
       flagMsg + 'object tested must be ' + str + ', but ' + objType + ' given',
       undefined,
       ssfi
@@ -968,7 +1088,7 @@ function getFuncName(aFunc) {
   return name;
 }
 
-var index$10 = getFuncName;
+var getFuncName_1 = getFuncName;
 
 /*!
  * Chai - getProperties utility
@@ -1126,7 +1246,7 @@ var config = {
    * @api public
    */
 
-  proxyExcludedKeys: ['then', 'inspect', 'toJSON']
+  proxyExcludedKeys: ['then', 'catch', 'inspect', 'toJSON']
 };
 
 var inspect_1 = createCommonjsModule(function (module, exports) {
@@ -1237,7 +1357,7 @@ function formatValue(ctx, value, recurseTimes) {
 
   var name, nameSuffix;
 
-  // Some type of object without properties can be shortcutted.
+  // Some type of object without properties can be shortcut.
   // In IE, errors have a single `stack` property, or if they are vanilla `Error`,
   // a `stack` plus `description` property; ignore those for consistency.
   if (keys.length === 0 || (isError(value) && (
@@ -1245,7 +1365,7 @@ function formatValue(ctx, value, recurseTimes) {
       (keys.length === 2 && keys[0] === 'description' && keys[1] === 'stack')
      ))) {
     if (typeof value === 'function') {
-      name = index$10(value);
+      name = getFuncName_1(value);
       nameSuffix = name ? ': ' + name : '';
       return ctx.stylize('[Function' + nameSuffix + ']', 'special');
     }
@@ -1278,7 +1398,7 @@ function formatValue(ctx, value, recurseTimes) {
 
   // Make functions say that they are functions
   if (typeof value === 'function') {
-    name = index$10(value);
+    name = getFuncName_1(value);
     nameSuffix = name ? ': ' + name : '';
     base = ' [Function' + nameSuffix + ']';
   }
@@ -1328,7 +1448,6 @@ function formatValue(ctx, value, recurseTimes) {
   return reduceToSingleString(output, base, braces);
 }
 
-
 function formatPrimitive(ctx, value) {
   switch (typeof value) {
     case 'undefined':
@@ -1358,11 +1477,9 @@ function formatPrimitive(ctx, value) {
   }
 }
 
-
 function formatError(value) {
   return '[' + Error.prototype.toString.call(value) + ']';
 }
-
 
 function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
   var output = [];
@@ -1466,12 +1583,8 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
   return name + ': ' + str;
 }
 
-
 function reduceToSingleString(output, base, braces) {
-  var numLinesEst = 0;
   var length = output.reduce(function(prev, cur) {
-    numLinesEst++;
-    if (cur.indexOf('\n') >= 0) numLinesEst++;
     return prev + cur.length + 1;
   }, 0);
 
@@ -1522,7 +1635,7 @@ function objectToString(o) {
  */
 
 /*!
- * Module dependancies
+ * Module dependencies
  */
 
 
@@ -1573,7 +1686,7 @@ var objDisplay$1 = function objDisplay(obj) {
  */
 
 /*!
- * Module dependancies
+ * Module dependencies
  */
 
 
@@ -1633,7 +1746,7 @@ var getMessage$1 = function getMessage(obj, args) {
  *     var newAssertion = new Assertion();
  *     utils.transferFlags(assertion, newAssertion);
  *
- *     var anotherAsseriton = new Assertion(myObj);
+ *     var anotherAssertion = new Assertion(myObj);
  *     utils.transferFlags(assertion, anotherAssertion, false);
  *
  * @param {Assertion} assertion the assertion to transfer the flags from
@@ -1661,431 +1774,33 @@ var transferFlags$1 = function transferFlags(assertion, object, includeAll) {
   }
 };
 
-var index$14 = createCommonjsModule(function (module) {
-'use strict';
-/* !
- * type-detect
- * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
- * MIT Licensed
- */
-var getPrototypeOfExists = typeof Object.getPrototypeOf === 'function';
-var promiseExists = typeof Promise === 'function';
-var globalObject = typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : self; // eslint-disable-line
-var isDom = 'location' in globalObject && 'document' in globalObject;
-var htmlElementExists = typeof HTMLElement !== 'undefined';
-var isArrayExists = typeof Array.isArray === 'function';
-var symbolExists = typeof Symbol !== 'undefined';
-var mapExists = typeof Map !== 'undefined';
-var setExists = typeof Set !== 'undefined';
-var weakMapExists = typeof WeakMap !== 'undefined';
-var weakSetExists = typeof WeakSet !== 'undefined';
-var dataViewExists = typeof DataView !== 'undefined';
-var symbolIteratorExists = symbolExists && typeof Symbol.iterator !== 'undefined';
-var symbolToStringTagExists = symbolExists && typeof Symbol.toStringTag !== 'undefined';
-var setEntriesExists = setExists && typeof Set.prototype.entries === 'function';
-var mapEntriesExists = mapExists && typeof Map.prototype.entries === 'function';
-var setIteratorPrototype = getPrototypeOfExists && setEntriesExists && Object.getPrototypeOf(new Set().entries());
-var mapIteratorPrototype = getPrototypeOfExists && mapEntriesExists && Object.getPrototypeOf(new Map().entries());
-var arrayIteratorExists = symbolIteratorExists && typeof Array.prototype[Symbol.iterator] === 'function';
-var arrayIteratorPrototype = arrayIteratorExists && Object.getPrototypeOf([][Symbol.iterator]());
-var stringIteratorExists = symbolIteratorExists && typeof Array.prototype[Symbol.iterator] === 'function';
-var stringIteratorPrototype = stringIteratorExists && Object.getPrototypeOf(''[Symbol.iterator]());
-var toStringLeftSliceLength = 8;
-var toStringRightSliceLength = -1;
-/**
- * ### typeOf (obj)
- *
- * Uses `Object.prototype.toString` to determine the type of an object,
- * normalising behaviour across engine versions & well optimised.
- *
- * @param {Mixed} object
- * @return {String} object type
- * @api public
- */
-module.exports = function typeDetect(obj) {
-  /* ! Speed optimisation
-   * Pre:
-   *   string literal     x 3,039,035 ops/sec ±1.62% (78 runs sampled)
-   *   boolean literal    x 1,424,138 ops/sec ±4.54% (75 runs sampled)
-   *   number literal     x 1,653,153 ops/sec ±1.91% (82 runs sampled)
-   *   undefined          x 9,978,660 ops/sec ±1.92% (75 runs sampled)
-   *   function           x 2,556,769 ops/sec ±1.73% (77 runs sampled)
-   * Post:
-   *   string literal     x 38,564,796 ops/sec ±1.15% (79 runs sampled)
-   *   boolean literal    x 31,148,940 ops/sec ±1.10% (79 runs sampled)
-   *   number literal     x 32,679,330 ops/sec ±1.90% (78 runs sampled)
-   *   undefined          x 32,363,368 ops/sec ±1.07% (82 runs sampled)
-   *   function           x 31,296,870 ops/sec ±0.96% (83 runs sampled)
-   */
-  var typeofObj = typeof obj;
-  if (typeofObj !== 'object') {
-    return typeofObj;
-  }
-
-  /* ! Speed optimisation
-   * Pre:
-   *   null               x 28,645,765 ops/sec ±1.17% (82 runs sampled)
-   * Post:
-   *   null               x 36,428,962 ops/sec ±1.37% (84 runs sampled)
-   */
-  if (obj === null) {
-    return 'null';
-  }
-
-  /* ! Spec Conformance
-   * Test: `Object.prototype.toString.call(window)``
-   *  - Node === "[object global]"
-   *  - Chrome === "[object global]"
-   *  - Firefox === "[object Window]"
-   *  - PhantomJS === "[object Window]"
-   *  - Safari === "[object Window]"
-   *  - IE 11 === "[object Window]"
-   *  - IE Edge === "[object Window]"
-   * Test: `Object.prototype.toString.call(this)``
-   *  - Chrome Worker === "[object global]"
-   *  - Firefox Worker === "[object DedicatedWorkerGlobalScope]"
-   *  - Safari Worker === "[object DedicatedWorkerGlobalScope]"
-   *  - IE 11 Worker === "[object WorkerGlobalScope]"
-   *  - IE Edge Worker === "[object WorkerGlobalScope]"
-   */
-  if (obj === globalObject) {
-    return 'global';
-  }
-
-  /* ! Speed optimisation
-   * Pre:
-   *   array literal      x 2,888,352 ops/sec ±0.67% (82 runs sampled)
-   * Post:
-   *   array literal      x 22,479,650 ops/sec ±0.96% (81 runs sampled)
-   */
-  if (isArrayExists && Array.isArray(obj)) {
-    return 'Array';
-  }
-
-  if (isDom) {
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/browsers.html#location)
-     * WhatWG HTML$7.7.3 - The `Location` interface
-     * Test: `Object.prototype.toString.call(window.location)``
-     *  - IE <=11 === "[object Object]"
-     *  - IE Edge <=13 === "[object Object]"
-     */
-    if (obj === globalObject.location) {
-      return 'Location';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/#document)
-     * WhatWG HTML$3.1.1 - The `Document` object
-     * Note: Most browsers currently adher to the W3C DOM Level 2 spec
-     *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-26809268)
-     *       which suggests that browsers should use HTMLTableCellElement for
-     *       both TD and TH elements. WhatWG separates these.
-     *       WhatWG HTML states:
-     *         > For historical reasons, Window objects must also have a
-     *         > writable, configurable, non-enumerable property named
-     *         > HTMLDocument whose value is the Document interface object.
-     * Test: `Object.prototype.toString.call(document)``
-     *  - Chrome === "[object HTMLDocument]"
-     *  - Firefox === "[object HTMLDocument]"
-     *  - Safari === "[object HTMLDocument]"
-     *  - IE <=10 === "[object Document]"
-     *  - IE 11 === "[object HTMLDocument]"
-     *  - IE Edge <=13 === "[object HTMLDocument]"
-     */
-    if (obj === globalObject.document) {
-      return 'Document';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/webappapis.html#mimetypearray)
-     * WhatWG HTML$8.6.1.5 - Plugins - Interface MimeTypeArray
-     * Test: `Object.prototype.toString.call(navigator.mimeTypes)``
-     *  - IE <=10 === "[object MSMimeTypesCollection]"
-     */
-    if (obj === (globalObject.navigator || {}).mimeTypes) {
-      return 'MimeTypeArray';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/webappapis.html#pluginarray)
-     * WhatWG HTML$8.6.1.5 - Plugins - Interface PluginArray
-     * Test: `Object.prototype.toString.call(navigator.plugins)``
-     *  - IE <=10 === "[object MSPluginsCollection]"
-     */
-    if (obj === (globalObject.navigator || {}).plugins) {
-      return 'PluginArray';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/multipage/webappapis.html#pluginarray)
-     * WhatWG HTML$4.4.4 - The `blockquote` element - Interface `HTMLQuoteElement`
-     * Test: `Object.prototype.toString.call(document.createElement('blockquote'))``
-     *  - IE <=10 === "[object HTMLBlockElement]"
-     */
-    if (htmlElementExists && obj instanceof HTMLElement && obj.tagName === 'BLOCKQUOTE') {
-      return 'HTMLQuoteElement';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/#htmltabledatacellelement)
-     * WhatWG HTML$4.9.9 - The `td` element - Interface `HTMLTableDataCellElement`
-     * Note: Most browsers currently adher to the W3C DOM Level 2 spec
-     *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-82915075)
-     *       which suggests that browsers should use HTMLTableCellElement for
-     *       both TD and TH elements. WhatWG separates these.
-     * Test: Object.prototype.toString.call(document.createElement('td'))
-     *  - Chrome === "[object HTMLTableCellElement]"
-     *  - Firefox === "[object HTMLTableCellElement]"
-     *  - Safari === "[object HTMLTableCellElement]"
-     */
-    if (htmlElementExists && obj instanceof HTMLElement && obj.tagName === 'TD') {
-      return 'HTMLTableDataCellElement';
-    }
-
-    /* ! Spec Conformance
-     * (https://html.spec.whatwg.org/#htmltableheadercellelement)
-     * WhatWG HTML$4.9.9 - The `td` element - Interface `HTMLTableHeaderCellElement`
-     * Note: Most browsers currently adher to the W3C DOM Level 2 spec
-     *       (https://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-82915075)
-     *       which suggests that browsers should use HTMLTableCellElement for
-     *       both TD and TH elements. WhatWG separates these.
-     * Test: Object.prototype.toString.call(document.createElement('th'))
-     *  - Chrome === "[object HTMLTableCellElement]"
-     *  - Firefox === "[object HTMLTableCellElement]"
-     *  - Safari === "[object HTMLTableCellElement]"
-     */
-    if (htmlElementExists && obj instanceof HTMLElement && obj.tagName === 'TH') {
-      return 'HTMLTableHeaderCellElement';
-    }
-  }
-
-  /* ! Speed optimisation
-  * Pre:
-  *   Float64Array       x 625,644 ops/sec ±1.58% (80 runs sampled)
-  *   Float32Array       x 1,279,852 ops/sec ±2.91% (77 runs sampled)
-  *   Uint32Array        x 1,178,185 ops/sec ±1.95% (83 runs sampled)
-  *   Uint16Array        x 1,008,380 ops/sec ±2.25% (80 runs sampled)
-  *   Uint8Array         x 1,128,040 ops/sec ±2.11% (81 runs sampled)
-  *   Int32Array         x 1,170,119 ops/sec ±2.88% (80 runs sampled)
-  *   Int16Array         x 1,176,348 ops/sec ±5.79% (86 runs sampled)
-  *   Int8Array          x 1,058,707 ops/sec ±4.94% (77 runs sampled)
-  *   Uint8ClampedArray  x 1,110,633 ops/sec ±4.20% (80 runs sampled)
-  * Post:
-  *   Float64Array       x 7,105,671 ops/sec ±13.47% (64 runs sampled)
-  *   Float32Array       x 5,887,912 ops/sec ±1.46% (82 runs sampled)
-  *   Uint32Array        x 6,491,661 ops/sec ±1.76% (79 runs sampled)
-  *   Uint16Array        x 6,559,795 ops/sec ±1.67% (82 runs sampled)
-  *   Uint8Array         x 6,463,966 ops/sec ±1.43% (85 runs sampled)
-  *   Int32Array         x 5,641,841 ops/sec ±3.49% (81 runs sampled)
-  *   Int16Array         x 6,583,511 ops/sec ±1.98% (80 runs sampled)
-  *   Int8Array          x 6,606,078 ops/sec ±1.74% (81 runs sampled)
-  *   Uint8ClampedArray  x 6,602,224 ops/sec ±1.77% (83 runs sampled)
-  */
-  var stringTag = (symbolToStringTagExists && obj[Symbol.toStringTag]);
-  if (typeof stringTag === 'string') {
-    return stringTag;
-  }
-
-  if (getPrototypeOfExists) {
-    var objPrototype = Object.getPrototypeOf(obj);
-    /* ! Speed optimisation
-    * Pre:
-    *   regex literal      x 1,772,385 ops/sec ±1.85% (77 runs sampled)
-    *   regex constructor  x 2,143,634 ops/sec ±2.46% (78 runs sampled)
-    * Post:
-    *   regex literal      x 3,928,009 ops/sec ±0.65% (78 runs sampled)
-    *   regex constructor  x 3,931,108 ops/sec ±0.58% (84 runs sampled)
-    */
-    if (objPrototype === RegExp.prototype) {
-      return 'RegExp';
-    }
-
-    /* ! Speed optimisation
-    * Pre:
-    *   date               x 2,130,074 ops/sec ±4.42% (68 runs sampled)
-    * Post:
-    *   date               x 3,953,779 ops/sec ±1.35% (77 runs sampled)
-    */
-    if (objPrototype === Date.prototype) {
-      return 'Date';
-    }
-
-    /* ! Spec Conformance
-     * (http://www.ecma-international.org/ecma-262/6.0/index.html#sec-promise.prototype-@@tostringtag)
-     * ES6$25.4.5.4 - Promise.prototype[@@toStringTag] should be "Promise":
-     * Test: `Object.prototype.toString.call(Promise.resolve())``
-     *  - Chrome <=47 === "[object Object]"
-     *  - Edge <=20 === "[object Object]"
-     *  - Firefox 29-Latest === "[object Promise]"
-     *  - Safari 7.1-Latest === "[object Promise]"
-     */
-    if (promiseExists && objPrototype === Promise.prototype) {
-      return 'Promise';
-    }
-
-    /* ! Speed optimisation
-    * Pre:
-    *   set                x 2,222,186 ops/sec ±1.31% (82 runs sampled)
-    * Post:
-    *   set                x 4,545,879 ops/sec ±1.13% (83 runs sampled)
-    */
-    if (setExists && objPrototype === Set.prototype) {
-      return 'Set';
-    }
-
-    /* ! Speed optimisation
-    * Pre:
-    *   map                x 2,396,842 ops/sec ±1.59% (81 runs sampled)
-    * Post:
-    *   map                x 4,183,945 ops/sec ±6.59% (82 runs sampled)
-    */
-    if (mapExists && objPrototype === Map.prototype) {
-      return 'Map';
-    }
-
-    /* ! Speed optimisation
-    * Pre:
-    *   weakset            x 1,323,220 ops/sec ±2.17% (76 runs sampled)
-    * Post:
-    *   weakset            x 4,237,510 ops/sec ±2.01% (77 runs sampled)
-    */
-    if (weakSetExists && objPrototype === WeakSet.prototype) {
-      return 'WeakSet';
-    }
-
-    /* ! Speed optimisation
-    * Pre:
-    *   weakmap            x 1,500,260 ops/sec ±2.02% (78 runs sampled)
-    * Post:
-    *   weakmap            x 3,881,384 ops/sec ±1.45% (82 runs sampled)
-    */
-    if (weakMapExists && objPrototype === WeakMap.prototype) {
-      return 'WeakMap';
-    }
-
-    /* ! Spec Conformance
-     * (http://www.ecma-international.org/ecma-262/6.0/index.html#sec-dataview.prototype-@@tostringtag)
-     * ES6$24.2.4.21 - DataView.prototype[@@toStringTag] should be "DataView":
-     * Test: `Object.prototype.toString.call(new DataView(new ArrayBuffer(1)))``
-     *  - Edge <=13 === "[object Object]"
-     */
-    if (dataViewExists && objPrototype === DataView.prototype) {
-      return 'DataView';
-    }
-
-    /* ! Spec Conformance
-     * (http://www.ecma-international.org/ecma-262/6.0/index.html#sec-%mapiteratorprototype%-@@tostringtag)
-     * ES6$23.1.5.2.2 - %MapIteratorPrototype%[@@toStringTag] should be "Map Iterator":
-     * Test: `Object.prototype.toString.call(new Map().entries())``
-     *  - Edge <=13 === "[object Object]"
-     */
-    if (mapExists && objPrototype === mapIteratorPrototype) {
-      return 'Map Iterator';
-    }
-
-    /* ! Spec Conformance
-     * (http://www.ecma-international.org/ecma-262/6.0/index.html#sec-%setiteratorprototype%-@@tostringtag)
-     * ES6$23.2.5.2.2 - %SetIteratorPrototype%[@@toStringTag] should be "Set Iterator":
-     * Test: `Object.prototype.toString.call(new Set().entries())``
-     *  - Edge <=13 === "[object Object]"
-     */
-    if (setExists && objPrototype === setIteratorPrototype) {
-      return 'Set Iterator';
-    }
-
-    /* ! Spec Conformance
-     * (http://www.ecma-international.org/ecma-262/6.0/index.html#sec-%arrayiteratorprototype%-@@tostringtag)
-     * ES6$22.1.5.2.2 - %ArrayIteratorPrototype%[@@toStringTag] should be "Array Iterator":
-     * Test: `Object.prototype.toString.call([][Symbol.iterator]())``
-     *  - Edge <=13 === "[object Object]"
-     */
-    if (arrayIteratorExists && objPrototype === arrayIteratorPrototype) {
-      return 'Array Iterator';
-    }
-
-    /* ! Spec Conformance
-     * (http://www.ecma-international.org/ecma-262/6.0/index.html#sec-%stringiteratorprototype%-@@tostringtag)
-     * ES6$21.1.5.2.2 - %StringIteratorPrototype%[@@toStringTag] should be "String Iterator":
-     * Test: `Object.prototype.toString.call(''[Symbol.iterator]())``
-     *  - Edge <=13 === "[object Object]"
-     */
-    if (stringIteratorExists && objPrototype === stringIteratorPrototype) {
-      return 'String Iterator';
-    }
-
-    /* ! Speed optimisation
-    * Pre:
-    *   object from null   x 2,424,320 ops/sec ±1.67% (76 runs sampled)
-    * Post:
-    *   object from null   x 5,838,000 ops/sec ±0.99% (84 runs sampled)
-    */
-    if (objPrototype === null) {
-      return 'Object';
-    }
-  }
-
-  return Object
-    .prototype
-    .toString
-    .call(obj)
-    .slice(toStringLeftSliceLength, toStringRightSliceLength);
-};
-
-module.exports.typeDetect = module.exports;
-});
-
-/* globals Symbol: true, Uint8Array: true, WeakMap: true */
+/* globals Symbol: false, Uint8Array: false, WeakMap: false */
 /*!
  * deep-eql
  * Copyright(c) 2013 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
-/*!
- * Module dependencies
- */
-
 
 function FakeMap() {
-  this.clear();
+  this._key = 'chai/deep-eql__' + Math.random() + Date.now();
 }
+
 FakeMap.prototype = {
-  clear: function clearMap() {
-    this.keys = [];
-    this.values = [];
-    return this;
+  get: function getMap(key) {
+    return key[this._key];
   },
   set: function setMap(key, value) {
-    var index = this.keys.indexOf(key);
-    if (index >= 0) {
-      this.values[index] = value;
-    } else {
-      this.keys.push(key);
-      this.values.push(value);
+    if (Object.isExtensible(key)) {
+      Object.defineProperty(key, this._key, {
+        value: value,
+        configurable: true,
+      });
     }
-    return this;
-  },
-  get: function getMap(key) {
-    return this.values[this.keys.indexOf(key)];
-  },
-  delete: function deleteMap(key) {
-    var index = this.keys.indexOf(key);
-    if (index >= 0) {
-      this.values = this.values.slice(0, index).concat(this.values.slice(index + 1));
-      this.keys = this.keys.slice(0, index).concat(this.keys.slice(index + 1));
-    }
-    return this;
   },
 };
 
-var MemoizeMap = null;
-if (typeof WeakMap === 'function') {
-  MemoizeMap = WeakMap;
-} else {
-  MemoizeMap = FakeMap;
-}
-
+var MemoizeMap = typeof WeakMap === 'function' ? WeakMap : FakeMap;
 /*!
  * Check to see if the MemoizeMap has recorded a result of the two operands
  *
@@ -2136,7 +1851,7 @@ function memoizeSet(leftHandOperand, rightHandOperand, memoizeMap, result) {
  * Primary Export
  */
 
-var index$12 = deepEqual;
+var deepEql = deepEqual;
 var MemoizeMap_1 = MemoizeMap;
 
 /**
@@ -2240,8 +1955,8 @@ function extensiveDeepEqual(leftHandOperand, rightHandOperand, options) {
     }
   }
 
-  var leftHandType = index$14(leftHandOperand);
-  if (leftHandType !== index$14(rightHandOperand)) {
+  var leftHandType = type$1(leftHandOperand);
+  if (leftHandType !== type$1(rightHandOperand)) {
     memoizeSet(leftHandOperand, rightHandOperand, options.memoize, false);
     return false;
   }
@@ -2514,7 +2229,7 @@ function isPrimitive(value) {
   return value === null || typeof value !== 'object';
 }
 
-index$12.MemoizeMap = MemoizeMap_1;
+deepEql.MemoizeMap = MemoizeMap_1;
 
 /*!
  * Chai - isProxyEnabled helper
@@ -2534,7 +2249,7 @@ index$12.MemoizeMap = MemoizeMap_1;
  */
 
 var isProxyEnabled$1 = function isProxyEnabled() {
-  return config.useProxy && 
+  return config.useProxy &&
     typeof Proxy !== 'undefined' &&
     typeof Reflect !== 'undefined';
 };
@@ -2577,7 +2292,7 @@ var isProxyEnabled$1 = function isProxyEnabled() {
  */
 
 var addProperty$1 = function addProperty(ctx, name, getter) {
-  getter = getter === undefined ? new Function() : getter;
+  getter = getter === undefined ? function () {} : getter;
 
   Object.defineProperty(ctx, name,
     { get: function propertyGetter() {
@@ -2604,7 +2319,7 @@ var addProperty$1 = function addProperty(ctx, name, getter) {
         if (result !== undefined)
           return result;
 
-        var newAssertion = new chai.Assertion();
+        var newAssertion = new chai$2.Assertion();
         transferFlags$1(this, newAssertion);
         return newAssertion;
       }
@@ -2688,7 +2403,7 @@ var addLengthGuard$1 = function addLengthGuard (fn, assertionName, isChainable) 
  * the list of existing properties. However, if a nonChainableMethodName is
  * provided, then the root cause is instead a failure to invoke a non-chainable
  * method prior to reading the non-existent property.
- * 
+ *
  * If proxies are unsupported or disabled via the user's Chai config, then
  * return object without modification.
  *
@@ -2719,19 +2434,31 @@ var proxify$1 = function proxify(obj, nonChainableMethodName) {
             nonChainableMethodName + '".');
         }
 
-        var orderedProperties = getProperties(target).filter(function(property) {
-          return !Object.prototype.hasOwnProperty(property) &&
-            builtins.indexOf(property) === -1;
-        }).sort(function(a, b) {
-          return stringDistance(property, a) - stringDistance(property, b);
+        // If the property is reasonably close to an existing Chai property,
+        // suggest that property to the user. Only suggest properties with a
+        // distance less than 4.
+        var suggestion = null;
+        var suggestionDistance = 4;
+        getProperties(target).forEach(function(prop) {
+          if (
+            !Object.prototype.hasOwnProperty(prop) &&
+            builtins.indexOf(prop) === -1
+          ) {
+            var dist = stringDistanceCapped(
+              property,
+              prop,
+              suggestionDistance
+            );
+            if (dist < suggestionDistance) {
+              suggestion = prop;
+              suggestionDistance = dist;
+            }
+          }
         });
 
-        if (orderedProperties.length &&
-            stringDistance(orderedProperties[0], property) < 4) {
-          // If the property is reasonably close to an existing Chai property,
-          // suggest that property to the user.
+        if (suggestion !== null) {
           throw Error('Invalid Chai property: ' + property +
-            '. Did you mean "' + orderedProperties[0] + '"?');
+            '. Did you mean "' + suggestion + '"?');
         } else {
           throw Error('Invalid Chai property: ' + property);
         }
@@ -2759,34 +2486,44 @@ var proxify$1 = function proxify(obj, nonChainableMethodName) {
 };
 
 /**
- * # stringDistance(strA, strB)
- * Return the Levenshtein distance between two strings.
+ * # stringDistanceCapped(strA, strB, cap)
+ * Return the Levenshtein distance between two strings, but no more than cap.
  * @param {string} strA
  * @param {string} strB
- * @return {number} the string distance between strA and strB
+ * @param {number} number
+ * @return {number} min(string distance between strA and strB, cap)
  * @api private
  */
 
-function stringDistance(strA, strB, memo) {
-  if (!memo) {
-    // `memo` is a two-dimensional array containing a cache of distances
-    // memo[i][j] is the distance between strA.slice(0, i) and
-    // strB.slice(0, j).
-    memo = [];
-    for (var i = 0; i <= strA.length; i++) {
-      memo[i] = [];
-    }
+function stringDistanceCapped(strA, strB, cap) {
+  if (Math.abs(strA.length - strB.length) >= cap) {
+    return cap;
   }
 
-  if (!memo[strA.length] || !memo[strA.length][strB.length]) {
-    if (strA.length === 0 || strB.length === 0) {
-      memo[strA.length][strB.length] = Math.max(strA.length, strB.length);
-    } else {
-      memo[strA.length][strB.length] = Math.min(
-        stringDistance(strA.slice(0, -1), strB, memo) + 1,
-        stringDistance(strA, strB.slice(0, -1), memo) + 1,
-        stringDistance(strA.slice(0, -1), strB.slice(0, -1), memo) +
-          (strA.slice(-1) === strB.slice(-1) ? 0 : 1)
+  var memo = [];
+  // `memo` is a two-dimensional array containing distances.
+  // memo[i][j] is the distance between strA.slice(0, i) and
+  // strB.slice(0, j).
+  for (var i = 0; i <= strA.length; i++) {
+    memo[i] = Array(strB.length + 1).fill(0);
+    memo[i][0] = i;
+  }
+  for (var j = 0; j < strB.length; j++) {
+    memo[0][j] = j;
+  }
+
+  for (var i = 1; i <= strA.length; i++) {
+    var ch = strA.charCodeAt(i - 1);
+    for (var j = 1; j <= strB.length; j++) {
+      if (Math.abs(i - j) >= cap) {
+        memo[i][j] = cap;
+        continue;
+      }
+      memo[i][j] = Math.min(
+        memo[i - 1][j] + 1,
+        memo[i][j - 1] + 1,
+        memo[i - 1][j - 1] +
+          (ch === strB.charCodeAt(j - 1) ? 0 : 1)
       );
     }
   }
@@ -2854,7 +2591,7 @@ var addMethod$1 = function addMethod(ctx, name, method) {
     if (result !== undefined)
       return result;
 
-    var newAssertion = new chai.Assertion();
+    var newAssertion = new chai$2.Assertion();
     transferFlags$1(this, newAssertion);
     return newAssertion;
   };
@@ -2877,7 +2614,7 @@ var addMethod$1 = function addMethod(ctx, name, method) {
 /**
  * ### .overwriteProperty(ctx, name, fn)
  *
- * Overwites an already existing property getter and provides
+ * Overwrites an already existing property getter and provides
  * access to previous value. Must return function to use as getter.
  *
  *     utils.overwriteProperty(chai.Assertion.prototype, 'ok', function (_super) {
@@ -2948,7 +2685,7 @@ var overwriteProperty$1 = function overwriteProperty(ctx, name, getter) {
           return result;
         }
 
-        var newAssertion = new chai.Assertion();
+        var newAssertion = new chai$2.Assertion();
         transferFlags$1(this, newAssertion);
         return newAssertion;
       }
@@ -2971,7 +2708,7 @@ var overwriteProperty$1 = function overwriteProperty(ctx, name, getter) {
 /**
  * ### .overwriteMethod(ctx, name, fn)
  *
- * Overwites an already existing method and provides
+ * Overwrites an already existing method and provides
  * access to previous function. Must return function
  * to be used for name.
  *
@@ -3040,7 +2777,7 @@ var overwriteMethod$1 = function overwriteMethod(ctx, name, method) {
       return result;
     }
 
-    var newAssertion = new chai.Assertion();
+    var newAssertion = new chai$2.Assertion();
     transferFlags$1(this, newAssertion);
     return newAssertion;
   };
@@ -3166,7 +2903,7 @@ var addChainableMethod$1 = function addChainableMethod(ctx, name, method, chaini
             return result;
           }
 
-          var newAssertion = new chai.Assertion();
+          var newAssertion = new chai$2.Assertion();
           transferFlags$1(this, newAssertion);
           return newAssertion;
         };
@@ -3214,7 +2951,7 @@ var addChainableMethod$1 = function addChainableMethod(ctx, name, method, chaini
 /**
  * ### .overwriteChainableMethod(ctx, name, method, chainingBehavior)
  *
- * Overwites an already existing chainable method
+ * Overwrites an already existing chainable method
  * and provides access to the previous function or
  * property.  Must return functions to be used for
  * name.
@@ -3254,7 +2991,7 @@ var overwriteChainableMethod$1 = function overwriteChainableMethod(ctx, name, me
       return result;
     }
 
-    var newAssertion = new chai.Assertion();
+    var newAssertion = new chai$2.Assertion();
     transferFlags$1(this, newAssertion);
     return newAssertion;
   };
@@ -3266,7 +3003,7 @@ var overwriteChainableMethod$1 = function overwriteChainableMethod(ctx, name, me
       return result;
     }
 
-    var newAssertion = new chai.Assertion();
+    var newAssertion = new chai$2.Assertion();
     transferFlags$1(this, newAssertion);
     return newAssertion;
   };
@@ -3279,7 +3016,7 @@ var overwriteChainableMethod$1 = function overwriteChainableMethod(ctx, name, me
  */
 
 /*!
- * Module dependancies
+ * Module dependencies
  */
 
 
@@ -3294,7 +3031,7 @@ var overwriteChainableMethod$1 = function overwriteChainableMethod(ctx, name, me
  *
  * @param {Mixed} first element to compare
  * @param {Mixed} second element to compare
- * @returns {Number} -1 if 'a' should come before 'b'; otherwise 1 
+ * @returns {Number} -1 if 'a' should come before 'b'; otherwise 1
  * @name compareByInspect
  * @namespace Utils
  * @api public
@@ -3339,7 +3076,7 @@ var getOwnEnumerablePropertySymbols$1 = function getOwnEnumerablePropertySymbols
  */
 
 /*!
- * Module dependancies
+ * Module dependencies
  */
 
 
@@ -3525,7 +3262,7 @@ function getMessage$3(errorLike) {
   return msg;
 }
 
-var index$16 = {
+var checkError$1 = {
   compatibleInstance: compatibleInstance,
   compatibleConstructor: compatibleConstructor,
   compatibleMessage: compatibleMessage,
@@ -3582,7 +3319,7 @@ var test = test$1;
  * type utility
  */
 
-var type = index$8;
+var type = type$1;
 
 /*!
  * expectTypes utility
@@ -3629,25 +3366,25 @@ var transferFlags = transferFlags$1;
  * Deep equal utility
  */
 
-var eql = index$12;
+var eql = deepEql;
 
 /*!
  * Deep path info
  */
 
-var getPathInfo = index$6.getPathInfo;
+var getPathInfo = pathval.getPathInfo;
 
 /*!
  * Check if a property exists
  */
 
-var hasProperty = index$6.hasProperty;
+var hasProperty = pathval.hasProperty;
 
 /*!
  * Function name
  */
 
-var getName = index$10;
+var getName = getFuncName_1;
 
 /*!
  * add Property
@@ -3707,7 +3444,7 @@ var getOwnEnumerableProperties = getOwnEnumerableProperties$1;
  * Checks error against a given set of criteria
  */
 
-var checkError = index$16;
+var checkError = checkError$1;
 
 /*!
  * Proxify util
@@ -3733,7 +3470,7 @@ var isProxyEnabled = isProxyEnabled$1;
 
 var isNaN = _isNaN;
 
-var index$4 = {
+var utils = {
 	test: test,
 	type: type,
 	expectTypes: expectTypes,
@@ -3964,16 +3701,17 @@ var assertions = function (chai, _) {
    * - same
    * - but
    * - does
+   * - still
    *
    * @name language chains
    * @namespace BDD
    * @api public
    */
 
-  [ 'to', 'be', 'been'
-  , 'is', 'and', 'has', 'have'
-  , 'with', 'that', 'which', 'at'
-  , 'of', 'same', 'but', 'does' ].forEach(function (chain) {
+  [ 'to', 'be', 'been', 'is'
+  , 'and', 'has', 'have', 'with'
+  , 'that', 'which', 'at', 'of'
+  , 'same', 'but', 'does', 'still' ].forEach(function (chain) {
     Assertion.addProperty(chain);
   });
 
@@ -4080,7 +3818,8 @@ var assertions = function (chai, _) {
    *     Object.prototype.b = 2;
    *
    *     expect({a: 1}).to.have.own.property('a');
-   *     expect({a: 1}).to.have.property('b').but.not.own.property('b'); 
+   *     expect({a: 1}).to.have.property('b');
+   *     expect({a: 1}).to.not.have.own.property('b');
    *
    *     expect({a: 1}).to.own.include({a: 1});
    *     expect({a: 1}).to.include({b: 2}).but.not.own.include({b: 2});
@@ -4140,7 +3879,6 @@ var assertions = function (chai, _) {
     flag(this, 'any', true);
     flag(this, 'all', false);
   });
-
 
   /**
    * ### .all
@@ -4213,7 +3951,7 @@ var assertions = function (chai, _) {
    *     expect(1, 'nooo why fail??').to.be.a('string');
    *
    * `.a` can also be used as a language chain to improve the readability of
-   * your assertions. 
+   * your assertions.
    *
    *     expect({b: 2}).to.have.a.property('b');
    *
@@ -4327,7 +4065,7 @@ var assertions = function (chai, _) {
    *
    *     expect('foobar').to.not.include('taco');
    *     expect([1, 2, 3]).to.not.include(4);
-   * 
+   *
    * However, it's dangerous to negate `.include` when the target is an object.
    * The problem is that it creates uncertain expectations by asserting that the
    * target object doesn't have all of `val`'s key/value pairs but may or may
@@ -4400,7 +4138,7 @@ var assertions = function (chai, _) {
 
   function include (val, msg) {
     if (msg) flag(this, 'message', msg);
-    
+
     var obj = flag(this, 'object')
       , objType = _.type(obj).toLowerCase()
       , flagMsg = flag(this, 'message')
@@ -4473,17 +4211,17 @@ var assertions = function (chai, _) {
         var props = Object.keys(val)
           , firstErr = null
           , numErrs = 0;
-  
+
         props.forEach(function (prop) {
           var propAssertion = new Assertion(obj);
           _.transferFlags(this, propAssertion, true);
           flag(propAssertion, 'lockSsfi', true);
-  
+
           if (!negate || props.length === 1) {
             propAssertion.property(prop, val[prop]);
             return;
           }
-  
+
           try {
             propAssertion.property(prop, val[prop]);
           } catch (err) {
@@ -4494,7 +4232,7 @@ var assertions = function (chai, _) {
             numErrs++;
           }
         }, this);
-  
+
         // When validating .not.include with multiple properties, we only want
         // to throw an assertion error if all of the properties are included,
         // in which case we throw the first property assertion error that we
@@ -4520,9 +4258,9 @@ var assertions = function (chai, _) {
   /**
    * ### .ok
    *
-   * Asserts that the target is loosely (`==`) equal to `true`. However, it's
-   * often best to assert that the target is strictly (`===`) or deeply equal to
-   * its expected value.
+   * Asserts that the target is a truthy value (considered `true` in boolean context).
+   * However, it's often best to assert that the target is strictly (`===`) or
+   * deeply equal to its expected value.
    *
    *     expect(1).to.equal(1); // Recommended
    *     expect(1).to.be.ok; // Not recommended
@@ -4906,7 +4644,7 @@ var assertions = function (chai, _) {
    *
    *     expect(1).to.equal(1);
    *     expect('foo').to.equal('foo');
-   * 
+   *
    * Add `.deep` earlier in the chain to use deep equality instead. See the
    * `deep-eql` project page for info on the deep equality algorithm:
    * https://github.com/chaijs/deep-eql.
@@ -4948,7 +4686,10 @@ var assertions = function (chai, _) {
     if (msg) flag(this, 'message', msg);
     var obj = flag(this, 'object');
     if (flag(this, 'deep')) {
-      return this.eql(val);
+      var prevLockSsfi = flag(this, 'lockSsfi');
+      flag(this, 'lockSsfi', true);
+      this.eql(val);
+      flag(this, 'lockSsfi', prevLockSsfi);
     } else {
       this.assert(
           val === obj
@@ -5031,8 +4772,8 @@ var assertions = function (chai, _) {
    *     expect(2).to.equal(2); // Recommended
    *     expect(2).to.be.above(1); // Not recommended
    *
-   * Add `.lengthOf` earlier in the chain to assert that the value of the
-   * target's `length` property is greater than the given number `n`.
+   * Add `.lengthOf` earlier in the chain to assert that the target's `length`
+   * or `size` is greater than the given number `n`.
    *
    *     expect('foo').to.have.lengthOf(3); // Recommended
    *     expect('foo').to.have.lengthOf.above(2); // Not recommended
@@ -5073,12 +4814,13 @@ var assertions = function (chai, _) {
       , ssfi = flag(this, 'ssfi')
       , objType = _.type(obj).toLowerCase()
       , nType = _.type(n).toLowerCase()
+      , errorMessage
       , shouldThrow = true;
 
-    if (doLength) {
+    if (doLength && objType !== 'map' && objType !== 'set') {
       new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
     }
-    
+
     if (!doLength && (objType === 'date' && nType !== 'date')) {
       errorMessage = msgPrefix + 'the argument to above must be a date';
     } else if (nType !== 'number' && (doLength || objType === 'number')) {
@@ -5095,13 +4837,20 @@ var assertions = function (chai, _) {
     }
 
     if (doLength) {
-      var len = obj.length;
+      var descriptor = 'length'
+        , itemsCount;
+      if (objType === 'map' || objType === 'set') {
+        descriptor = 'size';
+        itemsCount = obj.size;
+      } else {
+        itemsCount = obj.length;
+      }
       this.assert(
-          len > n
-        , 'expected #{this} to have a length above #{exp} but got #{act}'
-        , 'expected #{this} to not have a length above #{exp}'
+          itemsCount > n
+        , 'expected #{this} to have a ' + descriptor + ' above #{exp} but got #{act}'
+        , 'expected #{this} to not have a ' + descriptor + ' above #{exp}'
         , n
-        , len
+        , itemsCount
       );
     } else {
       this.assert(
@@ -5128,9 +4877,8 @@ var assertions = function (chai, _) {
    *     expect(2).to.be.at.least(1); // Not recommended
    *     expect(2).to.be.at.least(2); // Not recommended
    *
-   * Add `.lengthOf` earlier in the chain to assert that the value of the
-   * target's `length` property is greater than or equal to the given number
-   * `n`.
+   * Add `.lengthOf` earlier in the chain to assert that the target's `length`
+   * or `size` is greater than or equal to the given number `n`.
    *
    *     expect('foo').to.have.lengthOf(3); // Recommended
    *     expect('foo').to.have.lengthOf.at.least(2); // Not recommended
@@ -5169,9 +4917,10 @@ var assertions = function (chai, _) {
       , ssfi = flag(this, 'ssfi')
       , objType = _.type(obj).toLowerCase()
       , nType = _.type(n).toLowerCase()
+      , errorMessage
       , shouldThrow = true;
 
-    if (doLength) {
+    if (doLength && objType !== 'map' && objType !== 'set') {
       new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
     }
 
@@ -5191,13 +4940,20 @@ var assertions = function (chai, _) {
     }
 
     if (doLength) {
-      var len = obj.length;
+      var descriptor = 'length'
+        , itemsCount;
+      if (objType === 'map' || objType === 'set') {
+        descriptor = 'size';
+        itemsCount = obj.size;
+      } else {
+        itemsCount = obj.length;
+      }
       this.assert(
-          len >= n
-        , 'expected #{this} to have a length at least #{exp} but got #{act}'
-        , 'expected #{this} to have a length below #{exp}'
+          itemsCount >= n
+        , 'expected #{this} to have a ' + descriptor + ' at least #{exp} but got #{act}'
+        , 'expected #{this} to have a ' + descriptor + ' below #{exp}'
         , n
-        , len
+        , itemsCount
       );
     } else {
       this.assert(
@@ -5222,8 +4978,8 @@ var assertions = function (chai, _) {
    *     expect(1).to.equal(1); // Recommended
    *     expect(1).to.be.below(2); // Not recommended
    *
-   * Add `.lengthOf` earlier in the chain to assert that the value of the
-   * target's `length` property is less than the given number `n`.
+   * Add `.lengthOf` earlier in the chain to assert that the target's `length`
+   * or `size` is less than the given number `n`.
    *
    *     expect('foo').to.have.lengthOf(3); // Recommended
    *     expect('foo').to.have.lengthOf.below(4); // Not recommended
@@ -5264,9 +5020,10 @@ var assertions = function (chai, _) {
       , ssfi = flag(this, 'ssfi')
       , objType = _.type(obj).toLowerCase()
       , nType = _.type(n).toLowerCase()
+      , errorMessage
       , shouldThrow = true;
 
-    if (doLength) {
+    if (doLength && objType !== 'map' && objType !== 'set') {
       new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
     }
 
@@ -5286,13 +5043,20 @@ var assertions = function (chai, _) {
     }
 
     if (doLength) {
-      var len = obj.length;
+      var descriptor = 'length'
+        , itemsCount;
+      if (objType === 'map' || objType === 'set') {
+        descriptor = 'size';
+        itemsCount = obj.size;
+      } else {
+        itemsCount = obj.length;
+      }
       this.assert(
-          len < n
-        , 'expected #{this} to have a length below #{exp} but got #{act}'
-        , 'expected #{this} to not have a length below #{exp}'
+          itemsCount < n
+        , 'expected #{this} to have a ' + descriptor + ' below #{exp} but got #{act}'
+        , 'expected #{this} to not have a ' + descriptor + ' below #{exp}'
         , n
-        , len
+        , itemsCount
       );
     } else {
       this.assert(
@@ -5319,8 +5083,8 @@ var assertions = function (chai, _) {
    *     expect(1).to.be.at.most(2); // Not recommended
    *     expect(1).to.be.at.most(1); // Not recommended
    *
-   * Add `.lengthOf` earlier in the chain to assert that the value of the
-   * target's `length` property is less than or equal to the given number `n`.
+   * Add `.lengthOf` earlier in the chain to assert that the target's `length`
+   * or `size` is less than or equal to the given number `n`.
    *
    *     expect('foo').to.have.lengthOf(3); // Recommended
    *     expect('foo').to.have.lengthOf.at.most(4); // Not recommended
@@ -5359,12 +5123,13 @@ var assertions = function (chai, _) {
       , ssfi = flag(this, 'ssfi')
       , objType = _.type(obj).toLowerCase()
       , nType = _.type(n).toLowerCase()
+      , errorMessage
       , shouldThrow = true;
 
-    if (doLength) {
+    if (doLength && objType !== 'map' && objType !== 'set') {
       new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
     }
-    
+
     if (!doLength && (objType === 'date' && nType !== 'date')) {
       errorMessage = msgPrefix + 'the argument to most must be a date';
     } else if (nType !== 'number' && (doLength || objType === 'number')) {
@@ -5381,13 +5146,20 @@ var assertions = function (chai, _) {
     }
 
     if (doLength) {
-      var len = obj.length;
+      var descriptor = 'length'
+        , itemsCount;
+      if (objType === 'map' || objType === 'set') {
+        descriptor = 'size';
+        itemsCount = obj.size;
+      } else {
+        itemsCount = obj.length;
+      }
       this.assert(
-          len <= n
-        , 'expected #{this} to have a length at most #{exp} but got #{act}'
-        , 'expected #{this} to have a length above #{exp}'
+          itemsCount <= n
+        , 'expected #{this} to have a ' + descriptor + ' at most #{exp} but got #{act}'
+        , 'expected #{this} to have a ' + descriptor + ' above #{exp}'
         , n
-        , len
+        , itemsCount
       );
     } else {
       this.assert(
@@ -5415,9 +5187,9 @@ var assertions = function (chai, _) {
    *     expect(2).to.be.within(2, 3); // Not recommended
    *     expect(2).to.be.within(1, 2); // Not recommended
    *
-   * Add `.lengthOf` earlier in the chain to assert that the value of the
-   * target's `length` property is greater than or equal to the given number
-   * `start`, and less than or equal to the given number `finish`.
+   * Add `.lengthOf` earlier in the chain to assert that the target's `length`
+   * or `size` is greater than or equal to the given number `start`, and less
+   * than or equal to the given number `finish`.
    *
    *     expect('foo').to.have.lengthOf(3); // Recommended
    *     expect('foo').to.have.lengthOf.within(2, 4); // Not recommended
@@ -5455,12 +5227,13 @@ var assertions = function (chai, _) {
       , objType = _.type(obj).toLowerCase()
       , startType = _.type(start).toLowerCase()
       , finishType = _.type(finish).toLowerCase()
+      , errorMessage
       , shouldThrow = true
       , range = (startType === 'date' && finishType === 'date')
           ? start.toUTCString() + '..' + finish.toUTCString()
           : start + '..' + finish;
 
-    if (doLength) {
+    if (doLength && objType !== 'map' && objType !== 'set') {
       new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
     }
 
@@ -5480,11 +5253,18 @@ var assertions = function (chai, _) {
     }
 
     if (doLength) {
-      var len = obj.length;
+      var descriptor = 'length'
+        , itemsCount;
+      if (objType === 'map' || objType === 'set') {
+        descriptor = 'size';
+        itemsCount = obj.size;
+      } else {
+        itemsCount = obj.length;
+      }
       this.assert(
-          len >= start && len <= finish
-        , 'expected #{this} to have a length within ' + range
-        , 'expected #{this} to not have a length within ' + range
+          itemsCount >= start && itemsCount <= finish
+        , 'expected #{this} to have a ' + descriptor + ' within ' + range
+        , 'expected #{this} to not have a ' + descriptor + ' within ' + range
       );
     } else {
       this.assert(
@@ -5600,7 +5380,8 @@ var assertions = function (chai, _) {
    *
    *     expect({a: 1}).to.have.own.property('a');
    *     expect({a: 1}).to.have.own.property('a', 1);
-   *     expect({a: 1}).to.have.property('b').but.not.own.property('b'); 
+   *     expect({a: 1}).to.have.property('b');
+   *     expect({a: 1}).to.not.have.own.property('b');
    *
    * `.deep` and `.own` can be combined.
    *
@@ -5627,7 +5408,7 @@ var assertions = function (chai, _) {
    * Add `.not` earlier in the chain to negate `.property`.
    *
    *     expect({a: 1}).to.not.have.property('b');
-   * 
+   *
    * However, it's dangerous to negate `.property` when providing `val`. The
    * problem is that it creates uncertain expectations by asserting that the
    * target either doesn't have a property with the given key `name`, or that it
@@ -5665,7 +5446,7 @@ var assertions = function (chai, _) {
    *
    *     // Not recommended
    *     expect({a: 1}).to.have.property('b', undefined, 'nooo why fail??');
-   * 
+   *
    * The above assertion isn't the same thing as not providing `val`. Instead,
    * it's asserting that the target object has a `b` property that's equal to
    * `undefined`.
@@ -5689,10 +5470,30 @@ var assertions = function (chai, _) {
       , isOwn = flag(this, 'own')
       , flagMsg = flag(this, 'message')
       , obj = flag(this, 'object')
-      , ssfi = flag(this, 'ssfi');
+      , ssfi = flag(this, 'ssfi')
+      , nameType = typeof name;
+
+    flagMsg = flagMsg ? flagMsg + ': ' : '';
+
+    if (isNested) {
+      if (nameType !== 'string') {
+        throw new AssertionError(
+          flagMsg + 'the argument to property must be a string when using nested syntax',
+          undefined,
+          ssfi
+        );
+      }
+    } else {
+      if (nameType !== 'string' && nameType !== 'number' && nameType !== 'symbol') {
+        throw new AssertionError(
+          flagMsg + 'the argument to property must be a string, number, or symbol',
+          undefined,
+          ssfi
+        );
+      }
+    }
 
     if (isNested && isOwn) {
-      flagMsg = flagMsg ? flagMsg + ': ' : '';
       throw new AssertionError(
         flagMsg + 'The "nested" and "own" flags cannot be combined.',
         undefined,
@@ -5701,7 +5502,6 @@ var assertions = function (chai, _) {
     }
 
     if (obj === null || obj === undefined) {
-      flagMsg = flagMsg ? flagMsg + ': ' : '';
       throw new AssertionError(
         flagMsg + 'Target cannot be null or undefined.',
         undefined,
@@ -5784,7 +5584,7 @@ var assertions = function (chai, _) {
    * Add `.not` earlier in the chain to negate `.ownPropertyDescriptor`.
    *
    *     expect({a: 1}).to.not.have.ownPropertyDescriptor('b');
-   * 
+   *
    * However, it's dangerous to negate `.ownPropertyDescriptor` when providing
    * a `descriptor`. The problem is that it creates uncertain expectations by
    * asserting that the target either doesn't have a property descriptor with
@@ -5855,7 +5655,7 @@ var assertions = function (chai, _) {
    *       writable: true,
    *       value: 2,
    *     });
-   * 
+   *
    *     // Recommended
    *     expect({a: 1}, 'nooo why fail??').to.have.ownPropertyDescriptor('b');
    *
@@ -5912,11 +5712,13 @@ var assertions = function (chai, _) {
   /**
    * ### .lengthOf(n[, msg])
    *
-   * Asserts that the target's `length` property is equal to the given number
+   * Asserts that the target's `length` or `size` is equal to the given number
    * `n`.
    *
    *     expect([1, 2, 3]).to.have.lengthOf(3);
    *     expect('foo').to.have.lengthOf(3);
+   *     expect(new Set([1, 2, 3])).to.have.lengthOf(3);
+   *     expect(new Map([['a', 1], ['b', 2], ['c', 3]])).to.have.lengthOf(3);
    *
    * Add `.not` earlier in the chain to negate `.lengthOf`. However, it's often
    * best to assert that the target's `length` property is equal to its expected
@@ -5972,17 +5774,29 @@ var assertions = function (chai, _) {
   function assertLength (n, msg) {
     if (msg) flag(this, 'message', msg);
     var obj = flag(this, 'object')
+      , objType = _.type(obj).toLowerCase()
       , flagMsg = flag(this, 'message')
-      , ssfi = flag(this, 'ssfi');
-    new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
-    var len = obj.length;
+      , ssfi = flag(this, 'ssfi')
+      , descriptor = 'length'
+      , itemsCount;
+
+    switch (objType) {
+      case 'map':
+      case 'set':
+        descriptor = 'size';
+        itemsCount = obj.size;
+        break;
+      default:
+        new Assertion(obj, flagMsg, ssfi, true).to.have.property('length');
+        itemsCount = obj.length;
+    }
 
     this.assert(
-        len == n
-      , 'expected #{this} to have a length of #{exp} but got #{act}'
-      , 'expected #{this} to not have a length of #{act}'
+        itemsCount == n
+      , 'expected #{this} to have a ' + descriptor + ' of #{exp} but got #{act}'
+      , 'expected #{this} to not have a ' + descriptor + ' of #{act}'
       , n
-      , len
+      , itemsCount
     );
   }
 
@@ -6044,8 +5858,8 @@ var assertions = function (chai, _) {
    * message to show when the assertion fails. The message can also be given as
    * the second argument to `expect`.
    *
-   *     expect('foobar').to.have.string(/taco/, 'nooo why fail??');
-   *     expect('foobar', 'nooo why fail??').to.have.string(/taco/);
+   *     expect('foobar').to.have.string('taco', 'nooo why fail??');
+   *     expect('foobar', 'nooo why fail??').to.have.string('taco');
    *
    * @name string
    * @param {String} str
@@ -6072,7 +5886,7 @@ var assertions = function (chai, _) {
    * ### .keys(key1[, key2[, ...]])
    *
    * Asserts that the target object, array, map, or set has the given keys. Only
-   * the target's own inherited properties are included in the search. 
+   * the target's own inherited properties are included in the search.
    *
    * When the target is an object or array, keys can be provided as one or more
    * string arguments, a single array argument, or a single object argument. In
@@ -6180,6 +5994,7 @@ var assertions = function (chai, _) {
       , isDeep = flag(this, 'deep')
       , str
       , deepStr = ''
+      , actual
       , ok = true
       , flagMsg = flag(this, 'message');
 
@@ -6196,7 +6011,6 @@ var assertions = function (chai, _) {
       if (keysType !== 'Array') {
         keys = Array.prototype.slice.call(arguments);
       }
-
     } else {
       actual = _.getOwnEnumerableProperties(obj);
 
@@ -6229,8 +6043,7 @@ var assertions = function (chai, _) {
     var len = keys.length
       , any = flag(this, 'any')
       , all = flag(this, 'all')
-      , expected = keys
-      , actual;
+      , expected = keys;
 
     if (!any && !all) {
       all = true;
@@ -6307,7 +6120,7 @@ var assertions = function (chai, _) {
    *
    * When no arguments are provided, `.throw` invokes the target function and
    * asserts that an error is thrown.
-   * 
+   *
    *     var badFn = function () { throw new TypeError('Illegal salmon!'); };
    *
    *     expect(badFn).to.throw();
@@ -6359,11 +6172,11 @@ var assertions = function (chai, _) {
    *     expect(badFn).to.throw(err, /salmon/);
    *
    * Add `.not` earlier in the chain to negate `.throw`.
-   *     
+   *
    *     var goodFn = function () {};
    *
    *     expect(goodFn).to.not.throw();
-   * 
+   *
    * However, it's dangerous to negate `.throw` when providing any arguments.
    * The problem is that it creates uncertain expectations by asserting that the
    * target either doesn't throw an error, or that it throws an error but of a
@@ -6711,7 +6524,7 @@ var assertions = function (chai, _) {
    * first argument, and asserts that the value returned is truthy.
    *
    *     expect(1).to.satisfy(function(num) {
-   *       return num > 0; 
+   *       return num > 0;
    *     });
    *
    * Add `.not` earlier in the chain to negate `.satisfy`.
@@ -6932,7 +6745,7 @@ var assertions = function (chai, _) {
     var contains = flag(this, 'contains');
     var ordered = flag(this, 'ordered');
 
-    var subject, failMsg, failNegateMsg, lengthCheck;
+    var subject, failMsg, failNegateMsg;
 
     if (contains) {
       subject = ordered ? 'an ordered superset' : 'a superset';
@@ -7003,7 +6816,6 @@ var assertions = function (chai, _) {
   }
 
   Assertion.addMethod('oneOf', oneOf);
-
 
   /**
    * ### .change(subject[, prop[, msg]])
@@ -7180,7 +6992,7 @@ var assertions = function (chai, _) {
    *
    *     expect(subtractTwo).to.decrease(myObj, 'val').by(2); // Recommended
    *     expect(subtractTwo).to.not.increase(myObj, 'val'); // Not recommended
-   * 
+   *
    * When the subject is expected to stay the same, it's often best to assert
    * exactly that.
    *
@@ -7277,7 +7089,7 @@ var assertions = function (chai, _) {
    *
    * When two arguments are provided, `.decrease` asserts that the value of the
    * given object `subject`'s `prop` property is lesser after invoking the
-   * target function compared to beforehand. 
+   * target function compared to beforehand.
    *
    *     var myObj = {val: 1}
    *       , subtractTwo = function () { myObj.val -= 2; };
@@ -7299,7 +7111,7 @@ var assertions = function (chai, _) {
    *
    *     expect(addTwo).to.increase(myObj, 'val').by(2); // Recommended
    *     expect(addTwo).to.not.decrease(myObj, 'val'); // Not recommended
-   * 
+   *
    * When the subject is expected to stay the same, it's often best to assert
    * exactly that.
    *
@@ -7652,7 +7464,7 @@ var assertions = function (chai, _) {
     var obj = flag(this, 'object');
 
     this.assert(
-        typeof obj === "number" && isFinite(obj)
+        typeof obj === 'number' && isFinite(obj)
       , 'expected #{this} to be a finite number'
       , 'expected #{this} to not be a finite number'
     );
@@ -7671,9 +7483,17 @@ var expect = function (chai, util) {
   };
 
   /**
+   * ### .fail([message])
    * ### .fail(actual, expected, [message], [operator])
    *
    * Throw a failure.
+   *
+   *     expect.fail();
+   *     expect.fail("custom error message");
+   *     expect.fail(1, 2);
+   *     expect.fail(1, 2, "custom error message");
+   *     expect.fail(1, 2, "custom error message", ">");
+   *     expect.fail(1, 2, undefined, ">");
    *
    * @name fail
    * @param {Mixed} actual
@@ -7685,6 +7505,11 @@ var expect = function (chai, util) {
    */
 
   chai.expect.fail = function (actual, expected, message, operator) {
+    if (arguments.length < 2) {
+        message = actual;
+        actual = undefined;
+    }
+
     message = message || 'expect.fail()';
     throw new chai.AssertionError(message, {
         actual: actual
@@ -7738,9 +7563,18 @@ var should = function (chai, util) {
     var should = {};
 
     /**
+     * ### .fail([message])
      * ### .fail(actual, expected, [message], [operator])
      *
      * Throw a failure.
+     *
+     *     should.fail();
+     *     should.fail("custom error message");
+     *     should.fail(1, 2);
+     *     should.fail(1, 2, "custom error message");
+     *     should.fail(1, 2, "custom error message", ">");
+     *     should.fail(1, 2, undefined, ">");
+     *
      *
      * @name fail
      * @param {Mixed} actual
@@ -7752,6 +7586,11 @@ var should = function (chai, util) {
      */
 
     should.fail = function (actual, expected, message, operator) {
+      if (arguments.length < 2) {
+          message = actual;
+          actual = undefined;
+      }
+
       message = message || 'should.fail()';
       throw new chai.AssertionError(message, {
           actual: actual
@@ -7905,9 +7744,7 @@ var should = function (chai, util) {
  * MIT Licensed
  */
 
-
 var assert = function (chai, util) {
-
   /*!
    * Chai dependencies.
    */
@@ -7944,9 +7781,17 @@ var assert = function (chai, util) {
   };
 
   /**
+   * ### .fail([message])
    * ### .fail(actual, expected, [message], [operator])
    *
    * Throw a failure. Node.js `assert` module-compatible.
+   *
+   *     assert.fail();
+   *     assert.fail("custom error message");
+   *     assert.fail(1, 2);
+   *     assert.fail(1, 2, "custom error message");
+   *     assert.fail(1, 2, "custom error message", ">");
+   *     assert.fail(1, 2, undefined, ">");
    *
    * @name fail
    * @param {Mixed} actual
@@ -7958,6 +7803,13 @@ var assert = function (chai, util) {
    */
 
   assert.fail = function (actual, expected, message, operator) {
+    if (arguments.length < 2) {
+        // Comply with Node's fail([message]) interface
+
+        message = actual;
+        actual = undefined;
+    }
+
     message = message || 'assert.fail()';
     throw new chai.AssertionError(message, {
         actual: actual
@@ -8807,7 +8659,7 @@ var assert = function (chai, util) {
    * an array, the array is searched for an element that's strictly equal to the
    * given value. When asserting a subset of properties in an object, the object
    * is searched for the given property keys, checking that each one is present
-   * and stricty equal to the given property value. For instance:
+   * and strictly equal to the given property value. For instance:
    *
    *     var obj1 = {a: 1}
    *       , obj2 = {b: 2};
@@ -8834,8 +8686,8 @@ var assert = function (chai, util) {
    * the absence of a value in an array, a substring in a string, or a subset of
    * properties in an object.
    *
-   *     assert.notInclude([1,2,3], 4, 'array doesn't contain value');
-   *     assert.notInclude('foobar', 'baz', 'string doesn't contain substring');
+   *     assert.notInclude([1,2,3], 4, "array doesn't contain value");
+   *     assert.notInclude('foobar', 'baz', "string doesn't contain substring");
    *     assert.notInclude({ foo: 'bar', hello: 'universe' }, { foo: 'baz' }, 'object doesn't contain property');
    *
    * Strict equality (===) is used. When asserting the absence of a value in an
@@ -8915,24 +8767,24 @@ var assert = function (chai, util) {
 
   /**
    * ### .nestedInclude(haystack, needle, [message])
-   * 
-   * Asserts that 'haystack' includes 'needle'. 
-   * Can be used to assert the inclusion of a subset of properties in an 
+   *
+   * Asserts that 'haystack' includes 'needle'.
+   * Can be used to assert the inclusion of a subset of properties in an
    * object.
-   * Enables the use of dot- and bracket-notation for referencing nested 
+   * Enables the use of dot- and bracket-notation for referencing nested
    * properties.
    * '[]' and '.' in property names can be escaped using double backslashes.
-   * 
+   *
    *     assert.nestedInclude({'.a': {'b': 'x'}}, {'\\.a.[b]': 'x'});
    *     assert.nestedInclude({'a': {'[b]': 'x'}}, {'a.\\[b\\]': 'x'});
-   * 
+   *
    * @name nestedInclude
    * @param {Object} haystack
    * @param {Object} needle
    * @param {String} message
    * @namespace Assert
-   * @api public 
-   */ 
+   * @api public
+   */
 
   assert.nestedInclude = function (exp, inc, msg) {
     new Assertion(exp, msg, assert.nestedInclude, true).nested.include(inc);
@@ -8940,24 +8792,24 @@ var assert = function (chai, util) {
 
   /**
    * ### .notNestedInclude(haystack, needle, [message])
-   * 
-   * Asserts that 'haystack' does not include 'needle'. 
-   * Can be used to assert the absence of a subset of properties in an 
+   *
+   * Asserts that 'haystack' does not include 'needle'.
+   * Can be used to assert the absence of a subset of properties in an
    * object.
-   * Enables the use of dot- and bracket-notation for referencing nested 
-   * properties. 
+   * Enables the use of dot- and bracket-notation for referencing nested
+   * properties.
    * '[]' and '.' in property names can be escaped using double backslashes.
-   * 
+   *
    *     assert.notNestedInclude({'.a': {'b': 'x'}}, {'\\.a.b': 'y'});
    *     assert.notNestedInclude({'a': {'[b]': 'x'}}, {'a.\\[b\\]': 'y'});
-   * 
+   *
    * @name notNestedInclude
    * @param {Object} haystack
    * @param {Object} needle
    * @param {String} message
    * @namespace Assert
-   * @api public 
-   */ 
+   * @api public
+   */
 
   assert.notNestedInclude = function (exp, inc, msg) {
     new Assertion(exp, msg, assert.notNestedInclude, true)
@@ -8966,23 +8818,23 @@ var assert = function (chai, util) {
 
   /**
    * ### .deepNestedInclude(haystack, needle, [message])
-   * 
+   *
    * Asserts that 'haystack' includes 'needle'.
-   * Can be used to assert the inclusion of a subset of properties in an 
+   * Can be used to assert the inclusion of a subset of properties in an
    * object while checking for deep equality.
-   * Enables the use of dot- and bracket-notation for referencing nested 
+   * Enables the use of dot- and bracket-notation for referencing nested
    * properties.
    * '[]' and '.' in property names can be escaped using double backslashes.
-   * 
+   *
    *     assert.deepNestedInclude({a: {b: [{x: 1}]}}, {'a.b[0]': {x: 1}});
    *     assert.deepNestedInclude({'.a': {'[b]': {x: 1}}}, {'\\.a.\\[b\\]': {x: 1}});
-   *    
+   *
    * @name deepNestedInclude
    * @param {Object} haystack
    * @param {Object} needle
    * @param {String} message
    * @namespace Assert
-   * @api public 
+   * @api public
    */
 
   assert.deepNestedInclude = function(exp, inc, msg) {
@@ -8992,23 +8844,23 @@ var assert = function (chai, util) {
 
   /**
    * ### .notDeepNestedInclude(haystack, needle, [message])
-   * 
+   *
    * Asserts that 'haystack' does not include 'needle'.
-   * Can be used to assert the absence of a subset of properties in an 
+   * Can be used to assert the absence of a subset of properties in an
    * object while checking for deep equality.
-   * Enables the use of dot- and bracket-notation for referencing nested 
+   * Enables the use of dot- and bracket-notation for referencing nested
    * properties.
    * '[]' and '.' in property names can be escaped using double backslashes.
-   * 
+   *
    *     assert.notDeepNestedInclude({a: {b: [{x: 1}]}}, {'a.b[0]': {y: 1}})
    *     assert.notDeepNestedInclude({'.a': {'[b]': {x: 1}}}, {'\\.a.\\[b\\]': {y: 2}});
-   *    
+   *
    * @name notDeepNestedInclude
    * @param {Object} haystack
    * @param {Object} needle
    * @param {String} message
    * @namespace Assert
-   * @api public 
+   * @api public
    */
 
   assert.notDeepNestedInclude = function(exp, inc, msg) {
@@ -9018,13 +8870,13 @@ var assert = function (chai, util) {
 
   /**
    * ### .ownInclude(haystack, needle, [message])
-   * 
+   *
    * Asserts that 'haystack' includes 'needle'.
-   * Can be used to assert the inclusion of a subset of properties in an 
+   * Can be used to assert the inclusion of a subset of properties in an
    * object while ignoring inherited properties.
-   * 
+   *
    *     assert.ownInclude({ a: 1 }, { a: 1 });
-   * 
+   *
    * @name ownInclude
    * @param {Object} haystack
    * @param {Object} needle
@@ -9039,15 +8891,15 @@ var assert = function (chai, util) {
 
   /**
    * ### .notOwnInclude(haystack, needle, [message])
-   * 
+   *
    * Asserts that 'haystack' includes 'needle'.
-   * Can be used to assert the absence of a subset of properties in an 
+   * Can be used to assert the absence of a subset of properties in an
    * object while ignoring inherited properties.
-   * 
+   *
    *     Object.prototype.b = 2;
-   * 
+   *
    *     assert.notOwnInclude({ a: 1 }, { b: 2 });
-   * 
+   *
    * @name notOwnInclude
    * @param {Object} haystack
    * @param {Object} needle
@@ -9062,13 +8914,13 @@ var assert = function (chai, util) {
 
   /**
    * ### .deepOwnInclude(haystack, needle, [message])
-   * 
+   *
    * Asserts that 'haystack' includes 'needle'.
-   * Can be used to assert the inclusion of a subset of properties in an 
+   * Can be used to assert the inclusion of a subset of properties in an
    * object while ignoring inherited properties and checking for deep equality.
-   * 
+   *
    *      assert.deepOwnInclude({a: {b: 2}}, {a: {b: 2}});
-   *      
+   *
    * @name deepOwnInclude
    * @param {Object} haystack
    * @param {Object} needle
@@ -9084,13 +8936,13 @@ var assert = function (chai, util) {
 
    /**
    * ### .notDeepOwnInclude(haystack, needle, [message])
-   * 
+   *
    * Asserts that 'haystack' includes 'needle'.
-   * Can be used to assert the absence of a subset of properties in an 
+   * Can be used to assert the absence of a subset of properties in an
    * object while ignoring inherited properties and checking for deep equality.
-   * 
+   *
    *      assert.notDeepOwnInclude({a: {b: 2}}, {a: {c: 3}});
-   *      
+   *
    * @name notDeepOwnInclude
    * @param {Object} haystack
    * @param {Object} needle
@@ -9552,10 +9404,12 @@ var assert = function (chai, util) {
   /**
    * ### .lengthOf(object, length, [message])
    *
-   * Asserts that `object` has a `length` property with the expected value.
+   * Asserts that `object` has a `length` or `size` with the expected value.
    *
    *     assert.lengthOf([1,2,3], 3, 'array has length of 3');
    *     assert.lengthOf('foobar', 6, 'string has length of 6');
+   *     assert.lengthOf(new Set([1,2,3]), 3, 'set has size of 3');
+   *     assert.lengthOf(new Map([['a',1],['b',2],['c',3]]), 3, 'map has size of 3');
    *
    * @name lengthOf
    * @param {Mixed} object
@@ -9843,8 +9697,8 @@ var assert = function (chai, util) {
    * If `errMsgMatcher` is provided, it also asserts that the error thrown will have a
    * message matching `errMsgMatcher`.
    *
-   *     assert.throws(fn, 'function throws a reference error');
-   *     assert.throws(fn, /function throws a reference error/);
+   *     assert.throws(fn, 'Error thrown must have this msg');
+   *     assert.throws(fn, /Error thrown must have a msg that matches this/);
    *     assert.throws(fn, ReferenceError);
    *     assert.throws(fn, errorInstance);
    *     assert.throws(fn, ReferenceError, 'Error thrown must be a ReferenceError and have this msg');
@@ -10998,7 +10852,7 @@ var assert = function (chai, util) {
   ('isNotEmpty', 'notEmpty');
 };
 
-var chai = createCommonjsModule(function (module, exports) {
+var chai$2 = createCommonjsModule(function (module, exports) {
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -11011,13 +10865,13 @@ var used = [];
  * Chai version
  */
 
-exports.version = '4.1.1';
+exports.version = '4.2.0';
 
 /*!
  * Assertion Error
  */
 
-exports.AssertionError = index$2;
+exports.AssertionError = assertionError;
 
 /*!
  * Utils for plugins (not exported)
@@ -11037,7 +10891,7 @@ exports.AssertionError = index$2;
 
 exports.use = function (fn) {
   if (!~used.indexOf(fn)) {
-    fn(exports, index$4);
+    fn(exports, utils);
     used.push(fn);
   }
 
@@ -11048,7 +10902,7 @@ exports.use = function (fn) {
  * Utility Functions
  */
 
-exports.util = index$4;
+exports.util = utils;
 
 /*!
  * Configuration
@@ -11093,248 +10947,615 @@ exports.use(should);
 exports.use(assert);
 });
 
-var index = chai;
+var chai = chai$2;
 
-var index_1 = index.assert;
+var chai_1 = chai.assert;
 
-//describeIfApp("Fetch grafts", function () {
-//    it("Grafts fetch bodies", function () {
-//        return fetch("/ping-with-body", {
-//            method: swwebviewSettings.API_REQUEST_METHOD,
-//            body: JSON.stringify({ value: "test-string" })
-//        })
-//            .then(function (res) { return res.json(); })
-//            .then(function (json) {
-//            index_1.equal(json.pong, "test-string");
-//        });
-//    });
-//    it("Grafts XMLHttpRequest bodies", function (done) {
-//        var xhttp = new XMLHttpRequest();
-//        xhttp.onreadystatechange = function () {
-//            if (this.readyState == 4 && this.status == 200) {
-//                try {
-//                    var data = JSON.parse(this.responseText);
-//                    index_1.equal(data.pong, "test-string");
-//                }
-//                catch (error) {
-//                    done(error);
-//                }
-//                done();
-//            }
-//        };
-//        xhttp.open(swwebviewSettings.API_REQUEST_METHOD, "/ping-with-body", true);
-//        xhttp.send(JSON.stringify({ value: "test-string" }));
-//    });
-//});
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = Object.setPrototypeOf ||
-    ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-    function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-
-function __extends(d, b) {
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-var APIError = (function (_super) {
-    __extends(APIError, _super);
-    function APIError(message, response) {
-        var _this = _super.call(this, message) || this;
-        _this.response = response;
-        return _this;
-    }
-    return APIError;
-}(Error));
-function apiRequest(path, body) {
-    if (body === void 0) { body = undefined; }
-    return fetch(path, {
-        method: swwebviewSettings.API_REQUEST_METHOD,
-        body: JSON.stringify(body),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(function (res) {
-        if (res.ok === false) {
-            if (res.status === 500) {
-                return res.json().then(function (errorJSON) {
-                    throw new Error(errorJSON.error);
-                });
-            }
-            throw new APIError("Received a non-200 response to API request", res);
-        }
-        return res.json();
+function unregisterEverything() {
+    return navigator.serviceWorker
+        .getRegistrations()
+        .then(function (regs) {
+        console.groupCollapsed("Unregister calls");
+        console.info("Unregistering:" + regs.map(function (r) { return r.scope; }).join(", "));
+        var mapped = regs.map(function (r) { return r.unregister(); });
+        return Promise.all(mapped);
+    })
+        .then(function () {
+        console.groupEnd();
     });
 }
 
-function E() {
-  // Keep this empty so it's easier to inherit from
-  // (via https://github.com/lipsmack from https://github.com/scottcorgan/tiny-emitter/issues/3)
-}
-
-E.prototype = {
-  on: function(name, callback, ctx) {
-    var e = this.e || (this.e = {});
-
-    (e[name] || (e[name] = [])).push({
-      fn: callback,
-      ctx: ctx
+describe("CacheStorage", function () {
+    afterEach(function () {
+        return navigator.serviceWorker
+            .getRegistration("/fixtures/")
+            .then(function (reg) {
+            return execInWorker(reg.active, "\n                return caches.keys().then(keys => {\n                    return Promise.all(keys.map(k => caches.delete(k)));\n                });\n            ");
+        })
+            .then(function () {
+            return unregisterEverything();
+        });
     });
-
-    return this;
-  },
-
-  once: function(name, callback, ctx) {
-    var self = this;
-    function listener() {
-      self.off(name, listener);
-      callback.apply(ctx, arguments);
-    }
-
-    listener._ = callback;
-    return this.on(name, listener, ctx);
-  },
-
-  emit: function(name) {
-    var data = [].slice.call(arguments, 1);
-    var evtArr = ((this.e || (this.e = {}))[name] || []).slice();
-    var i = 0;
-    var len = evtArr.length;
-
-    for (i; i < len; i++) {
-      evtArr[i].fn.apply(evtArr[i].ctx, data);
-    }
-
-    return this;
-  },
-
-  dispatchEvent: function(ev) {
-    var name = ev.type;
-    console.log("DISPATCH!", name, ev);
-    this.emit(name, ev);
-  },
-
-  off: function(name, callback) {
-    var e = this.e || (this.e = {});
-    var evts = e[name];
-    var liveEvents = [];
-
-    if (evts && callback) {
-      for (var i = 0, len = evts.length; i < len; i++) {
-        if (evts[i].fn !== callback && evts[i].fn._ !== callback)
-          liveEvents.push(evts[i]);
-      }
-    }
-
-    // Remove event from queue to prevent memory leak
-    // Suggested by https://github.com/lazd
-    // Ref: https://github.com/scottcorgan/tiny-emitter/commit/c6ebfaa9bc973b33d110a84a307742b7cf94c953#commitcomment-5024910
-
-    liveEvents.length ? (e[name] = liveEvents) : delete e[name];
-
-    return this;
-  }
-};
-
-E.prototype.addEventListener = E.prototype.on;
-E.prototype.removeEventListener = E.prototype.off;
-
-var index$18 = E;
-
-var StreamingXHR = (function (_super) {
-    __extends(StreamingXHR, _super);
-    function StreamingXHR(url) {
-        var _this = _super.call(this) || this;
-        _this.seenBytes = 0;
-        _this.xhr = new XMLHttpRequest();
-        _this.xhr.open(swwebviewSettings.API_REQUEST_METHOD, url);
-        _this.xhr.onreadystatechange = _this.receiveData.bind(_this);
-        _this.xhr.send();
-        return _this;
-    }
-    StreamingXHR.prototype.receiveData = function () {
-        try {
-            if (this.xhr.readyState !== 3) {
-                return;
-            }
-            // This means the responseText keeps growing and growing. Perhaps
-            // we should look into cutting this off and re-establishing a new
-            // link if it gets too big.
-            var newData = this.xhr.responseText.substr(this.seenBytes);
-            this.seenBytes = this.xhr.responseText.length;
-            var _a = /([\w\-]+):(.*)/.exec(newData), _ = _a[0], event_1 = _a[1], data = _a[2];
-            var evt = new MessageEvent(event_1, {
-                data: JSON.parse(data)
+    it("should open a cache and record it in list of keys", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                return caches.open(\"test-cache\")\n                .then(() => {\n                    return caches.keys()\n                })\n            ");
+        })
+            .then(function (response) {
+            chai_1.equal(response.length, 1);
+            chai_1.equal(response[0], "test-cache");
+        });
+    });
+    it("should return correct values for has()", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "return caches.has('test-cache')").then(function (response) {
+                chai_1.equal(response, false);
+                return execInWorker(worker, "return caches.open('test-cache').then(() => caches.has('test-cache'))");
             });
-            this.dispatchEvent(evt);
-        }
-        catch (err) {
-            var errEvt = new ErrorEvent("error", {
-                error: err
-            });
-            this.dispatchEvent(errEvt);
-        }
-    };
-    StreamingXHR.prototype.close = function () {
-        this.xhr.abort();
-    };
-    return StreamingXHR;
-}(index$18));
-
-describeIfApp("Basic HTTP hooks for Service Worker API", function () {
-    it("Returns 404 when trying to access a URL we don't know", function () {
-        return apiRequest("/does_not_exist").catch(function (error) {
-            index_1.equal(error.response.status, 404);
+        })
+            .then(function (response2) {
+            chai_1.equal(response2, true);
         });
     });
-    it("Returns JSON response when URL is known", function () {
-        return apiRequest("/ping").then(function (json) {
-            index_1.equal(json.pong, true);
-        });
-    });
-    it("Can use a streaming XHR request", function (done) {
-        var stream = new StreamingXHR("/stream");
-        var receivedFirstEvent = false;
-        stream.addEventListener("test-event", function (ev) {
-            index_1.equal(ev.data.test, "hello");
-            receivedFirstEvent = true;
-        });
-        stream.addEventListener("test-event2", function (ev) {
-            index_1.equal(ev.data.test, "hello2");
-            index_1.equal(receivedFirstEvent, true);
-            stream.close();
-            done();
-        });
-        stream.addEventListener("error", function (ev) {
-            done(ev.error);
+    it("should delete() successfully", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "return caches.open('test-cache')\n                        .then(() => caches.delete('test-cache'))\n                        .then(() => caches.has('test-cache'))");
+        })
+            .then(function (response2) {
+            chai_1.equal(response2, false);
         });
     });
 });
 
-describe("Service Worker Container", function () {
-    it("Should register a service worker", function () {
-        return navigator.serviceWorker.register("/test-worker.js");
+describe("Cache", function () {
+    afterEach(function () {
+        return navigator.serviceWorker
+            .getRegistration("/fixtures/")
+            .then(function (reg) {
+            return execInWorker(reg.active, "\n                    console.log(\"END CACHE TEST\");\n                return caches.keys().then(keys => {\n                    return Promise.all(keys.map(k => caches.delete(k)));\n                });\n            ");
+        })
+            .then(function () {
+            return unregisterEverything();
+        });
     });
+    it("should put() requests and responses", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    let request = new Request('/');\n                    let response = new Response(\"hello\");\n                    \n                    return caches.open('test-cache')\n                        .then((cache) => {\n                            return cache.put(request, response)\n                            .then(() => {\n                                return cache.match(request);\n                            })\n                        })\n                        .then((response) => {\n                            console.log(\"GOT RESPONSE\")\n                            return response.text()\n                        })\n                    ");
+        })
+            .then(function (cacheResponse) {
+            chai_1.equal(cacheResponse, "hello");
+        });
+    });
+    it("should use ignoreSearch match option", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    let request = new Request('/test?test=value');\n                    let response = new Response(\"hello\");\n                    \n                    return caches.open('test-cache')\n                        .then((cache) => {\n                            return cache.put(request, response)\n                            .then(() => {\n\n                                let noSearchRequest = new Request('/test')\n\n                                return Promise.all([\n                                    cache.match(noSearchRequest),\n                                    cache.match(noSearchRequest, {ignoreSearch: true})\n                                ]);\n                            })\n                        })\n                        .then((responses) => {\n                            return responses.map((response) => response ? true : false)\n                        })\n                    ");
+        })
+            .then(function (cacheResponses) {
+            chai_1.equal(cacheResponses.length, 2);
+            chai_1.equal(cacheResponses[0], false);
+            chai_1.equal(cacheResponses[1], true);
+        });
+    });
+    it("should use ignoreMethod match option", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    let request = new Request('/test');\n                    let response = new Response(\"hello\");\n                    \n                    return caches.open('test-cache')\n                        .then((cache) => {\n                            return cache.put(request, response)\n                            .then(() => {\n\n                                let postRequest = new Request('/test', {\n                                    method: \"POST\"\n                                })\n\n                                return Promise.all([\n                                    cache.match(postRequest),\n                                    cache.match(postRequest, {ignoreMethod: true})\n                                ]);\n                            })\n                        })\n                        .then((responses) => {\n                            return responses.map((response) => response ? true : false)\n                        })\n                    ");
+        })
+            .then(function (cacheResponses) {
+            chai_1.equal(cacheResponses.length, 2);
+            chai_1.equal(cacheResponses[0], false);
+            chai_1.equal(cacheResponses[1], true);
+        });
+    });
+    it("should use ignoreVary match option", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    let request = new Request('/test', {\n                        headers: {\n                            'X-Vary-Header':'value1'\n                        }\n                    });\n                    let response = new Response(\"hello\", {\n                        headers: {\n                            Vary: 'X-Vary-Header'\n                        }\n                    });\n                    \n                    return caches.open('test-cache')\n                        .then((cache) => {\n                            return cache.put(request, response)\n                            .then(() => {\n\n                                let variedRequest = new Request('/test', {\n                                    headers: {\n                                        'X-Vary-Header':'value2'\n                                    }\n                                })\n\n                                return Promise.all([\n                                    cache.match(variedRequest),\n                                    cache.match(variedRequest, {ignoreVary: true})\n                                ]);\n                            })\n                        })\n                        .then((responses) => {\n                            return responses.map((response) => response ? true : false)\n                        })\n                    ");
+        })
+            .then(function (cacheResponses) {
+            chai_1.equal(cacheResponses.length, 2);
+            chai_1.equal(cacheResponses[0], false);
+            chai_1.equal(cacheResponses[1], true);
+        });
+    });
+    it("should match() on caches object and respect cacheName option", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    let request = new Request('/test');\n                    let response = new Response(\"hello\");\n                    \n                    return caches.open('test-cache')\n                        .then((cache) => {\n                            return cache.put(request, response)\n                            .then(() => {\n                                return Promise.all([\n                                    caches.match(request),\n                                    caches.match(request, {cacheName: 'test-cache2'})\n                                ]);\n                            })\n                        })\n                        .then((responses) => {\n                            return responses.map((response) => response ? true : false)\n                        })\n                    ");
+        })
+            .then(function (cacheResponses) {
+            chai_1.equal(cacheResponses.length, 2);
+            chai_1.equal(cacheResponses[0], true);
+            chai_1.equal(cacheResponses[1], false);
+        });
+    });
+    it("should successfully matchAll()", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    let request = new Request('/test');\n                    let request2 = new Request('/test?withsearch');\n                    let response = new Response(\"hello\");\n                    let response2 = new Response(\"hello2\");\n                    \n                    return caches.open('test-cache')\n                        .then((cache) => {\n                            return Promise.all([\n                                cache.put(request, response),\n                                cache.put(request2, response2)\n                            ])\n                            .then(() => {\n                                return cache.matchAll(request, {ignoreSearch: true})\n                            })\n                        })\n                        .then((responses) => {\n                            return Promise.all(responses.map((response) => response.text()))\n                        })\n                    ");
+        })
+            .then(function (cacheResponses) {
+            chai_1.equal(cacheResponses.length, 2);
+            chai_1.equal(cacheResponses[0], "hello");
+            chai_1.equal(cacheResponses[1], "hello2");
+        });
+    });
+    it("should successfully add()", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    return caches.open('test-cache')\n                    .then((cache) => {\n                        return cache.add('/fixtures/cache-file.txt')\n                        .then(() => {\n                            return cache.match('/fixtures/cache-file.txt');\n                        })\n                    })\n                    .then((response) => {\n                        return response.text()\n                    })\n                ");
+        })
+            .then(function (cacheResponse) {
+            chai_1.equal(cacheResponse, "this is cached content");
+        });
+    });
+    it("should successfully addAll()", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    return caches.open('test-cache')\n                    .then((cache) => {\n                        return cache.addAll([\n                            '/fixtures/cache-file.txt',\n                            '/fixtures/cache-file2.txt'\n                        ])\n                        .then(() => {\n                            return Promise.all([\n                                cache.match('/fixtures/cache-file.txt'),\n                                cache.match('/fixtures/cache-file2.txt')\n                            ])\n                        })\n                    })\n                    .then((responses) => {\n                        return Promise.all(responses.map((r) => r.text()))\n                    })\n                ");
+        })
+            .then(function (cacheResponses) {
+            chai_1.equal(cacheResponses[0], "this is cached content");
+            chai_1.equal(cacheResponses[1], "this is the second cached file");
+        });
+    });
+    it("should successfully return keys()", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    return caches.open('test-cache')\n                    .then((cache) => {\n                        return cache.addAll([\n                            '/fixtures/cache-file.txt',\n                            '/fixtures/cache-file2.txt'\n                        ])\n                        .then(() => {\n                            return cache.keys()\n                        })\n                    })\n                    .then((keys) => {\n                        return keys.map((r) => r.url)\n                    })\n                ");
+        })
+            .then(function (cacheResponses) {
+            var urlOne = new URL("/fixtures/cache-file.txt", window.location.href);
+            var urlTwo = new URL("/fixtures/cache-file2.txt", window.location.href);
+            chai_1.equal(cacheResponses[0], urlOne.href);
+            chai_1.equal(cacheResponses[1], urlTwo.href);
+        });
+    });
+    it("should successfully delete()", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                    return caches.open('test-cache')\n                    .then((cache) => {\n                        return cache.add('/fixtures/cache-file.txt')\n                        .then(() => {\n                            return cache.delete('/fixtures/cache-file.txt')\n                        })\n                        .then((didDelete) => {\n                            return cache.keys()\n                            .then((keys) => {\n                                return [keys.length, didDelete]\n                            })\n                        })\n                    })\n                    \n                ");
+        })
+            .then(function (responses) {
+            chai_1.equal(responses[0], 0);
+            chai_1.equal(responses[1], true);
+        });
+    });
+});
+
+// This isn't actually included in the final JS bundle - instead the code is used in
+// the ServiceWorker bundle to mirror console messages in the native log. But we
+// include it here so we can run some tests on it.
+
+var createConsoleInterceptor = function(funcToCall) {
+    let levels = ["debug", "info", "warn", "error", "log"];
+    let originalConsole = console;
+
+    let levelProxy = {
+        apply: function(target, thisArg, argumentsList) {
+            // send to original console logging function
+            target.apply(thisArg, argumentsList);
+
+            let level = levels.find(l => originalConsole[l] == target);
+
+            funcToCall(level, argumentsList);
+        }
+    };
+
+    let interceptors = levels.map(
+        l => new Proxy(originalConsole[l], levelProxy)
+    );
+
+    return new Proxy(originalConsole, {
+        get: function(target, name) {
+            let idx = levels.indexOf(name);
+            if (idx === -1) {
+                // not intercepted
+                return target[name];
+            }
+            return interceptors[idx];
+        }
+    });
+};
+
+describe("Console Interceptor", function () {
+    it("Should intercept messages", function (done) {
+        var interceptor = createConsoleInterceptor(function (level, args) {
+            chai_1.equal(level, "log");
+            chai_1.equal(args[0], "hello");
+            done();
+        });
+        interceptor.log("hello");
+    });
+});
+
+function withIframe(src, cb) {
+    if (src === void 0) { src = "/fixtures/blank.html"; }
+    return new Promise(function (fulfill, reject) {
+        var iframe = document.createElement("iframe");
+        iframe.onload = function () {
+            fulfill(Promise.resolve(cb(iframe.contentWindow))
+                .then(function () {
+                return iframe.contentWindow.navigator.serviceWorker.getRegistrations();
+            })
+                .then(function (regs) {
+                var mapped = regs.map(function (r) { return r.unregister(); });
+                return Promise.all(mapped);
+            })
+                .then(function () {
+                return new Promise(function (fulfill, reject) {
+                    setTimeout(function () {
+                        // No idea why this has to be in a timeout, but the promise stops
+                        // if it isn't.
+                        document.body.removeChild(iframe);
+                        // setTimeout(() => {
+                        fulfill();
+                        // }, 10);
+                    }, 1);
+                });
+            }));
+        };
+        iframe.src = src;
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+    });
+}
+
+describe("Service Worker Container", function () {
+    afterEach(function () {
+        return unregisterEverything();
+    });
+    it("Should register with default scope as JS file directory", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/test-register-worker.js")
+            .then(function (reg) {
+            chai_1.equal(reg.scope, new URL("/fixtures/", window.location.href).href);
+            console.log(reg.installing);
+            // reg.installing!.onstatechange = e =>
+            //     console.log(e.target.state);
+        });
+    });
+    it("Should fire ready promise", function () {
+        // have to use iframe as none of the fixture JS files are in this
+        // page's scope
+        this.timeout(10000);
+        return withIframe("/fixtures/blank.html", function (_a) {
+            var navigator = _a.navigator;
+            navigator.serviceWorker.register("./test-register-worker.js");
+            return navigator.serviceWorker.ready.then(function (reg) {
+                return navigator.serviceWorker.getRegistration().then(function (reg2) {
+                    chai_1.equal(reg, reg2);
+                });
+            });
+        });
+    });
+    it("Should be controller on a newly created client", function () {
+        return withIframe("/fixtures/blank.html", function (parentWindow) {
+            parentWindow.navigator.serviceWorker.register("./test-register-worker.js");
+            return parentWindow.navigator.serviceWorker.ready
+                .then(function (reg) {
+                if (reg.active.state === "activated") {
+                    return;
+                }
+                return new Promise(function (fulfill, reject) {
+                    reg.active.onstatechange = function () {
+                        reg.active.onstatechange = null;
+                        if (reg.active.state == "activated") {
+                            fulfill();
+                        }
+                    };
+                });
+            })
+                .then(function () {
+                // we now have a fully installed worker.
+                return withIframe("/fixtures/blank.html?page2", function (childWindow) {
+                    // shouldn't be necessary, but it is
+                    return childWindow.navigator.serviceWorker.ready.then(function () {
+                        var regURL = new URL("./test-register-worker.js", childWindow.location.href);
+                        chai_1.equal(childWindow.navigator.serviceWorker
+                            .controller.scriptURL, regURL.href);
+                        chai_1.notExists(parentWindow.navigator.serviceWorker
+                            .controller);
+                    });
+                });
+            });
+        });
+    });
+    it("Should fire oncontrollerchange promise", function () {
+        // have to use iframe as none of the fixture JS files are in this
+        // page's scope
+        return withIframe("/fixtures/blank.html", function (_a) {
+            var navigator = _a.navigator;
+            return new Promise(function (fulfill, reject) {
+                navigator.serviceWorker.oncontrollerchange = fulfill;
+                navigator.serviceWorker
+                    .register("./test-take-control-worker.js")
+                    .then(function (reg) {
+                    console.log(reg.active.state);
+                });
+            })
+                .then(function () {
+                chai_1.equal(navigator.serviceWorker.controller.state, "activating");
+                return navigator.serviceWorker.ready;
+            })
+                .then(function (reg) {
+                chai_1.equal(navigator.serviceWorker.controller, reg.active);
+            });
+        });
+    });
+    it("Should unregister", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/test-register-worker.js")
+            .then(function (reg) {
+            return reg.unregister();
+        })
+            .then(function () {
+            return navigator.serviceWorker.getRegistrations();
+        })
+            .then(function (regs) {
+            chai_1.equal(regs.length, 0);
+            chai_1.notExists(navigator.serviceWorker.controller);
+        });
+    });
+    it("Should register with specified scope", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/test-register-worker.js", {
+            scope: "/fixtures/a-test-scope"
+        })
+            .then(function (reg) {
+            chai_1.equal(reg.scope, new URL("/fixtures/a-test-scope", window.location.href).href);
+        });
+    });
+    it("Should fail when loading out of scope", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/test-register-worker.js", {
+            scope: "/no-fixtures/"
+        })
+            .catch(function (err) {
+            return "Errored!";
+        })
+            .then(function (result) {
+            chai_1.equal(result, "Errored!");
+        });
+    });
+    it("Should fail when loading off-domain", function () {
+        return navigator.serviceWorker
+            .register("https://www.example.com/test-worker.js")
+            .catch(function (err) {
+            return "Errored!";
+        })
+            .then(function (result) {
+            chai_1.equal(result, "Errored!");
+        });
+    });
+    it("Should not automatically claim a registrant that isn't in scope", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/test-register-worker.js")
+            .then(function (result) {
+            return waitUntilWorkerIsActivated(result.installing);
+        })
+            .then(function () {
+            chai_1.notExists(navigator.serviceWorker.controller);
+        });
+    });
+    it("Should take over a less specific scope", function () {
+        return withIframe("/fixtures/subscope/blank.html", function (parentFrame) {
+            return parentFrame.navigator.serviceWorker
+                .register("/fixtures/test-register-worker.js", {
+                scope: "/fixtures/"
+            })
+                .then(function (reg) {
+                return waitUntilWorkerIsActivated(reg.installing);
+            })
+                .then(function () {
+                return parentFrame.navigator.serviceWorker.register("/fixtures/test-take-control-worker.js", {
+                    scope: "/fixtures/subscope/"
+                });
+            })
+                .then(function (reg) { return waitUntilWorkerIsActivated(reg.installing); })
+                .then(function () {
+                chai_1.equal(parentFrame.navigator.serviceWorker.controller
+                    .scriptURL, new URL("/fixtures/test-take-control-worker.js", window.location.href).href);
+            });
+        });
+    });
+    it("Should not take over a more specific scope", function () {
+        return withIframe("/fixtures/subscope/blank.html", function (_a) {
+            var navigator = _a.navigator;
+            return navigator.serviceWorker
+                .register("/fixtures/test-take-control-worker.js?subscope", {
+                scope: "/fixtures/subscope/"
+            })
+                .then(function (reg) {
+                return waitUntilWorkerIsActivated(reg.installing);
+            })
+                .then(function (worker) {
+                chai_1.exists(navigator.serviceWorker.controller);
+                return navigator.serviceWorker.register("/fixtures/test-take-control-worker.js?notsubscope", {
+                    scope: "/fixtures/"
+                });
+            })
+                .then(function (reg) {
+                return waitUntilWorkerIsActivated(reg.installing);
+            })
+                .then(function () {
+                chai_1.equal(navigator.serviceWorker.controller.scriptURL, new URL("/fixtures/test-take-control-worker.js?subscope", window.location.href).href);
+            });
+        });
+    });
+});
+
+describe("Service Worker", function () {
+    afterEach(function () {
+        return unregisterEverything();
+    });
+    it("Should post a message", function (done) {
+        var channel = new MessageChannel();
+        var numberOfMessages = 0;
+        channel.port2.onmessage = function (e) {
+            console.timeEnd("Round-trip message");
+            numberOfMessages++;
+            console.log(e);
+            e.ports[0].onmessage = function () {
+                console.timeEnd("Second round-trip message");
+                done();
+            };
+            console.time("Second round-trip message");
+            e.ports[0].postMessage("reply");
+        };
+        navigator.serviceWorker
+            .register("/fixtures/test-message-reply-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            console.time("Round-trip message");
+            worker.postMessage({ hello: "there", port: channel.port1 }, [
+                channel.port1
+            ]);
+        });
+    });
+    it("Should import a script successfully", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                self.testValue = \"unset\";\n                importScripts(\"./script-to-import.js\");\n                return self.testValue;\n                ");
+        })
+            .then(function (returnValue) {
+            chai_1.equal(returnValue, "set");
+        });
+    });
+    it("Should import multiple scripts successfully", function () {
+        return navigator.serviceWorker
+            .register("/fixtures/exec-worker.js")
+            .then(function (reg) {
+            return waitUntilWorkerIsActivated(reg.installing);
+        })
+            .then(function (worker) {
+            return execInWorker(worker, "\n                self.testValue = \"unset\";\n                importScripts(\"./script-to-import.js\",\"./script-to-import2.js\");\n                return self.testValue;\n                ");
+        })
+            .then(function (returnValue) {
+            chai_1.equal(returnValue, "set again");
+        });
+    });
+    it("Should send fetch events to worker, and worker should respond", function () {
+        return withIframe("/fixtures/blank.html", function (_a) {
+            var window = _a.window, navigator = _a.navigator;
+            navigator.serviceWorker.register("./test-response-worker.js");
+            return new Promise(function (fulfill) {
+                navigator.serviceWorker.oncontrollerchange = fulfill;
+            })
+                .then(function (reg) {
+                return window.fetch("testfile?test=hello");
+            })
+                .then(function (res) {
+                chai_1.equal(res.status, 200);
+                chai_1.equal(res.headers.get("content-type"), "application/json");
+                return res.json();
+            })
+                .then(function (json) {
+                chai_1.equal(json.success, true);
+                chai_1.equal(json.queryValue, "hello");
+            });
+        });
+    });
+    // it.only("Should successfully open an indexedDB database", function() {
+    //     this.timeout(50000);
+    //     return navigator.serviceWorker
+    //         .register("/fixtures/exec-worker.js")
+    //         .then(reg => {
+    //             return waitUntilWorkerIsActivated(reg.installing!);
+    //         })
+    //         .then(worker => {
+    //             return execInWorker(
+    //                 worker,
+    //                 `
+    //         return new Promise((fulfill,reject) => {
+    //             try {
+    //                 console.log("do open")
+    //                 var openRequest = indexedDB.open("testDB",1);
+    //                 console.log("request successful")
+    //                 openRequest.onsuccess = () => {
+    //                     // fulfill(true)
+    //                 };
+    //                 openRequest.onerror = (err) => {
+    //                     reject(err)
+    //                 };
+    //             } catch (err) {
+    //                 console.log("error caught");
+    //                 reject(err)
+    //             }
+    //         })
+    //         `
+    //             );
+    //         })
+    //         .then(returnValue => {
+    //             assert.equal(returnValue, true);
+    //         });
+    // });
 });
 
 function describeIfApp(desc, target) {
-    if (window.NOT_APP === true) {
+    if (!window.swwebviewSettings) {
         xdescribe(desc, target);
     }
     else {
@@ -11345,6 +11566,7 @@ function describeIfApp(desc, target) {
 
 exports.describeIfApp = describeIfApp;
 
-return exports;
+Object.defineProperty(exports, '__esModule', { value: true });
 
-}({},swwebviewSettings));
+})));
+//# sourceMappingURL=tests.js.map

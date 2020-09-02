@@ -30,6 +30,8 @@ public class SWWebView: WKWebView {
             .appendingPathComponent("js-dist", isDirectory: true)
             .appendingPathComponent("runtime.js")
 
+        print("开始注入 js-dist/runtime.js from \(pathToJS)")
+
         let jsRuntimeSource: String
 
         do {
