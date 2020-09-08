@@ -99,7 +99,9 @@ import PromiseKit
     fileprivate var loadingExecutionEnvironmentPromise: Promise<ServiceWorkerExecutionEnvironment>?
 
     internal func getExecutionEnvironment() -> Promise<ServiceWorkerExecutionEnvironment> {
+        print("Step 0: getExecutionEnvironment")
         if let exec = _executionEnvironment {
+            print("Step 0: return existing env")
             return Promise.value(exec)
         }
 
@@ -108,14 +110,14 @@ import PromiseKit
             // getExecutionEnvironment() could be run while an existing environment
             // is being created. Adding this promise means we can close that loop
             // and ensure we only ever have one environment per worker.
-
+            print("Step 0: return loading promise")
             return loadingPromise
         }
 
         // Being lazy means that we can create instances of ServiceWorker whenever we feel
         // like it (like, say, when ServiceWorkerRegistration is populating active, waiting etc)
         // without incurring a huge penalty for doing so.
-
+        print("Step 0: finally create a new worker")
         Log.info?("Creating execution environment for worker: " + self.id)
 
         return firstly { () -> Promise<ServiceWorkerExecutionEnvironment> in
@@ -130,6 +132,8 @@ import PromiseKit
                 do {
                     let env = try ServiceWorkerExecutionEnvironment(self)
 
+
+                    print("Step 1: 尝试获取 worker 执行上下文")
                     // Return the promise early, before we run...
                     seal.fulfill(env)
 
@@ -137,9 +141,11 @@ import PromiseKit
                     // point the run loop is terminated and this function will complete, closing
                     // down the thread.
 
+                    print("Step 1: 已经获取 worker 执行上下文成功 GKD")
                     env.run()
 
                 } catch {
+                    print("Step 1: 获取 worker 执行上下文失败")
                     seal.reject(error)
                 }
             }
@@ -148,6 +154,7 @@ import PromiseKit
         }
         .then { env -> Promise<ServiceWorkerExecutionEnvironment> in
 
+            print("Step 2: 获取执行上下文内容下一步 准备执行 worker 脚本")
             // Now that we have a context, we need to load the actual worker script.
 
             guard let delegate = self.delegate else {
@@ -162,6 +169,7 @@ import PromiseKit
 
             let eval = ServiceWorkerExecutionEnvironment.EvaluateScriptCall(script: script, url: self.url, passthrough: passthrough, returnType: .void)
 
+            print("Step 2: 开始执行脚本了嗷，脚本内容 \(script)")
             env.perform(#selector(ServiceWorkerExecutionEnvironment.evaluateScript(_:)), on: env.thread, with: eval, waitUntilDone: false)
 
             let finalChain = promise
@@ -182,7 +190,7 @@ import PromiseKit
 
             // As mentioned above, this is set to ensure we don't have two environments
             // created for one worker
-
+            print("Step 2: 可能能搞定。loadingExecutingEnvironment")
             self.loadingExecutionEnvironmentPromise = finalChain
 
             return finalChain
@@ -201,7 +209,7 @@ import PromiseKit
     public func evaluateScript<T>(_ script: String) -> Promise<T> {
         return self.getExecutionEnvironment()
             .then { (exec: ServiceWorkerExecutionEnvironment) -> Promise<T> in
-
+                print("#evaluateScript \(script)")
                 // We deliberately don't return any kind of JSValue from ServiceWorkerExecutionEnvironment, to avoid
                 // any leaking across threads. But JSContextPromise requires a JSValue in order to be created, so
                 // we need to pass in an extra argument - if returnType is .promise then the ExecutionEnvironment will
@@ -216,6 +224,7 @@ import PromiseKit
 
                 exec.perform(#selector(ServiceWorkerExecutionEnvironment.evaluateScript), on: exec.thread, with: call, waitUntilDone: false)
 
+                print("Step other: 通过 evaluateScript 执行脚本")
                 return promise
             }
     }
@@ -224,10 +233,11 @@ import PromiseKit
     /// sometimes it's necessary to perform some custom code directly onto our JSContext.
     public func withJSContext(_ cb: @escaping (JSContext) throws -> Void) -> Promise<Void> {
         let call = ServiceWorkerExecutionEnvironment.WithJSContextCall(cb)
-
+        print("Step other: withJSContext:", call)
         return self.getExecutionEnvironment()
             .done { exec in
                 exec.perform(#selector(ServiceWorkerExecutionEnvironment.withJSContext), on: exec.thread, with: call, waitUntilDone: false)
+                print("Step other: withJSContext:", call, " done")
             }
     }
 
@@ -235,6 +245,7 @@ import PromiseKit
     /// is just a wrapper to ensure we end up on the worker thread.
     public func dispatchEvent(_ event: Event) -> Promise<Void> {
         let call = ServiceWorkerExecutionEnvironment.DispatchEventCall(event)
+        print("Step other: dispatchEvent:", event, " type: \(event.type)")
 
         // Need to actually profile whether this matters for performance, but if the exec environment already
         // exists we just use it directly, rather than call the promise. The promise should return immediately
@@ -249,11 +260,13 @@ import PromiseKit
             return self
                 .getExecutionEnvironment()
                 .then { exec -> Promise<Void> in
-                    exec.perform(#selector(ServiceWorkerExecutionEnvironment.dispatchEvent), on: exec.thread, with: call, waitUntilDone: false)
+                     exec.perform(#selector(ServiceWorkerExecutionEnvironment.dispatchEvent), on: exec.thread, with: call, waitUntilDone: false)
+                    print("Step other: dispatchEvent:", event, " type: \(event.type)", " done")
                     return .value
                 }
                 .then { () -> Promise<Void> in
-                    call.resolveVoid()
+                    print("Step other: dispatchEvent:", event, " type: \(event.type)", " done in next")
+                    return call.resolveVoid()
                 }
         }
     }

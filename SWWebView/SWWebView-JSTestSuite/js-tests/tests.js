@@ -10970,7 +10970,7 @@ describe("CacheStorage", function () {
         return navigator.serviceWorker
             .getRegistration("/fixtures/")
             .then(function (reg) {
-            return execInWorker(reg.active, "\n                return caches.keys().then(keys => {\n                    return Promise.all(keys.map(k => caches.delete(k)));\n                });\n            ");
+            return execInWorker(reg.active, "\n                    console.log(\"END CACHE STORAGE TEST\");\n                return caches.keys().then(keys => {\n                    return Promise.all(keys.map(k => caches.delete(k)));\n                });\n            ");
         })
             .then(function () {
             return unregisterEverything();
@@ -10983,7 +10983,7 @@ describe("CacheStorage", function () {
             return waitUntilWorkerIsActivated(reg.installing);
         })
             .then(function (worker) {
-            return execInWorker(worker, "\n                return caches.open(\"test-cache\")\n                .then(() => {\n                    return caches.keys()\n                })\n            ");
+            return execInWorker(worker, "\n                    console.log(\"OPEN test-cache 1\");\n                        return caches.open(\"test-cache\")\n                        .then(() => {\n                    return caches.keys()\n                })\n            ");
         })
             .then(function (response) {
             chai_1.equal(response.length, 1);
@@ -10999,7 +10999,7 @@ describe("CacheStorage", function () {
             .then(function (worker) {
             return execInWorker(worker, "return caches.has('test-cache')").then(function (response) {
                 chai_1.equal(response, false);
-                return execInWorker(worker, "return caches.open('test-cache').then(() => caches.has('test-cache'))");
+                return execInWorker(worker, "\n                            console.log(\"OPEN test-cache 2\");\n                            return caches.open('test-cache')\n                                .then(() => caches.has('test-cache'))\n                        ");
             });
         })
             .then(function (response2) {
@@ -11013,7 +11013,7 @@ describe("CacheStorage", function () {
             return waitUntilWorkerIsActivated(reg.installing);
         })
             .then(function (worker) {
-            return execInWorker(worker, "return caches.open('test-cache')\n                        .then(() => caches.delete('test-cache'))\n                        .then(() => caches.has('test-cache'))");
+            return execInWorker(worker, "\n                            console.log(\"OPEN test-cache 3\");\n                            return caches.open('test-cache')\n                        .then(() => caches.delete('test-cache'))\n                        .then(() => caches.has('test-cache'))");
         })
             .then(function (response2) {
             chai_1.equal(response2, false);

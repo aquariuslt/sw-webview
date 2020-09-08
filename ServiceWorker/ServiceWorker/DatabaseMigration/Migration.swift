@@ -67,6 +67,7 @@ public class DatabaseMigration {
                     do {
                         try connection.exec(sql: sql)
                     } catch {
+                        Log.info?("Processing migration file failed.");
                         throw ErrorMessage("Error when attempting migration: " + migration.fileName.absoluteString + ", internal error: " + String(describing: error))
                     }
                 }

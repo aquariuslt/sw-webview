@@ -39,6 +39,8 @@
 		8AF85D751F3A2747001B0A87 /* ServiceWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; };
 		8AF85D941F3A3A39001B0A87 /* js-dist in Resources */ = {isa = PBXBuildFile; fileRef = 8AF85D931F3A39D3001B0A87 /* js-dist */; };
 		8AF85DB41F3B6900001B0A87 /* EventStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF85DB31F3B6900001B0A87 /* EventStream.swift */; };
+		AF3BE67A250768910027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AF3BE67F25076BA00027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,26 @@
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF3BE678250768270027C604 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AF3BE67A250768910027C604 /* ServiceWorker.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		AF3BE67E25076B900027C604 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AF3BE67F25076BA00027C604 /* ServiceWorker.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -265,6 +287,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8A5D98331F3E0D77002E521F /* Build configuration list for PBXNativeTarget "SWWebView-JSTestSuite" */;
 			buildPhases = (
+				AF3BE678250768270027C604 /* CopyFiles */,
 				8A5D98201F3E0D77002E521F /* Sources */,
 				8A5D98211F3E0D77002E521F /* Frameworks */,
 				8A5D98221F3E0D77002E521F /* Resources */,
@@ -288,6 +311,7 @@
 				8A5B361F1F604B6F009F72AC /* SwiftFormat */,
 				8A5B36201F604B8A009F72AC /* SwiftLint */,
 				8AF85DAF1F3A4780001B0A87 /* Compile runtime JS */,
+				AF3BE67E25076B900027C604 /* CopyFiles */,
 				8AA76F491F38B81600EFB4E1 /* Sources */,
 				8AA76F4A1F38B81600EFB4E1 /* Frameworks */,
 				8AA76F4B1F38B81600EFB4E1 /* Headers */,
@@ -660,6 +684,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.gdnmobilelab.SWWebView;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64 arm64-apple-ios x86";
@@ -682,6 +707,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.gdnmobilelab.SWWebView;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
