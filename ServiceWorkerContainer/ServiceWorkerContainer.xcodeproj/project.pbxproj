@@ -33,6 +33,7 @@
 		8AF85D851F3A28C3001B0A87 /* PromiseAssert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF85D801F3A289B001B0A87 /* PromiseAssert.swift */; };
 		8AF85D871F3A2A0C001B0A87 /* ServiceWorkerContainerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF85D861F3A2A0C001B0A87 /* ServiceWorkerContainerExtensions.swift */; };
 		8AF85D8E1F3A31AA001B0A87 /* DatabaseMigrations in Resources */ = {isa = PBXBuildFile; fileRef = 8AF85D8D1F3A3134001B0A87 /* DatabaseMigrations */; };
+		AF3BE686250794590027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8A23604D1F35FE4A00969268 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,19 @@
 			remoteInfo = ServiceWorker;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AF3BE685250794480027C604 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AF3BE686250794590027C604 /* ServiceWorker.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		8A181AB41F7564F8005CED14 /* SQLiteCacheStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteCacheStorage.swift; sourceTree = "<group>"; };
@@ -280,6 +294,7 @@
 			buildPhases = (
 				8A5B361B1F5F57AE009F72AC /* SwiftFormat */,
 				8A5B361D1F5F57C9009F72AC /* SwiftLint */,
+				AF3BE685250794480027C604 /* CopyFiles */,
 				8A23600C1F35FDCC00969268 /* Sources */,
 				8A23600D1F35FDCC00969268 /* Frameworks */,
 				8A23600E1F35FDCC00969268 /* Headers */,
@@ -327,6 +342,7 @@
 					8A2360101F35FDCC00969268 = {
 						CreatedOnToolsVersion = 9.0;
 						LastSwiftMigration = 1160;
+						ProvisioningStyle = Automatic;
 					};
 					8A2360191F35FDCC00969268 = {
 						CreatedOnToolsVersion = 9.0;
@@ -618,9 +634,11 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
+				DEVELOPMENT_TEAM = 964Y87Q87P;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -631,8 +649,10 @@
 				INFOPLIST_FILE = ServiceWorkerContainer/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.gdnmobilelab.ServiceWorkerContainer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aquariuslt.ServiceWorkerContainer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -645,9 +665,11 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
+				DEVELOPMENT_TEAM = 964Y87Q87P;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -658,8 +680,10 @@
 				INFOPLIST_FILE = ServiceWorkerContainer/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.gdnmobilelab.ServiceWorkerContainer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aquariuslt.ServiceWorkerContainer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s arm64-apple-ios arm64-apple-ios-simulator x86_64 x86";
@@ -670,7 +694,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
+				DEVELOPMENT_TEAM = 964Y87Q87P;
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../Carthage/**",
 					"$(inherited)",
@@ -688,7 +712,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
+				DEVELOPMENT_TEAM = 964Y87Q87P;
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../Carthage/**",
 					"$(inherited)",

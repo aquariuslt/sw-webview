@@ -39,8 +39,10 @@
 		8AF85D751F3A2747001B0A87 /* ServiceWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; };
 		8AF85D941F3A3A39001B0A87 /* js-dist in Resources */ = {isa = PBXBuildFile; fileRef = 8AF85D931F3A39D3001B0A87 /* js-dist */; };
 		8AF85DB41F3B6900001B0A87 /* EventStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF85DB31F3B6900001B0A87 /* EventStream.swift */; };
-		AF3BE67A250768910027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AF3BE67F25076BA00027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AF3BE682250782E40027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8A5D980B1F3DF55B002E521F /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AF3BE689250798090027C604 /* ServiceWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF3BE688250798090027C604 /* ServiceWorker.framework */; };
+		AF3BE68A250798090027C604 /* ServiceWorker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AF3BE688250798090027C604 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,20 +62,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				AF3BE68A250798090027C604 /* ServiceWorker.framework in Embed Frameworks */,
 				8AABC4201F6082DA00429EF3 /* SWWebView.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AF3BE678250768270027C604 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				AF3BE67A250768910027C604 /* ServiceWorker.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 1;
 		};
 		AF3BE67E25076B900027C604 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -81,6 +74,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				AF3BE682250782E40027C604 /* ServiceWorker.framework in CopyFiles */,
 				AF3BE67F25076BA00027C604 /* ServiceWorker.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
@@ -124,6 +118,7 @@
 		8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceWorker.framework; path = "../../../Library/Developer/Xcode/DerivedData/SWWebView-asilpmvykkqkfehhurjnoakeivko/Build/Products/Debug-iphonesimulator/ServiceWorker.framework"; sourceTree = "<group>"; };
 		8AF85D931F3A39D3001B0A87 /* js-dist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "js-dist"; sourceTree = "<group>"; };
 		8AF85DB31F3B6900001B0A87 /* EventStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStream.swift; sourceTree = "<group>"; };
+		AF3BE688250798090027C604 /* ServiceWorker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ServiceWorker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF3BE689250798090027C604 /* ServiceWorker.framework in Frameworks */,
 				8AABC41F1F6082DA00429EF3 /* SWWebView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -238,6 +234,7 @@
 		8AF85D511F38BA1D001B0A87 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AF3BE688250798090027C604 /* ServiceWorker.framework */,
 				8AF85D741F3A2747001B0A87 /* ServiceWorker.framework */,
 				8A5D980B1F3DF55B002E521F /* ServiceWorker.framework */,
 				8A5D980A1F3DF55B002E521F /* ServiceWorkerContainer.framework */,
@@ -287,7 +284,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8A5D98331F3E0D77002E521F /* Build configuration list for PBXNativeTarget "SWWebView-JSTestSuite" */;
 			buildPhases = (
-				AF3BE678250768270027C604 /* CopyFiles */,
 				8A5D98201F3E0D77002E521F /* Sources */,
 				8A5D98211F3E0D77002E521F /* Frameworks */,
 				8A5D98221F3E0D77002E521F /* Resources */,
@@ -343,6 +339,7 @@
 					8AA76F4D1F38B81600EFB4E1 = {
 						CreatedOnToolsVersion = 9.0;
 						LastSwiftMigration = 1160;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -672,9 +669,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
+				DEVELOPMENT_TEAM = 964Y87Q87P;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -683,6 +681,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.aquariuslt.SWWebView;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -695,9 +694,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 998P9U5NGJ;
+				DEVELOPMENT_TEAM = 964Y87Q87P;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -706,6 +706,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.aquariuslt.SWWebView;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
