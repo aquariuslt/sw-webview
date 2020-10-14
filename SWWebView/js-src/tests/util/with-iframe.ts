@@ -9,6 +9,7 @@ export function withIframe(
             fulfill(
                 Promise.resolve(cb(iframe.contentWindow))
                     .then(() => {
+                        // @ts-ignore
                         return iframe.contentWindow.navigator.serviceWorker.getRegistrations();
                     })
                     .then((regs: ServiceWorkerRegistration[]) => {
@@ -26,7 +27,9 @@ export function withIframe(
                                 // }, 10);
                             }, 1);
                         });
-                    })
+                    }).catch((error) => {
+                    console.log('with frame error:', error)
+                })
             );
         };
 

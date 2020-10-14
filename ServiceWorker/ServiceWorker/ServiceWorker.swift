@@ -199,6 +199,7 @@ import PromiseKit
 
     deinit {
         Log.info?("Service Worker \(self.id) has been deinitialised")
+        print("Service worker \(self.id) has been deinitialised")
         if let exec = self._executionEnvironment {
             exec.perform(#selector(ServiceWorkerExecutionEnvironment.stop), on: exec.thread, with: nil, waitUntilDone: true)
         }

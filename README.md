@@ -56,6 +56,8 @@ But for now, take it for a spin! If you see anything that behaves weirdly or if 
 
 ## 中文指南 (for XCode 12)
 
+> 推荐使用 iOS 12.1 版本模拟器，还未对iOS 13+ 进行兼容
+
 1. 使用 `carthage` 安装依赖 (如系统无 carthage 包管理器，需要执行 `brew install carthage`)
 
 ```bash

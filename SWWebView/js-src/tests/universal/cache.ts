@@ -27,12 +27,14 @@ describe("Cache", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
+                console.log('[cache.ts]:', 'before waitUntilWorkerIsActivated');
                 return waitUntilWorkerIsActivated(reg.installing!);
             })
             .then(worker => {
                 return execInWorker(
                     worker,
                     `
+                    console.log('[cache.ts]:', 'after waitUntilWorkerIsActivated');
                     let request = new Request('/');
                     let response = new Response("hello");
                     
@@ -40,6 +42,7 @@ describe("Cache", () => {
                         .then((cache) => {
                             return cache.put(request, response)
                             .then(() => {
+                                console.log('[cache.ts]:', 'open cache and before executing cache.match(request)');
                                 return cache.match(request);
                             })
                         })
