@@ -39,7 +39,7 @@ First and foremost, it's an experiment. So it is in no way ready for production 
 The project uses Carthage for iOS dependencies and NPM for JavaScript dependencies. So make sure you have both installed. Then:
 
  1. Clone this repo
- 2. Go to the repo directory and type `carthage bootstrap` to install the iOS dependencies.
+ 2. Go to the repo directory and type `./carthage.sh bootstrap` to install the iOS dependencies.
  3. Go to the `SWWebView/js-src` directory and type `npm install` to install the JavaScript dependencies
 
 ## Running
@@ -51,3 +51,33 @@ Right now the easiest way to take a look at the project running is to open `SWWe
 If you're interested in the project and want to contribute: you are brilliant. But I'd hold off getting too excited just yet - I still need to go through and add a lot of comments to the `ServiceWorkerContainer` and `SWWebView` modules (I know, I know, I should do it as I go along) so that it's even possible to work out what's going on. Then identify which features are missing and how they might be implemented. *Then* we're good to go.
 
 But for now, take it for a spin! If you see anything that behaves weirdly or if you have any thoughts on the project in general, please do [let me know](https://twitter.com/_alastair).
+
+
+
+## 中文指南 (for XCode 12)
+
+1. 使用 `carthage` 安装依赖 (如系统无 carthage 包管理器，需要执行 `brew install carthage`)
+
+```bash
+./carthage.sh bootstrap --platform iOS
+```
+
+
+2. 使用模拟器运行项目时，需要一个 `nodejs` 环境以便运行本地的 js 逻辑 (官网 nodejs.org 下载 pkg安装 or `brew install node`)
+
+
+
+```bash
+cd SWWebView/js-src
+
+## 安装依赖 (只用执行一次)
+npm install
+
+## 每次启动项目/更变js代码都要执行
+npm run build-tests
+npm run test-watch
+```
+
+3. 使用模拟器编译运行项目 `SWWebView-JSTestSuite`
+
+

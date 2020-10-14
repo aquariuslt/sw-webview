@@ -10970,13 +10970,20 @@ describe("CacheStorage", function () {
         return navigator.serviceWorker
             .getRegistration("/fixtures/")
             .then(function (reg) {
-            return execInWorker(reg.active, "\n                    console.log(\"END CACHE STORAGE TEST\");\n                return caches.keys().then(keys => {\n                    return Promise.all(keys.map(k => caches.delete(k)));\n                });\n            ");
+            if (reg !== undefined) {
+                return execInWorker(reg.active, "\n                    console.log(\"(afterEach): END CACHE STORAGE TEST\");\n                return caches.keys().then(keys => {\n                    return Promise.all(keys.map(k => caches.delete(k)));\n                });\n            ");
+            }
+            else {
+                return Promise.resolve(null);
+            }
         })
             .then(function () {
+            console.log("unregisterEverything.");
             return unregisterEverything();
         });
     });
     it("should open a cache and record it in list of keys", function () {
+        console.log("============= Start Cache Storage 1 ===============");
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(function (reg) {
@@ -10991,6 +10998,7 @@ describe("CacheStorage", function () {
         });
     });
     it("should return correct values for has()", function () {
+        console.log("============= Start Cache Storage 2 ===============");
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(function (reg) {
@@ -10999,7 +11007,7 @@ describe("CacheStorage", function () {
             .then(function (worker) {
             return execInWorker(worker, "return caches.has('test-cache')").then(function (response) {
                 chai_1.equal(response, false);
-                return execInWorker(worker, "\n                            console.log(\"OPEN test-cache 2\");\n                            return caches.open('test-cache')\n                                .then(() => caches.has('test-cache'))\n                        ");
+                return execInWorker(worker, "\n                            console.log(\"OPEN test-cache 2\");\n                            return caches.open('test-cache')\n                                .then(() => {\n                                    return caches.has('test-cache')\n                                })\n                        ");
             });
         })
             .then(function (response2) {
@@ -11007,6 +11015,7 @@ describe("CacheStorage", function () {
         });
     });
     it("should delete() successfully", function () {
+        console.log("============= Start Cache Storage 2 ===============");
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(function (reg) {
