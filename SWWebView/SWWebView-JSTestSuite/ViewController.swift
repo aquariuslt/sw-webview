@@ -48,7 +48,7 @@ class ViewController: UIViewController {
 
         // MARK: - Home URL
 
-        let urlString = "sw://localhost:4567"
+        let urlString = "sw://localhost:4567/tests.html"
 
         guard let urlComps = URLComponents(string: urlString), let host = urlComps.host else {
             fatalError("must provide a valid url")
