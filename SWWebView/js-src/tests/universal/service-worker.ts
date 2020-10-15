@@ -83,48 +83,55 @@ describe("Service Worker", () => {
     });
 
     it("Should send fetch events to worker, and worker should respond", (done) => {
+        navigator.serviceWorker.register("/fixtures/test-response-worker.js")
+            .then((reg)=>{
+                new Promise((resolve => {
+                    navigator.serviceWorker.oncontrollerchange = resolve;
+                }))
 
-        withIframe("/fixtures/blank.html", ({window, navigator}) => {
-            navigator.serviceWorker.register("./test-response-worker.js");
-
-            return new Promise(fulfill => {
-                navigator.serviceWorker.oncontrollerchange = fulfill;
+                // return Promise.resolve(reg);
             })
-                .then(reg => {
-                    window.fetch('testfile?test=bb')
-                        .then((res) => {
-                            return res.json();
-                        }).then((res) => {
-                        console.log('bb response' + JSON.stringify(res))
-                    });
-
-                    console.log('check if is new Fetch:', window.isNewFetch)
-                    console.log('check if is new XHR:', window.isNewXHR)
-                    window.axios.get('testfile?test=axios')
-                        .then((res) => {
-                            console.log('axios response' + JSON.stringify(res))
-                        })
-                        .catch((error) => {
-                            console.error('axios error' + error)
-                        })
-                    ;
-
-                    return window.fetch("testfile?test=hello");
-                })
-                .then(res => {
-                    assert.equal(res.status, 200);
-                    assert.equal(
-                        res.headers.get("content-type"),
-                        "application/json"
-                    );
-                    return res.json();
-                })
-                .then(json => {
-                    assert.equal(json.success, true);
-                    assert.equal(json.queryValue, "hello");
-                    done();
+            .then(reg => {
+                console.log('complete registeration:', reg);
+                window.fetch('/fixtures/testfile?test=bb')
+                    .then((res) => {
+                        return res.json();
+                    }).then((res) => {
+                    console.log('bb response' + JSON.stringify(res))
                 });
-        });
+
+                console.log('check if is new Fetch:', window.isNewFetch)
+                console.log('check if is new XHR:', window.isNewXHR)
+
+                console.log('check referer before XHR, location.href:', window.location.href, 'document.referrer', document.referrer)
+
+                const xhrRequest = new XMLHttpRequest();
+                xhrRequest.addEventListener('load', () => {
+                    console.log('response.status:', xhrRequest.status);
+                    console.log('response.content:', xhrRequest.responseText)
+                })
+                // xhrRequest.setRequestHeader("Referrer-Policy", "origin");
+                xhrRequest.open('GET', '/fixtures/testfile?test=axios');
+                xhrRequest.send();
+
+                return window.fetch("/fixtures/testfile?test=hello");
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
+                assert.equal(
+                    res.headers.get("content-type"),
+                    "application/json"
+                );
+                return res.json();
+            })
+            .then(json => {
+                assert.equal(json.success, true);
+                assert.equal(json.queryValue, "hello");
+                done();
+            })
+
+
+
     });
 
 
@@ -158,7 +165,7 @@ describe("Service Worker", () => {
                     done();
                 })
                 .catch((error) => {
-                    console.error('response error is',error)
+                    console.error('response error is', error)
                     done();
                 });
         });

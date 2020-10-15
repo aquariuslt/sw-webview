@@ -72,10 +72,14 @@ public class SWURLSchemeTask {
         // Because WKURLSchemeTask doesn't receive POST bodies (rdar://33814386) we have to
         // graft them into a header. Gross. Hopefully this gets fixed.
 
+
         let graftedBody = underlyingTask.request.value(forHTTPHeaderField: SWWebViewBridge.graftedRequestBodyHeader)
+
+        print("开始从 header. X-Grafted-Request-Body 中读取数据, url:", requestURL, request.allHTTPHeaderFields);
 
         if let body = graftedBody {
             request.httpBody = body.data(using: .utf8)
+            print("搞到 graftedBody: ", requestURL, body.data(using: .utf8))
         }
 
         self.request = request

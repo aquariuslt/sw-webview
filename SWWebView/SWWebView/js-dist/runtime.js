@@ -49,6 +49,10 @@ if (originalFetch.__bodyGrafted !== true) {
         console.log('使用 wrap 过的 XHR 请求 send():' + data);
         originalSend_1.apply(this, arguments);
     };
+    // @ts-ignore
+    window.isNewFetch = 1;
+    // @ts-ignore
+    window.isNewXHR = 1;
 }
 
 function E() {
@@ -194,6 +198,7 @@ var StreamingXHR = /** @class */ (function (_super) {
         // this.xhr.send();
     };
     StreamingXHR.prototype.addEventListener = function (type, func) {
+        console.log("[Streaming XHR]: addEventListener:" + type);
         _super.prototype.addEventListener.call(this, type, func);
         if (this.subscribedEvents.indexOf(type) === -1) {
             if (this.eventSource) {
@@ -206,6 +211,7 @@ var StreamingXHR = /** @class */ (function (_super) {
         // this.eventSource.addEventListener(type, func);
     };
     StreamingXHR.prototype.receiveNewEvent = function (e) {
+        console.log("[Streaming XHR]: receiveNewEvent:" + e.type);
         if (e.isTrusted === false) {
             return;
         }

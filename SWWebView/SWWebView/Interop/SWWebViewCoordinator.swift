@@ -28,7 +28,7 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
     var inUseContainers: [ContainerAndUsageNumber] = []
 
     public func container(_ webview: SWWebView, createContainerFor url: URL) throws -> ServiceWorkerContainer {
-        if var alreadyExists = self.inUseContainers.first(where: { $0.webview == webview && $0.container.url.hasSameScope(with: url) }) {
+        if var alreadyExists = self.inUseContainers.first(where: { $0.webview == webview && $0.container.url.absoluteString == url.absoluteString }) {
             alreadyExists.numUsing += 1
             Log.info?("Returning existing ServiceWorkerContainer for \(url.absoluteString). It has \(alreadyExists.numUsing) other clients")
             return alreadyExists.container
@@ -44,8 +44,17 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
 
     public func container(_ webview: SWWebView, getContainerFor url: URL) -> ServiceWorkerContainer? {
         let container = self.inUseContainers.first(where: {
-            $0.webview == webview && $0.container.url.hasSameScope(with: url)
+
+            if ($0.webview == webview) {
+                print("$0.container.url.absoluteString:", $0.container.url.absoluteString, "url.absoluteString:", url.absoluteString)
+            }
+            // TODO: 这里 referer 的资料得多看看，fix it
+            if ($0.webview == webview && url.absoluteString  != nil) {
+                return true;
+            }
+            return false;
         })?.container
+
 
         if container == nil {
             Log.debug?("No container for: \(url)")

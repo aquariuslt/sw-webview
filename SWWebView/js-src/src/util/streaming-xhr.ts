@@ -91,6 +91,7 @@ export class StreamingXHR extends EventEmitter {
         type: string,
         func: (e: CustomMessageEvent<T>) => void
     ) {
+        console.log(`[Streaming XHR]: addEventListener:` + type)
         super.addEventListener(type, func);
         if (this.subscribedEvents.indexOf(type) === -1) {
             if (this.eventSource) {
@@ -104,6 +105,8 @@ export class StreamingXHR extends EventEmitter {
     }
 
     receiveNewEvent(e: MessageEvent) {
+
+        console.log(`[Streaming XHR]: receiveNewEvent:` + e.type)
         if (e.isTrusted === false) {
             return;
         }

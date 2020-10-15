@@ -53,4 +53,9 @@ if ((originalFetch as any).__bodyGrafted !== true) {
         console.log('使用 wrap 过的 XHR 请求 send():' + data);
         originalSend.apply(this, arguments);
     };
+
+    // @ts-ignore
+    window.isNewFetch = 1;
+    // @ts-ignore
+    window.isNewXHR = 1;
 }
