@@ -95,6 +95,7 @@ class ServiceWorkerContainerImplementation extends EventEmitter
         if (newControllerInstance !== this._controller) {
             this._controller = newControllerInstance;
             let evt = new CustomEvent("controllerchange");
+            console.log(`worker 分发 controllerchange 事件`)
             this.dispatchEvent(evt);
         }
     }

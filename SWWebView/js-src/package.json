@@ -1,4 +1,4 @@
- {
+{
   "name": "swwebview-client",
   "version": "1.0.0",
   "description": "",
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/chai": "^4.0.2",
+    "axios": "^0.20.0",
     "chai": "^4.1.1",
     "event-target": "^0.1.0",
     "eventtarget": "^0.1.0",

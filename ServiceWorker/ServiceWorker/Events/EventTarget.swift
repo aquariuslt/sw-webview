@@ -13,6 +13,7 @@ import JavaScriptCore
     fileprivate var listeners: [EventListener] = []
 
     func addEventListener(_ name: String, _ funcToRun: JSValue) {
+        print("[EventTarget in Swift:] calling `addEventListener` with event:" + name);
         // We tie our event listeners to the worker thread, so we need to throw
         // an error if trying to use this function off-thread.
 
@@ -32,6 +33,7 @@ import JavaScriptCore
 
                 return false
             }
+
 
             return jsListener.eventName == name && jsListener.funcToRun == funcToRun
 

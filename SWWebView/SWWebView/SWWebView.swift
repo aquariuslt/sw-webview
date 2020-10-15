@@ -44,9 +44,31 @@ public class SWWebView: WKWebView {
             fatalError()
         }
 
+        let axiosJsRuntimeSource: String;
+
+        let axiosBundleRuntimeJS = Bundle(for: SWWebView.self).bundleURL
+                .appendingPathComponent("js-dist", isDirectory: true)
+                .appendingPathComponent("axios.js")
+
+        print("开始注入 js-dist/axios.js from \(axiosBundleRuntimeJS)")
+
+        do {
+            axiosJsRuntimeSource =  try String(contentsOf: axiosBundleRuntimeJS)
+        } catch {
+            Log.error?("Could not load SWWebKit axios JS. Quitting.")
+
+            // There's something very fundamentally wrong with the app if this happens,
+            // so we hard exit.
+            fatalError()
+        }
+
+
         let userScript = WKUserScript(source: SWWebView.wrapScriptInWebviewSettings(jsRuntimeSource), injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        let axiosScript = WKUserScript(source: SWWebView.wrapScriptInWebviewSettings(axiosJsRuntimeSource), injectionTime: .atDocumentStart, forMainFrameOnly: false)
+
 
         configuration.userContentController.addUserScript(userScript)
+        configuration.userContentController.addUserScript(axiosScript)
 
         configuration.userContentController.add(bridge, name: "SWWebView")
 

@@ -23,7 +23,7 @@ module.exports = {
     ],
     sourceMap: true,
     moduleName: "swwebview",
-    external: ["swwebview-settings"],
+    external: ["swwebview-settings", "axios"],
     globals: {
         "swwebview-settings": "swwebviewSettings"
     }

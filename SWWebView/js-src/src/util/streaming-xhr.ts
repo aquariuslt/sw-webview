@@ -45,6 +45,7 @@ export class StreamingXHR extends EventEmitter {
     }
 
     open() {
+        console.log('[Streaming XHR] called open')
         if (this.isOpen === true) {
             throw new Error("Already open");
         }

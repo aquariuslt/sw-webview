@@ -29,19 +29,24 @@ function graftedFetch(request, opts) {
 graftedFetch.__bodyGrafted = true;
 if (originalFetch.__bodyGrafted !== true) {
     window.fetch = graftedFetch;
+    console.log('fetch 替换成功');
     var originalSend_1 = XMLHttpRequest.prototype.send;
     var originalOpen_1 = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url) {
         var resolvedURL = new URL(url, window.location.href);
         if (resolvedURL.protocol === swwebviewSettings.SW_PROTOCOL + ":") {
+            console.log('设置 _graftBody = true');
             this._graftBody = true;
         }
+        console.log('使用 wrap 过的 XHR 请求 open(), url:' + resolvedURL);
         originalOpen_1.apply(this, arguments);
     };
     XMLHttpRequest.prototype.send = function (data) {
-        if (data && this._graftBody === true) {
+        if (this._graftBody === true) {
+            console.log('wrap 过的 XHR 请求准备发送前设置 header:' + swwebviewSettings.GRAFTED_REQUEST_HEADER + ',' + data);
             this.setRequestHeader(swwebviewSettings.GRAFTED_REQUEST_HEADER, data);
         }
+        console.log('使用 wrap 过的 XHR 请求 send():' + data);
         originalSend_1.apply(this, arguments);
     };
 }
@@ -155,6 +160,7 @@ var StreamingXHR = /** @class */ (function (_super) {
     };
     StreamingXHR.prototype.open = function () {
         var _this = this;
+        console.log('[Streaming XHR] called open');
         if (this.isOpen === true) {
             throw new Error("Already open");
         }
@@ -488,12 +494,15 @@ var ServiceWorkerRegistrationImplementation = /** @class */ (function (_super) {
             existingRegistrations.splice(idx, 1);
             return;
         }
+        // @ts-ignore
         this.active = opts.active
             ? ServiceWorkerImplementation.getOrCreate(opts.active, this)
             : null;
+        // @ts-ignore
         this.installing = opts.installing
             ? ServiceWorkerImplementation.getOrCreate(opts.installing, this)
             : null;
+        // @ts-ignore
         this.waiting = opts.waiting
             ? ServiceWorkerImplementation.getOrCreate(opts.waiting, this)
             : null;
@@ -590,6 +599,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
         if (newControllerInstance !== this._controller) {
             this._controller = newControllerInstance;
             var evt = new CustomEvent("controllerchange");
+            console.log("worker \u5206\u53D1 controllerchange \u4E8B\u4EF6");
             this.dispatchEvent(evt);
         }
     };

@@ -8,7 +8,7 @@ describe("Service Worker Container", () => {
         return unregisterEverything();
     });
 
-    it("Should register with default scope as JS file directory", () => {
+    it.skip("Should register with default scope as JS file directory", () => {
         return navigator.serviceWorker
             .register("/fixtures/test-register-worker.js")
             .then(reg => {
@@ -22,7 +22,7 @@ describe("Service Worker Container", () => {
             });
     });
 
-    it("Should fire ready promise", function() {
+    it.skip("Should fire ready promise", function() {
         // have to use iframe as none of the fixture JS files are in this
         // page's scope
         this.timeout(10000);
@@ -36,7 +36,7 @@ describe("Service Worker Container", () => {
         });
     });
 
-    it("Should be controller on a newly created client", function() {
+    it.skip("Should be controller on a newly created client", function() {
         return withIframe("/fixtures/blank.html", parentWindow => {
             parentWindow.navigator.serviceWorker.register(
                 "./test-register-worker.js"
@@ -86,7 +86,7 @@ describe("Service Worker Container", () => {
         });
     });
 
-    it("Should fire oncontrollerchange promise", function() {
+    it.skip("Should fire oncontrollerchange promise", function() {
         // have to use iframe as none of the fixture JS files are in this
         // page's scope
         return withIframe("/fixtures/blank.html", ({ navigator }) => {
@@ -114,7 +114,7 @@ describe("Service Worker Container", () => {
         });
     });
 
-    it("Should unregister", () => {
+    it.skip("Should unregister", () => {
         return navigator.serviceWorker
             .register("/fixtures/test-register-worker.js")
             .then(reg => {
@@ -129,7 +129,7 @@ describe("Service Worker Container", () => {
             });
     });
 
-    it("Should register with specified scope", () => {
+    it.skip("Should register with specified scope", () => {
         return navigator.serviceWorker
             .register("/fixtures/test-register-worker.js", {
                 scope: "/fixtures/a-test-scope"
@@ -142,7 +142,7 @@ describe("Service Worker Container", () => {
             });
     });
 
-    it("Should fail when loading out of scope", () => {
+    it.skip("Should fail when loading out of scope", () => {
         return navigator.serviceWorker
             .register("/fixtures/test-register-worker.js", {
                 scope: "/no-fixtures/"
@@ -155,7 +155,7 @@ describe("Service Worker Container", () => {
             });
     });
 
-    it("Should fail when loading off-domain", () => {
+    it.skip("Should fail when loading off-domain", () => {
         return navigator.serviceWorker
             .register("https://www.example.com/test-worker.js")
             .catch(err => {
@@ -166,7 +166,7 @@ describe("Service Worker Container", () => {
             });
     });
 
-    it("Should not automatically claim a registrant that isn't in scope", () => {
+    it.skip("Should not automatically claim a registrant that isn't in scope", () => {
         return navigator.serviceWorker
             .register("/fixtures/test-register-worker.js")
             .then(result => {
@@ -177,7 +177,7 @@ describe("Service Worker Container", () => {
             });
     });
 
-    it("Should take over a less specific scope", function() {
+    it.skip("Should take over a less specific scope", function() {
         return withIframe("/fixtures/subscope/blank.html", parentFrame => {
             return parentFrame.navigator.serviceWorker
                 .register("/fixtures/test-register-worker.js", {
@@ -208,7 +208,7 @@ describe("Service Worker Container", () => {
         });
     });
 
-    it("Should not take over a more specific scope", function() {
+    it.skip("Should not take over a more specific scope", function() {
         return withIframe("/fixtures/subscope/blank.html", ({ navigator }) => {
             return navigator.serviceWorker
                 .register("/fixtures/test-take-control-worker.js?subscope", {
@@ -240,4 +240,5 @@ describe("Service Worker Container", () => {
                 });
         });
     });
+
 });

@@ -43,6 +43,7 @@
 		AF3BE682250782E40027C604 /* ServiceWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8A5D980B1F3DF55B002E521F /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AF3BE689250798090027C604 /* ServiceWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF3BE688250798090027C604 /* ServiceWorker.framework */; };
 		AF3BE68A250798090027C604 /* ServiceWorker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AF3BE688250798090027C604 /* ServiceWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C687B8839A86002D16392354 /* axios.js in Sources */ = {isa = PBXBuildFile; fileRef = C687B0A88CCC412C317F9518 /* axios.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,6 +120,7 @@
 		8AF85D931F3A39D3001B0A87 /* js-dist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "js-dist"; sourceTree = "<group>"; };
 		8AF85DB31F3B6900001B0A87 /* EventStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStream.swift; sourceTree = "<group>"; };
 		AF3BE688250798090027C604 /* ServiceWorker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ServiceWorker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C687B0A88CCC412C317F9518 /* axios.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = axios.js; path = "js-dist/axios.js"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,6 +229,7 @@
 				8AA76F521F38B81600EFB4E1 /* Info.plist */,
 				8AF85D561F38BB70001B0A87 /* SWWebView.swift */,
 				8AF85D581F38C2BA001B0A87 /* SWWebViewNavigationDelegate.swift */,
+				C687B0A88CCC412C317F9518 /* axios.js */,
 			);
 			path = SWWebView;
 			sourceTree = "<group>";
@@ -481,6 +484,7 @@
 				8A5D98011F3CC62A002E521F /* ServiceWorker.swift in Sources */,
 				8A43C1741F4C9293001221C1 /* WorkerInstallationError.swift in Sources */,
 				8AC7BBC21F47751B0001CD49 /* ServiceWorkerContainer.swift in Sources */,
+				C687B8839A86002D16392354 /* axios.js in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

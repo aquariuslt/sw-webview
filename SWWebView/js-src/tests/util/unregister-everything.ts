@@ -1,4 +1,5 @@
 export function unregisterEverything() {
+    console.log(`unregisterEverything`);
     return navigator.serviceWorker
         .getRegistrations()
         .then((regs: ServiceWorkerRegistration[]) => {
@@ -11,4 +12,5 @@ export function unregisterEverything() {
         .then(() => {
             console.groupEnd();
         });
+
 }

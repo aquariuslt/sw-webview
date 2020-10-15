@@ -31,21 +31,26 @@ function graftedFetch(request: RequestInfo, opts?: RequestInit) {
 if ((originalFetch as any).__bodyGrafted !== true) {
     (window as any).fetch = graftedFetch;
 
+    console.log('fetch 替换成功');
     const originalSend = XMLHttpRequest.prototype.send;
     const originalOpen = XMLHttpRequest.prototype.open;
 
     XMLHttpRequest.prototype.open = function(method, url) {
         let resolvedURL = new URL(url, window.location.href);
         if (resolvedURL.protocol === SW_PROTOCOL + ":") {
+            console.log('设置 _graftBody = true');
             this._graftBody = true;
         }
+        console.log('使用 wrap 过的 XHR 请求 open(), url:' + resolvedURL);
         originalOpen.apply(this, arguments);
     };
 
     XMLHttpRequest.prototype.send = function(data) {
-        if (data && this._graftBody === true) {
+        if (this._graftBody === true) {
+            console.log('wrap 过的 XHR 请求准备发送前设置 header:' + GRAFTED_REQUEST_HEADER + ','+ data)
             this.setRequestHeader(GRAFTED_REQUEST_HEADER, data);
         }
+        console.log('使用 wrap 过的 XHR 请求 send():' + data);
         originalSend.apply(this, arguments);
     };
 }
