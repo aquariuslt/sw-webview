@@ -48,7 +48,7 @@ class ViewController: UIViewController {
 
         // MARK: - Home URL
 
-        let urlString = "sw://localhost:4567/tests.html"
+        let urlString = "sw://localhost:5000"
 //        let urlString = "sw://localhost:4567"
 //        let urlString = "https://www.baidu.com"
 

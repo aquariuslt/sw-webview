@@ -37,8 +37,8 @@ class ServiceWorkerContainerImplementation extends EventEmitter
 
     constructor() {
         super();
-        console.info(
-            "Created new ServiceWorkerContainer for",
+        console.log(
+            "[swwebview - ts]Created new ServiceWorkerContainer for",
             window.location.href
         );
         this.location = window.location;
@@ -143,7 +143,7 @@ class ServiceWorkerContainerImplementation extends EventEmitter
         url: string,
         opts?: RegistrationOptions
     ): Promise<ServiceWorkerRegistration> {
-        console.info("Registering new worker at:", url);
+        console.log("[swwebview - ts] Registering new worker at:", url);
         return apiRequest<
             ServiceWorkerRegistrationAPIResponse
         >("/ServiceWorkerContainer/register", {

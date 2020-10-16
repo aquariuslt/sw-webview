@@ -131,12 +131,17 @@ import ServiceWorker
             // strip our querystring items, so it's now "/test/worker.js"
             scopeComponents.queryItems = nil
 
+            // 这里比较 scope，没看懂为什么需要加 `/` scopeComponents.path 可能本身已经是 `/` 结尾，如 http://localhost:5000/
             if workerURL.path.last != "/" {
                 // if our worker URL is a file (and it usually is) strip that out.
                 // so, scopeURL is now "/test/". For some reason this strips out the "/"
                 // at the end of the path, so we need to add it back in.
-                scopeComponents.path = workerURL.deletingLastPathComponent().path + "/"
+                scopeComponents.path = workerURL.deletingLastPathComponent().path
             }
+
+            print("workerURL: \(workerURL)")
+            print("scopeComponents.url \(String(describing: scopeComponents.url?.absoluteString))")
+
 
             guard var scopeURL = scopeComponents.url else {
                 throw ErrorMessage("Could not parse out default scope URL from worker URL")
@@ -156,8 +161,13 @@ import ServiceWorker
                 scopeURL = scope
             }
 
-            if workerURL.absoluteString.starts(with: maxScope.absoluteString) == false {
-                throw ErrorMessage("Script must be within scope")
+            let maxScopePrefixUrlEndIndex = maxScope.absoluteString.index(maxScope.absoluteString.endIndex, offsetBy: -1)
+            let maxScopePrefixUrl = maxScope.absoluteString.substring(to: maxScopePrefixUrlEndIndex);
+
+            print("[ServiceWorkerContainer]: maxScopePrefixUrl \(maxScopePrefixUrl)");
+
+            if workerURL.absoluteString.starts(with: maxScopePrefixUrl) == false {
+                throw ErrorMessage("Script must be within scope: \(workerURL.absoluteString) vs \(maxScope.absoluteString)")
             }
 
             let existingRegistration = try self.registrationFactory.get(byScope: scopeURL)
@@ -165,24 +175,31 @@ import ServiceWorker
             let reg = try existingRegistration ?? self.registrationFactory.create(scope: scopeURL)
 
             return reg.register(workerURL)
-                .map { result -> ServiceWorkerRegistration in
+                    .map { result -> ServiceWorkerRegistration in
 
-                    result.registerComplete
-                        .done {
-                            // If our registration was successful and this container is within
-                            // its scope, we should set it as the ready registration
+                        result.registerComplete
+                                .done {
+                                    // If our registration was successful and this container is within
+                                    // its scope, we should set it as the ready registration
 
-                            if self.url.absoluteString.hasPrefix(reg.scope.absoluteString) {
-                                self.readyRegistration = reg
-                                GlobalEventLog.notifyChange(self)
-                            }
-                        }
-                        .catch { error in
-                            GlobalEventLog.notifyChange(WorkerInstallationError(worker: result.worker, container: self, error: error))
-                        }
+                                    print("[ServiceWorkerContainer]: registerComplete");
 
-                    return reg
-                }
+                                    print("[ServiceWorkerContainer debug]: \(self.url.absoluteString) vs \(reg.scope.absoluteString)")
+
+                                    if self.url.absoluteString.hasPrefix(reg.scope.absoluteString) {
+                                        self.readyRegistration = reg
+                                        print("[ServiceWorkerContainer]: doNotify");
+                                        GlobalEventLog.notifyChange(self)
+                                    }
+                                }
+                                .catch { error in
+
+                                    print("[ServiceWorkerContainer]: registerError \(error)");
+                                    GlobalEventLog.notifyChange(WorkerInstallationError(worker: result.worker, container: self, error: error))
+                                }
+
+                        return reg
+                    }
         }
     }
 

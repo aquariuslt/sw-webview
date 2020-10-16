@@ -548,7 +548,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this._controller = null;
         _this.receivedInitialProperties = false;
-        console.info("Created new ServiceWorkerContainer for", window.location.href);
+        console.log("[swwebview - ts]Created new ServiceWorkerContainer for", window.location.href);
         _this.location = window.location;
         var readyFulfill;
         _this.ready = new Promise(function (fulfill, reject) {
@@ -634,7 +634,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
         });
     };
     ServiceWorkerContainerImplementation.prototype.register = function (url, opts) {
-        console.info("Registering new worker at:", url);
+        console.log("[swwebview - ts] Registering new worker at:", url);
         return apiRequest("/ServiceWorkerContainer/register", {
             path: window.location.pathname,
             url: url,
