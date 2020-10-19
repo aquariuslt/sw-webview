@@ -29,24 +29,24 @@ function graftedFetch(request, opts) {
 graftedFetch.__bodyGrafted = true;
 if (originalFetch.__bodyGrafted !== true) {
     window.fetch = graftedFetch;
-    console.log('fetch 替换成功');
+    console.log('[fetch-grafted] fetch 替换成功');
     var originalSend_1 = XMLHttpRequest.prototype.send;
     var originalOpen_1 = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url) {
         var resolvedURL = new URL(url, window.location.href);
         if (resolvedURL.protocol === swwebviewSettings.SW_PROTOCOL + ":") {
-            console.log('设置 _graftBody = true');
+            console.log('[fetch-grafted] 设置 _graftBody = true');
             this._graftBody = true;
         }
-        console.log('使用 wrap 过的 XHR 请求 open(), url:' + resolvedURL);
+        console.log('[fetch-grafted] 使用 wrap 过的 XHR 请求 open(), url:' + resolvedURL);
         originalOpen_1.apply(this, arguments);
     };
     XMLHttpRequest.prototype.send = function (data) {
         if (this._graftBody === true) {
-            console.log('wrap 过的 XHR 请求准备发送前设置 header:' + swwebviewSettings.GRAFTED_REQUEST_HEADER + ',' + data);
+            console.log('[fetch-grafted] wrap 过的 XHR 请求准备发送前设置 header:' + swwebviewSettings.GRAFTED_REQUEST_HEADER + ',' + data);
             this.setRequestHeader(swwebviewSettings.GRAFTED_REQUEST_HEADER, data);
         }
-        console.log('使用 wrap 过的 XHR 请求 send():' + data);
+        console.log('[fetch-grafted] 使用 wrap 过的 XHR 请求 send():' + data);
         originalSend_1.apply(this, arguments);
     };
     // @ts-ignore
@@ -164,7 +164,7 @@ var StreamingXHR = /** @class */ (function (_super) {
     };
     StreamingXHR.prototype.open = function () {
         var _this = this;
-        console.log('[Streaming XHR] called open');
+        console.log('[streaming-xhr.ts] called open');
         if (this.isOpen === true) {
             throw new Error("Already open");
         }
@@ -175,7 +175,7 @@ var StreamingXHR = /** @class */ (function (_super) {
             _this.eventSource.addEventListener(type, _this.receiveNewEvent);
         });
         this.eventSource.addEventListener("eventstream", function (e) {
-            console.log("GOT ID:", e.data);
+            console.log("[streaming-xhr.ts] GOT ID:", e.data);
             _this.id = JSON.parse(e.data).id;
             if (_this.readyFulfill) {
                 _this.readyFulfill();
@@ -198,7 +198,7 @@ var StreamingXHR = /** @class */ (function (_super) {
         // this.xhr.send();
     };
     StreamingXHR.prototype.addEventListener = function (type, func) {
-        console.log("[Streaming XHR]: addEventListener:" + type);
+        console.log("[streaming-xhr.ts]: addEventListener:" + type);
         _super.prototype.addEventListener.call(this, type, func);
         if (this.subscribedEvents.indexOf(type) === -1) {
             if (this.eventSource) {
@@ -211,7 +211,7 @@ var StreamingXHR = /** @class */ (function (_super) {
         // this.eventSource.addEventListener(type, func);
     };
     StreamingXHR.prototype.receiveNewEvent = function (e) {
-        console.log("[Streaming XHR]: receiveNewEvent:" + e.type);
+        console.log("[streaming-xhr.ts]: receiveNewEvent:" + e.type);
         if (e.isTrusted === false) {
             return;
         }
@@ -365,7 +365,7 @@ var MessagePortProxy = /** @class */ (function () {
         this.port.start();
     }
     MessagePortProxy.prototype.receiveMessage = function (e) {
-        console.log("! GOT MESSAGE", e);
+        console.log("[messageport-manager.ts]! GOT MESSAGE", e);
         apiRequest("/MessagePort/proxyMessage", {
             id: this.id,
             message: e.data
@@ -532,7 +532,7 @@ var ServiceWorkerRegistrationImplementation = /** @class */ (function (_super) {
     return ServiceWorkerRegistrationImplementation;
 }(tinyEmitter));
 eventStream.addEventListener("serviceworkerregistration", function (e) {
-    console.log("reg update", e.data);
+    console.log("[service-worker-registration.ts] reg update", e.data);
     var reg = existingRegistrations.find(function (r) { return r.id == e.data.id; });
     if (reg) {
         reg.updateFromResponse(e.data);
@@ -548,7 +548,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this._controller = null;
         _this.receivedInitialProperties = false;
-        console.log("[swwebview - ts]Created new ServiceWorkerContainer for", window.location.href);
+        console.log("[components/service-worker-container.ts] Created new ServiceWorkerContainer for", window.location.href);
         _this.location = window.location;
         var readyFulfill;
         _this.ready = new Promise(function (fulfill, reject) {
@@ -605,7 +605,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
         if (newControllerInstance !== this._controller) {
             this._controller = newControllerInstance;
             var evt = new CustomEvent("controllerchange");
-            console.log("worker \u5206\u53D1 controllerchange \u4E8B\u4EF6");
+            console.log("[components/service-worker-container.ts] worker \u5206\u53D1 controllerchange \u4E8B\u4EF6");
             this.dispatchEvent(evt);
         }
     };
@@ -634,7 +634,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
         });
     };
     ServiceWorkerContainerImplementation.prototype.register = function (url, opts) {
-        console.log("[swwebview - ts] Registering new worker at:", url);
+        console.log("[components/service-worker-container.ts] Registering new worker at:", url);
         return apiRequest("/ServiceWorkerContainer/register", {
             path: window.location.pathname,
             url: url,
@@ -648,7 +648,7 @@ var ServiceWorkerContainerImplementation = /** @class */ (function (_super) {
     return ServiceWorkerContainerImplementation;
 }(tinyEmitter));
 eventStream.addEventListener("serviceworkercontainer", function (e) {
-    console.log("Container update", e.data);
+    console.log("[components/service-worker-container.ts] Container update", e.data);
     navigator.serviceWorker.updateFromAPIResponse(e.data);
 });
 if ("ServiceWorkerContainer" in self === false) {

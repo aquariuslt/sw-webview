@@ -38,7 +38,7 @@ class ServiceWorkerContainerImplementation extends EventEmitter
     constructor() {
         super();
         console.log(
-            "[swwebview - ts]Created new ServiceWorkerContainer for",
+            "[components/service-worker-container.ts] Created new ServiceWorkerContainer for",
             window.location.href
         );
         this.location = window.location;
@@ -95,7 +95,7 @@ class ServiceWorkerContainerImplementation extends EventEmitter
         if (newControllerInstance !== this._controller) {
             this._controller = newControllerInstance;
             let evt = new CustomEvent("controllerchange");
-            console.log(`worker 分发 controllerchange 事件`)
+            console.log(`[components/service-worker-container.ts] worker 分发 controllerchange 事件`)
             this.dispatchEvent(evt);
         }
     }
@@ -143,7 +143,7 @@ class ServiceWorkerContainerImplementation extends EventEmitter
         url: string,
         opts?: RegistrationOptions
     ): Promise<ServiceWorkerRegistration> {
-        console.log("[swwebview - ts] Registering new worker at:", url);
+        console.log("[components/service-worker-container.ts] Registering new worker at:", url);
         return apiRequest<
             ServiceWorkerRegistrationAPIResponse
         >("/ServiceWorkerContainer/register", {
@@ -161,7 +161,7 @@ class ServiceWorkerContainerImplementation extends EventEmitter
 eventStream.addEventListener<
     ServiceWorkerContainerAPIResponse
 >("serviceworkercontainer", e => {
-    console.log("Container update", e.data);
+    console.log("[components/service-worker-container.ts] Container update", e.data);
     (navigator.serviceWorker as ServiceWorkerContainerImplementation).updateFromAPIResponse(
         e.data
     );

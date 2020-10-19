@@ -139,8 +139,8 @@ import ServiceWorker
                 scopeComponents.path = workerURL.deletingLastPathComponent().path
             }
 
-            print("workerURL: \(workerURL)")
-            print("scopeComponents.url \(String(describing: scopeComponents.url?.absoluteString))")
+            print("[swift: ServiceWorkerContainer] workerURL: \(workerURL)")
+            print("[swift: ServiceWorkerContainer] scopeComponents.url \(String(describing: scopeComponents.url?.absoluteString))")
 
 
             guard var scopeURL = scopeComponents.url else {
@@ -164,7 +164,7 @@ import ServiceWorker
             let maxScopePrefixUrlEndIndex = maxScope.absoluteString.index(maxScope.absoluteString.endIndex, offsetBy: -1)
             let maxScopePrefixUrl = maxScope.absoluteString.substring(to: maxScopePrefixUrlEndIndex);
 
-            print("[ServiceWorkerContainer]: maxScopePrefixUrl \(maxScopePrefixUrl)");
+            print("[swift: ServiceWorkerContainer]: maxScopePrefixUrl \(maxScopePrefixUrl)");
 
             if workerURL.absoluteString.starts(with: maxScopePrefixUrl) == false {
                 throw ErrorMessage("Script must be within scope: \(workerURL.absoluteString) vs \(maxScope.absoluteString)")
@@ -182,19 +182,19 @@ import ServiceWorker
                                     // If our registration was successful and this container is within
                                     // its scope, we should set it as the ready registration
 
-                                    print("[ServiceWorkerContainer]: registerComplete");
+                                    print("[swift: ServiceWorkerContainer]: registerComplete");
 
-                                    print("[ServiceWorkerContainer debug]: \(self.url.absoluteString) vs \(reg.scope.absoluteString)")
+                                    print("[swift: ServiceWorkerContainer]: \(self.url.absoluteString) vs \(reg.scope.absoluteString)")
 
                                     if self.url.absoluteString.hasPrefix(reg.scope.absoluteString) {
                                         self.readyRegistration = reg
-                                        print("[ServiceWorkerContainer]: doNotify");
+                                        print("[swift: ServiceWorkerContainer]: doNotify");
                                         GlobalEventLog.notifyChange(self)
                                     }
                                 }
                                 .catch { error in
 
-                                    print("[ServiceWorkerContainer]: registerError \(error)");
+                                    print("[swift: ServiceWorkerContainer]: registerError \(error)");
                                     GlobalEventLog.notifyChange(WorkerInstallationError(worker: result.worker, container: self, error: error))
                                 }
 

@@ -30,7 +30,7 @@ public class SWWebView: WKWebView {
             .appendingPathComponent("js-dist", isDirectory: true)
             .appendingPathComponent("runtime.js")
 
-        print("开始注入 js-dist/runtime.js from \(pathToJS)")
+        print("[swift: SWWebView] 开始注入 js-dist/runtime.js from \(pathToJS)")
 
         let jsRuntimeSource: String
 
@@ -50,7 +50,7 @@ public class SWWebView: WKWebView {
                 .appendingPathComponent("js-dist", isDirectory: true)
                 .appendingPathComponent("axios.js")
 
-        print("开始注入 js-dist/axios.js from \(axiosBundleRuntimeJS)")
+        print("[swift: SWWebView] 开始注入 js-dist/axios.js from \(axiosBundleRuntimeJS)")
 
         do {
             axiosJsRuntimeSource =  try String(contentsOf: axiosBundleRuntimeJS)

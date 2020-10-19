@@ -44,7 +44,7 @@ extension URL {
             rhsPath = url.deletingPathExtension().absoluteString
         }
 
-        print("hasSameScope 判断: this ", lhsPath, "对比url:", lhsPath);
+        print("[swift: SWWebView - ToJSON] hasSameScope 判断: this ", lhsPath, "对比url:", lhsPath);
 
         return lhsPath == rhsPath
     }

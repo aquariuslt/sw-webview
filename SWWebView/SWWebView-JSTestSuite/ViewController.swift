@@ -65,7 +65,7 @@ class ViewController: UIViewController {
 
         swView.serviceWorkerPermittedDomains.append(domain)
         URLCache.shared.removeAllCachedResponses()
-        print("Loading \(urlComps.url!.absoluteString)")
+        print("[swift: JSTestSuite/ViewController] Loading: \(urlComps.url!.absoluteString)")
         _ = self.swView.load(URLRequest(url: urlComps.url!))
     }
 

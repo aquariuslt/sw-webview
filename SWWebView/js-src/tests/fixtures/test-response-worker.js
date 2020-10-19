@@ -2,7 +2,7 @@ self.addEventListener("fetch", e => {
     let requestURL = new URL(e.request.url);
     // console.log(requestURL.searchParams.);
 
-    console.log('[Test:RespondWith] catching url:', e.request.url);
+    console.log('[test-response-worker.js] catching url:', e.request.url);
 
     let responseJSON = {
         success: true,
@@ -18,14 +18,14 @@ self.addEventListener("fetch", e => {
     e.respondWith(response);
 });
 
-console.log('[Test:RespondWith] addEventListener complete');
+console.log('[test-response-worker.js] addEventListener complete');
 
 self.addEventListener("install", e => {
-    console.log('[Test:Install] test-response-worker.js installed')
+    console.log('[test-response-worker.js] test-response-worker.js installed')
     self.skipWaiting();
 });
 
 self.addEventListener("activate", e => {
-    console.log('[Test:Activate] test-response-worker.js activate')
+    console.log('[test-response-worker.js] test-response-worker.js activate')
     e.waitUntil(self.clients.claim());
 });

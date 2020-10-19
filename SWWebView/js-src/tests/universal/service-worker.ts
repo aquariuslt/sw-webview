@@ -92,23 +92,23 @@ describe("Service Worker", () => {
                 // return Promise.resolve(reg);
             })
             .then(reg => {
-                console.log('complete registeration:', reg);
+                console.log('[universal/service-worker.ts] complete registeration:', reg);
                 window.fetch('/fixtures/testfile?test=bb')
                     .then((res) => {
                         return res.json();
                     }).then((res) => {
-                    console.log('bb response' + JSON.stringify(res))
+                    console.log('[universal/service-worker.ts] bb response' + JSON.stringify(res))
                 });
 
-                console.log('check if is new Fetch:', window.isNewFetch)
-                console.log('check if is new XHR:', window.isNewXHR)
+                console.log('[universal/service-worker.ts] check if is new Fetch:', window.isNewFetch)
+                console.log('[universal/service-worker.ts] check if is new XHR:', window.isNewXHR)
 
-                console.log('check referer before XHR, location.href:', window.location.href, 'document.referrer', document.referrer)
+                console.log('[universal/service-worker.ts] check referer before XHR, location.href:', window.location.href, 'document.referrer', document.referrer)
 
                 const xhrRequest = new XMLHttpRequest();
                 xhrRequest.addEventListener('load', () => {
-                    console.log('response.status:', xhrRequest.status);
-                    console.log('response.content:', xhrRequest.responseText)
+                    console.log('[universal/service-worker.ts] response.status:', xhrRequest.status);
+                    console.log('[universal/service-worker.ts] response.content:', xhrRequest.responseText)
                 })
                 // xhrRequest.setRequestHeader("Referrer-Policy", "origin");
                 xhrRequest.open('GET', '/fixtures/testfile?test=axios');
@@ -139,7 +139,7 @@ describe("Service Worker", () => {
         withIframe("/fixtures/blank.html", ({window, navigator}) => {
             navigator.serviceWorker.register("./test-response-worker.js");
 
-            console.log('# should send xhr events to worker, and worker catch xhr as fetch event and respond')
+            console.log('[universal/service-worker.ts] # should send xhr events to worker, and worker catch xhr as fetch event and respond')
             return new Promise(fulfill => {
                 navigator.serviceWorker.oncontrollerchange = fulfill;
             })
@@ -150,7 +150,7 @@ describe("Service Worker", () => {
                     return new Promise((resolve) => {
                         const xhrRequest = new XMLHttpRequest();
                         xhrRequest.addEventListener('load', () => {
-                            console.log('response.status:', xhrRequest.status);
+                            console.log('[universal/service-worker.ts] response.status:', xhrRequest.status);
                             resolve(xhrRequest.response)
                         })
                         xhrRequest.open('GET', 'fixtures/testfile?test=hello1');
@@ -159,13 +159,13 @@ describe("Service Worker", () => {
 
                 })
                 .then(res => {
-                    console.log('response is:', res);
+                    console.log('[universal/service-worker.ts] response is:', res);
                     // assert.equal(res.success, true);
                     // assert.equal(res.queryValue, "hello1");
                     done();
                 })
                 .catch((error) => {
-                    console.error('response error is', error)
+                    console.error('[universal/service-worker.ts] response error is', error)
                     done();
                 });
         });

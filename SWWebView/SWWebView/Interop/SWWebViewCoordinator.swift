@@ -46,7 +46,7 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
         let container = self.inUseContainers.first(where: {
 
             if ($0.webview == webview) {
-                print("$0.container.url.absoluteString:", $0.container.url.absoluteString, "url.absoluteString:", url.absoluteString)
+                print("[swift: SWWebViewCoordinator] $0.container.url.absoluteString:", $0.container.url.absoluteString, "url.absoluteString:", url.absoluteString)
             }
             // TODO: 这里 referer 的资料得多看看，fix it
             if ($0.webview == webview && url.absoluteString  != nil) {
@@ -57,9 +57,9 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
 
 
         if container == nil {
-            Log.debug?("No container for: \(url)")
+            Log.debug?("[swift: SWWebViewCoordinator] No container for: \(url)")
         } else {
-            Log.debug?("Container: \(url)")
+            Log.debug?("[swift: SWWebViewCoordinator] Container: \(url)")
         }
 
         return container
@@ -67,7 +67,7 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
 
     public func container(_ webview: SWWebView, freeContainer container: ServiceWorkerContainer) {
         guard let containerIndex = self.inUseContainers.firstIndex(where: { $0.webview == webview && $0.container == container }) else {
-            Log.error?("Tried to remove a ServiceWorkerContainer that doesn't exist")
+            Log.error?("[swift: SWWebViewCoordinator] Tried to remove a ServiceWorkerContainer that doesn't exist")
             return
         }
 
@@ -77,16 +77,16 @@ public class SWWebViewCoordinator: SWWebViewContainerDelegate, ServiceWorkerClie
 
         if self.inUseContainers[containerIndex].numUsing == 0 {
             // If this is the only client using this container then we can safely dispose of it.
-            Log.info?("Deleting existing ServiceWorkerContainer for \(url.absoluteString).")
+            Log.info?("[swift: SWWebViewCoordinator] Deleting existing ServiceWorkerContainer for \(url.absoluteString).")
             self.inUseContainers.remove(at: containerIndex)
         } else {
-            Log.info?("Released link to ServiceWorkerContainer for \(url.absoluteString). It has \(self.inUseContainers[containerIndex].numUsing) remaining clients")
+            Log.info?("[swift: SWWebViewCoordinator] Released link to ServiceWorkerContainer for \(url.absoluteString). It has \(self.inUseContainers[containerIndex].numUsing) remaining clients")
         }
     }
 
     public func clientsClaim(_ worker: ServiceWorker, _ cb: (Error?) -> Void) {
         if worker.state != .activated, worker.state != .activating {
-            cb(ErrorMessage("Service worker can only claim clients when in activated or activating state"))
+            cb(ErrorMessage("[swift: SWWebViewCoordinator] Service worker can only claim clients when in activated or activating state"))
             return
         }
 

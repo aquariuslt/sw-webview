@@ -15,7 +15,7 @@ class MessagePortProxy {
     }
 
     receiveMessage(e: MessageEvent) {
-        console.log("! GOT MESSAGE", e);
+        console.log("[messageport-manager.ts]! GOT MESSAGE", e);
         apiRequest("/MessagePort/proxyMessage", {
             id: this.id,
             message: e.data

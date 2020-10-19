@@ -26,7 +26,7 @@ public class SWWebViewBridge: NSObject, WKURLSchemeHandler, WKScriptMessageHandl
 
     public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         firstly { () -> Promise<Any?> in
-            print("[SWWebViewBridge] useContentController, didReceive message:" + message.name)
+            print("[swift: SWWebViewBridge] useContentController, didReceive message:" + message.name)
             guard let body = message.body as? [String: Any] else {
                 throw ErrorMessage("Could not parse body")
             }

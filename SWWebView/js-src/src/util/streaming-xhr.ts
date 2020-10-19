@@ -45,7 +45,7 @@ export class StreamingXHR extends EventEmitter {
     }
 
     open() {
-        console.log('[Streaming XHR] called open')
+        console.log('[streaming-xhr.ts] called open')
         if (this.isOpen === true) {
             throw new Error("Already open");
         }
@@ -60,7 +60,7 @@ export class StreamingXHR extends EventEmitter {
         });
 
         this.eventSource.addEventListener("eventstream", (e: MessageEvent) => {
-            console.log("GOT ID:", e.data);
+            console.log("[streaming-xhr.ts] GOT ID:", e.data);
             this.id = JSON.parse(e.data).id;
             if (this.readyFulfill) {
                 this.readyFulfill();
@@ -91,7 +91,7 @@ export class StreamingXHR extends EventEmitter {
         type: string,
         func: (e: CustomMessageEvent<T>) => void
     ) {
-        console.log(`[Streaming XHR]: addEventListener:` + type)
+        console.log(`[streaming-xhr.ts]: addEventListener:` + type)
         super.addEventListener(type, func);
         if (this.subscribedEvents.indexOf(type) === -1) {
             if (this.eventSource) {
@@ -106,7 +106,7 @@ export class StreamingXHR extends EventEmitter {
 
     receiveNewEvent(e: MessageEvent) {
 
-        console.log(`[Streaming XHR]: receiveNewEvent:` + e.type)
+        console.log(`[streaming-xhr.ts]: receiveNewEvent:` + e.type)
         if (e.isTrusted === false) {
             return;
         }
