@@ -45,6 +45,8 @@ public enum FetchRequestMode: String {
     var redirectString: String { get }
 
     init?(url: JSValue, options: JSValue)
+
+    func toString() -> String
 }
 
 /// Replicating the Request API: https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
@@ -209,5 +211,9 @@ public enum FetchRequestMode: String {
         }
 
         return nsRequest
+    }
+
+    func toString() -> String {
+        return self.urlString
     }
 }

@@ -63,10 +63,21 @@ public class SWURLSchemeTask {
                 throw ErrorMessage("Could not parse Referer header correctly")
             }
             self.referrer = referrerURL
+            print("[swift: SWURLSchemeTask] set referer url to \(referrerURL) when request url is \(underlyingTask.request.url)")
+
         } else if let url = underlyingTask.request.url, url.path != "/" {
-            self.referrer = url.pathExtension.isEmpty ? url : url.deletingLastPathComponent()
+            let refererUrl =  url.pathExtension.isEmpty ? url : url.deletingLastPathComponent()
+            var refererUrlComponent = URLComponents(string: refererUrl.absoluteString)
+            refererUrlComponent?.queryItems = nil
+
+            self.referrer = refererUrlComponent?.url;
+
+            print("[swift: SWURLSchemeTask] url.pathExtension.isEmpty : \(url.pathExtension.isEmpty)")
+            print("[swift: SWURLSchemeTask] url.deletingLastPathComponent() : \(url.deletingLastPathComponent())")
+            print("[swift: SWURLSchemeTask] set referer url to \(refererUrlComponent?.url) when request url is \(underlyingTask.request.url)")
         } else {
             self.referrer = nil
+            print("[swift: SWURLSchemeTask] set referer url to nil when request url is \(underlyingTask.request.url)")
         }
 
         // Because WKURLSchemeTask doesn't receive POST bodies (rdar://33814386) we have to

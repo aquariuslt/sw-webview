@@ -459,13 +459,13 @@ var ServiceWorkerImplementation = /** @class */ (function (_super) {
 }(tinyEmitter));
 eventStream.addEventListener("serviceworker", function (e) {
     var existingWorker = ServiceWorkerImplementation.get(e.data);
-    console.info("Worker update:", e.data);
+    console.log("[components/service-worker.ts] Worker update:", e.data);
     if (existingWorker) {
         existingWorker.updateFromAPIResponse(e.data);
     }
 });
 eventStream.addEventListener("workerinstallerror", function (e) {
-    console.error("Worker installation failed: " + e.data.error + " (in " + e.data.worker
+    console.error('[components/service-worker.ts]', "Worker installation failed: " + e.data.error + " (in " + e.data.worker
         .scriptURL + ")");
 });
 
@@ -485,7 +485,7 @@ var ServiceWorkerRegistrationImplementation = /** @class */ (function (_super) {
             if (opts.unregistered === true) {
                 throw new Error("Trying to create an unregistered registration");
             }
-            console.info("Creating new registration:", opts.id, opts);
+            console.log("[service-worker-registration.ts] Creating new registration:", opts.id, opts);
             registration = new ServiceWorkerRegistrationImplementation(opts);
             existingRegistrations.push(registration);
         }
@@ -493,7 +493,7 @@ var ServiceWorkerRegistrationImplementation = /** @class */ (function (_super) {
     };
     ServiceWorkerRegistrationImplementation.prototype.updateFromResponse = function (opts) {
         if (opts.unregistered === true) {
-            console.info("Removing inactive registration:", opts.id);
+            console.log("[service-worker-registration.ts] Removing inactive registration:", opts.id);
             // Remove from our array of existing registrations, as we don't
             // want to refer to this again.
             var idx = existingRegistrations.indexOf(this);
@@ -538,7 +538,7 @@ eventStream.addEventListener("serviceworkerregistration", function (e) {
         reg.updateFromResponse(e.data);
     }
     else {
-        console.info("Received update for non-existent registration", e.data.id);
+        console.log('[service-worker-registration.ts]', "Received update for non-existent registration", e.data.id);
     }
 });
 

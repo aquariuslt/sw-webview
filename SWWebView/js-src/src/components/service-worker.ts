@@ -84,7 +84,7 @@ export class ServiceWorkerImplementation extends EventEmitter
 
 eventStream.addEventListener<ServiceWorkerAPIResponse>("serviceworker", e => {
     let existingWorker = ServiceWorkerImplementation.get(e.data);
-    console.info("Worker update:", e.data);
+    console.log("[components/service-worker.ts] Worker update:", e.data);
     if (existingWorker) {
         existingWorker.updateFromAPIResponse(e.data);
     }
@@ -94,6 +94,7 @@ eventStream.addEventListener<
     WorkerInstallErrorAPIResponse
 >("workerinstallerror", e => {
     console.error(
+        '[components/service-worker.ts]',
         `Worker installation failed: ${e.data.error} (in ${e.data.worker
             .scriptURL})`
     );

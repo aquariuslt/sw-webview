@@ -13,6 +13,7 @@ import JavaScriptCore
     var searchParams: URLSearchParams { get }
 
     init?(url: JSValue, relativeTo: JSValue)
+    func toString() -> String
 }
 
 /// An implementation of the JS URL object: https://developer.mozilla.org/en-US/docs/Web/API/URL
@@ -32,6 +33,7 @@ import JavaScriptCore
                 throw ErrorMessage("Invalid URL")
             }
 
+            print("[swift:JSURL] init JSURL with parsedURL: \(parsedURL)")
             super.init(withURL: parsedURL)
 
         } catch {
@@ -39,5 +41,10 @@ import JavaScriptCore
             url.context.exception = err
             return nil
         }
+    }
+
+    public func toString() -> String {
+        print("[swift:JSURL] calling toString() with :\(self.href)");
+        return self.href;
     }
 }

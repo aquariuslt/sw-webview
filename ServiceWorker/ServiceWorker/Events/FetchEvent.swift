@@ -42,6 +42,7 @@ import PromiseKit
         self.respondValue = resolved
     }
 
+
     public init(request: FetchRequest) {
         self.request = request
         super.init()
