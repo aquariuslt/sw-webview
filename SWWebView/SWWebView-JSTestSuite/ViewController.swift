@@ -49,6 +49,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
 
         self.coordinator = SWWebViewCoordinator(storageURL: storageURL)
 
+        self.view.backgroundColor = UIColor.white
         self.swView = SWWebView(frame: self.view.frame, configuration: config)
         // This will move to a delegate method eventually
         self.swView.containerDelegate = self.coordinator!
@@ -66,10 +67,10 @@ class ViewController: UIViewController, WKNavigationDelegate {
 //        let urlString = "sw://tytx.m.cn.miaozhen.com/r/k=2184908&p=7caxc&dx=__IPDX__&rt=2&pro=s&ns=__IP__&ni=__IESID__&v=__LOC__&xa=__ADPLATFORM__&tr=__REQUESTID__&ro=sm&txp=__TXP__&o=https://m.buick.com.cn/envisions/?utm_source=qqnews&utm_medium=APP&utm_term=SP-BU2000478_HS-202007791_MOB32-2_32650925&utm_content=SGMMRK2020000157&utm_campaign=2020envisions"
 //        let urlString = "http://tytx.m.cn.miaozhen.com/r/k=2119286&p=7OO87&dx=__IPDX__&rt=2&ns=__IP__&ni=__IESID__&v=__LOC__&xa=__ADPLATFORM__&tr=__REQUESTID__&mo=__OS__&m0=__OPENUDID__&m0a=__DUID__&m1=__ANDROIDID1__&m1a=__ANDROIDID__&m2=__IMEI__&m4=__AAID__&m5=__IDFA__&m6=__MAC1__&m6a=__MAC__&txp=__TXP__&vo=3a0882f9c&vr=2&o=https%3A%2F%2Fwww.tiffany.cn%2F%3Fomcid%3Ddis-cn_tencentvideo_openingpage_2019%2Bspring%2Bbrand%26utm_medium%3Ddisplay-cn%26utm_source%3Dtencentvideo_openingpage%26utm_campaign%3D2019%2Bspring%2Bbrand"
 
-//        let urlString = "sw://www.tiffany.cn/?omcid=dis-cn_tencentvideo_openingpage_2019+spring+brand&utm_medium=display-cn&utm_source=tencentvideo_openingpage&utm_campaign=2019+spring+brand"
+        let urlString = "sw://www.tiffany.cn/?omcid=dis-cn_tencentvideo_openingpage_2019+spring+brand&utm_medium=display-cn&utm_source=tencentvideo_openingpage&utm_campaign=2019+spring+brand"
 //        let urlString = "sw://localhost:5000"
 //        let urlString = "sw://localhost:4567"
-        let urlString = "sw://www.baidu.com"
+//        let urlString = "sw://m.baidu.com"
 
         guard let urlComps = URLComponents(string: urlString), let host = urlComps.host else {
             fatalError("must provide a valid url")
@@ -82,7 +83,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
             return host
         }()
 
-//        swView.serviceWorkerPermittedDomains.append(domain)
+        swView.serviceWorkerPermittedDomains.append(domain)
         URLCache.shared.removeAllCachedResponses()
         print("[swift: JSTestSuite/ViewController] Loading: \(urlComps.url!.absoluteString)")
         _ = self.swView.load(URLRequest(url: urlComps.url!))
