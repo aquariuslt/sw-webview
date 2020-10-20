@@ -30,6 +30,8 @@ public class SWURLSchemeTask {
             throw ErrorMessage("Incoming task must have a URL set")
         }
 
+        // 此处 不应该直接使用 new URL(baseUrl, requestURL) 进行计算
+        // 对于以下场景，需要做到
         guard let modifiedURL = URL(swWebViewString: requestURL.absoluteString) else {
             throw ErrorMessage("Could not parse incoming task URL")
         }
@@ -66,7 +68,7 @@ public class SWURLSchemeTask {
             print("[swift: SWURLSchemeTask] set referer url to \(referrerURL) when request url is \(underlyingTask.request.url)")
 
         } else if let url = underlyingTask.request.url, url.path != "/" {
-            let refererUrl =  url.pathExtension.isEmpty ? url : url.deletingLastPathComponent()
+            let refererUrl = url.pathExtension.isEmpty ? url : url.deletingLastPathComponent()
             var refererUrlComponent = URLComponents(string: refererUrl.absoluteString)
             refererUrlComponent?.queryItems = nil
 
@@ -132,6 +134,9 @@ public class SWURLSchemeTask {
             throw ErrorMessage("Task is no longer open")
         }
 
+
+        let defaultURLHolder = "";
+        print("[swift: SWURLSchemeTask]: did receive response with url: \(self.request.url?.absoluteString ?? defaultURLHolder)");
         self.underlyingTask.didReceive(response)
     }
 

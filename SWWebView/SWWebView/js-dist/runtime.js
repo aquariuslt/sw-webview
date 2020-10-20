@@ -11,19 +11,23 @@ function __extends(d, b) {
 // putting it in a custom header. Hoping we can get rid of this nonsense soon.
 var originalFetch = fetch;
 function graftedFetch(request, opts) {
-    if (!opts || !opts.body) {
+    var url = request instanceof Request ? request.url : request;
+    console.log('[fetch-grafted] 捕获请求: ' + url);
+    if (!opts) {
         // no body, so none of this matters
+        console.log('[fetch-grafted] 因opts为空，使用原始fetch for:', url);
         return originalFetch(request, opts);
     }
-    var url = request instanceof Request ? request.url : request;
     var resolvedURL = new URL(url, window.location.href);
     if (resolvedURL.protocol !== swwebviewSettings.SW_PROTOCOL + ":") {
         // if we're not fetching on the SW protocol, then this
         // doesn't matter.
+        console.log('[fetch-grafted] protocol 不是 sw:，使用原始fetch for:', url);
         return originalFetch(request, opts);
     }
     opts.headers = opts.headers || {};
     opts.headers[swwebviewSettings.GRAFTED_REQUEST_HEADER] = opts.body;
+    console.log('[fetch-grafted] 已设置 GRAFTED_REQUEST_HEADER for:', url);
     return originalFetch(request, opts);
 }
 graftedFetch.__bodyGrafted = true;

@@ -117,25 +117,31 @@ import PromiseKit
             return responsePromise.fulfill(())
         }
         Log.info?("Waiting until \(allWebSQL.count) WebSQL connections close before we stop.")
-        let mappedClosePromises = allWebSQL.map { $0.close() }
+        let mappedClosePromises = allWebSQL.map {
+            $0.close()
+        }
 
         when(fulfilled: mappedClosePromises)
-            .done {
-                Log.info?("Closed WebSQL connections")
-            }
-            .passthrough(responsePromise)
+                .done {
+                    Log.info?("Closed WebSQL connections")
+                }
+                .passthrough(responsePromise)
     }
 
     deinit {
         Log.info?("Closing execution environment for: \(self.workerId)")
         let allWebSQL = self.activeWebSQLDatabases.allObjects
-            .filter { $0.connection.open == true }
+                .filter {
+            $0.connection.open == true
+        }
 
         if allWebSQL.count > 0 {
             Log.info?("\(allWebSQL.count) open WebSQL connections when shutting down worker")
         }
 
-        allWebSQL.forEach { $0.forceClose() }
+        allWebSQL.forEach {
+            $0.forceClose()
+        }
 
         GlobalVariableProvider.destroy(forContext: self.jsContext)
         self.currentException = nil
@@ -334,6 +340,8 @@ import PromiseKit
 
             if let fetchInstance = requestOrString.toObjectOf(FetchRequest.self) as? FetchRequest {
                 request = fetchInstance
+                print("[swift: SWExecutionEnvironment] called fetch request url(as object) \(request.urlString)");
+
             } else if requestOrString.isString {
                 guard let requestString = requestOrString.toString() else {
                     throw ErrorMessage("Could not convert request to string")
@@ -342,9 +350,11 @@ import PromiseKit
                 guard let parsedURL = URL(string: requestString) else {
                     throw ErrorMessage("Could not parse URL string")
                 }
+                print("[swift: SWExecutionEnvironment] called fetch request url(as string) \(parsedURL)");
 
                 request = FetchRequest(url: parsedURL)
             } else {
+                print("[swift: SWExecutionEnvironment] Did not understand first argument passed in");
                 throw ErrorMessage("Did not understand first argument passed in")
             }
 

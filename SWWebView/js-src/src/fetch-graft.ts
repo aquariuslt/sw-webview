@@ -1,4 +1,4 @@
-import { SW_PROTOCOL, GRAFTED_REQUEST_HEADER } from "swwebview-settings";
+import {SW_PROTOCOL, GRAFTED_REQUEST_HEADER} from "swwebview-settings";
 
 // We can't read POST bodies in native code, so we're doing the super-gross:
 // putting it in a custom header. Hoping we can get rid of this nonsense soon.
@@ -6,22 +6,28 @@ import { SW_PROTOCOL, GRAFTED_REQUEST_HEADER } from "swwebview-settings";
 const originalFetch = fetch;
 
 function graftedFetch(request: RequestInfo, opts?: RequestInit) {
-    if (!opts || !opts.body) {
+
+    let url = request instanceof Request ? request.url : request;
+    console.log('[fetch-grafted] 捕获请求: ' + url);
+
+    if (!opts) {
         // no body, so none of this matters
+        console.log('[fetch-grafted] 因opts为空，使用原始fetch for:', url);
         return originalFetch(request, opts);
     }
 
-    let url = request instanceof Request ? request.url : request;
     let resolvedURL = new URL(url, window.location.href);
 
     if (resolvedURL.protocol !== SW_PROTOCOL + ":") {
         // if we're not fetching on the SW protocol, then this
         // doesn't matter.
+        console.log('[fetch-grafted] protocol 不是 sw:，使用原始fetch for:', url);
         return originalFetch(request, opts);
     }
 
     opts.headers = opts.headers || {};
     opts.headers[GRAFTED_REQUEST_HEADER] = opts.body;
+    console.log('[fetch-grafted] 已设置 GRAFTED_REQUEST_HEADER for:', url);
 
     return originalFetch(request, opts);
 }
@@ -35,7 +41,7 @@ if ((originalFetch as any).__bodyGrafted !== true) {
     const originalSend = XMLHttpRequest.prototype.send;
     const originalOpen = XMLHttpRequest.prototype.open;
 
-    XMLHttpRequest.prototype.open = function(method, url) {
+    XMLHttpRequest.prototype.open = function (method, url) {
         let resolvedURL = new URL(url, window.location.href);
         if (resolvedURL.protocol === SW_PROTOCOL + ":") {
             console.log('[fetch-grafted] 设置 _graftBody = true');
@@ -45,9 +51,9 @@ if ((originalFetch as any).__bodyGrafted !== true) {
         originalOpen.apply(this, arguments);
     };
 
-    XMLHttpRequest.prototype.send = function(data) {
+    XMLHttpRequest.prototype.send = function (data) {
         if (this._graftBody === true) {
-            console.log('[fetch-grafted] wrap 过的 XHR 请求准备发送前设置 header:' + GRAFTED_REQUEST_HEADER + ','+ data)
+            console.log('[fetch-grafted] wrap 过的 XHR 请求准备发送前设置 header:' + GRAFTED_REQUEST_HEADER + ',' + data)
             this.setRequestHeader(GRAFTED_REQUEST_HEADER, data);
         }
         console.log('[fetch-grafted] 使用 wrap 过的 XHR 请求 send():' + data);

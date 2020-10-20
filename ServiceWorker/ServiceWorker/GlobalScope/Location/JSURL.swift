@@ -21,6 +21,7 @@ import JavaScriptCore
     public required init?(url: JSValue, relativeTo: JSValue) {
         do {
             var parsedRelative: URL?
+            print("[swift:JSURL] init JSURL with url: \(url)")
 
             if relativeTo.isUndefined == false {
                 guard let relative = URL(string: relativeTo.toString()), relative.host != nil, relative.scheme != nil else {
@@ -39,6 +40,7 @@ import JavaScriptCore
         } catch {
             let err = JSValue(newErrorFromMessage: "\(error)", in: url.context)
             url.context.exception = err
+            print("[swift:JSURL] init JSURL error: \(err)")
             return nil
         }
     }
