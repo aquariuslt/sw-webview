@@ -24,7 +24,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should put() requests and responses", function() {
+    it("should put() requests and responses", function() {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -59,7 +59,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should use ignoreSearch match option", () => {
+    it("should use ignoreSearch match option", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -98,7 +98,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should use ignoreMethod match option", () => {
+    it("should use ignoreMethod match option", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -139,7 +139,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should use ignoreVary match option", () => {
+    it("should use ignoreVary match option", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -190,7 +190,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should match() on caches object and respect cacheName option", () => {
+    it("should match() on caches object and respect cacheName option", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -226,7 +226,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should successfully matchAll()", () => {
+    it("should successfully matchAll()", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -264,7 +264,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should successfully add()", () => {
+    it("should successfully add()", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -292,7 +292,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should successfully addAll()", () => {
+    it("should successfully addAll()", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -330,7 +330,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should successfully return keys()", () => {
+    it("should successfully return keys()", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -371,7 +371,7 @@ describe("Cache", () => {
             });
     });
 
-    it.skip("should successfully delete()", () => {
+    it("should successfully delete()", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {

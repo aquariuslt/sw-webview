@@ -6,10 +6,10 @@ import {execInWorker} from "../util/exec-in-worker";
 
 describe("Service Worker", () => {
     afterEach(() => {
-        return unregisterEverything();
+        //return unregisterEverything();
     });
 
-    it.skip("Should post a message", done => {
+    it("Should post a message", done => {
         let channel = new MessageChannel();
 
         let numberOfMessages = 0;
@@ -40,7 +40,7 @@ describe("Service Worker", () => {
             });
     });
 
-    it.skip("Should import a script successfully", () => {
+    it("Should import a script successfully", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -61,7 +61,7 @@ describe("Service Worker", () => {
             });
     });
 
-    it.skip("Should import multiple scripts successfully", () => {
+    it("Should import multiple scripts successfully", () => {
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
             .then(reg => {
@@ -86,7 +86,9 @@ describe("Service Worker", () => {
         navigator.serviceWorker.register("/fixtures/test-response-worker.js")
             .then((reg)=>{
                 new Promise((resolve => {
-                    navigator.serviceWorker.oncontrollerchange = resolve;
+                    navigator.serviceWorker.oncontrollerchange = ()=>{
+                        resolve(reg)
+                    };
                 }))
 
                 // return Promise.resolve(reg);

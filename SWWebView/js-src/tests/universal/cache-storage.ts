@@ -28,7 +28,7 @@ describe("CacheStorage", () => {
             });
     });
 
-    it.skip("should open a cache and record it in list of keys", () => {
+    it("should open a cache and record it in list of keys", () => {
         console.log("============= Start Cache Storage 1 ===============")
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
@@ -53,7 +53,7 @@ describe("CacheStorage", () => {
             });
     });
 
-    it.skip("should return correct values for has()", () => {
+    it("should return correct values for has()", () => {
         console.log("============= Start Cache Storage 2 ===============")
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
@@ -83,7 +83,7 @@ describe("CacheStorage", () => {
             });
     });
 
-    it.skip("should delete() successfully", () => {
+    it("should delete() successfully", () => {
         console.log("============= Start Cache Storage 2 ===============")
         return navigator.serviceWorker
             .register("/fixtures/exec-worker.js")
