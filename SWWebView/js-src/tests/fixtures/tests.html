@@ -1,0 +1,32 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../mocha.css" type="text/css" rel="stylesheet" />
+    <meta name="referrer" content="origin">
+</head>
+
+<body>
+    <h2>SWWebView Test HTML</h2>
+    <button style="position: fixed; bottom: 0;left:0;" onclick="window.location.reload()">Reload</button>
+    <img src="//preview.ibb.co/fm6g30/Screen-Shot-2018-10-11-at-2-57-41-PM-2.png" alt="Try protocol-relative cross domain URL" height="42" width="42">
+
+    <div id="mocha"></div>
+    <script src="../mocha.js"></script>
+    <script>
+        mocha.setup({
+            ui: "bdd",
+            slow: 4000
+        });
+    </script>
+
+<!--    <script src="lib.js"></script>-->
+    <script src="../tests.js"></script>
+    <script>
+        mocha.run();
+    </script>
+    <script src="http://localhost:35729/livereload.js"></script>
+
+</body>
+
+</html>
